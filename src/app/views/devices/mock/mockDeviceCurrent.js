@@ -1,0 +1,222 @@
+export const mockDeviceCurrent = [
+  {
+    "userId": "user1",
+    "deviceName": "\u0110i\u1ec7n tho\u1ea1i",
+    "platform": "Android",
+    "osVersion": "12.5.8",
+    "model": "Pixel 6",
+    "manufacturer": "Apple",
+    "appVersion": "3.4.9",
+    "pushNotificationToken": "e5296e7babf04c2d8daf8daf4005e30f",
+    "status": "Pending"
+  },
+  {
+    "userId": "user2",
+    "deviceName": "\u0110i\u1ec7n tho\u1ea1i",
+    "platform": "iOS",
+    "osVersion": "17.2.3",
+    "model": "Samsung S22",
+    "manufacturer": "Samsung",
+    "appVersion": "1.1.1",
+    "pushNotificationToken": "1185a1d4a1f44561bd19b7e7d73ae34b",
+    "status": "Approved"
+  },
+  {
+    "userId": "user3",
+    "deviceName": "\u0110i\u1ec7n tho\u1ea1i",
+    "platform": "Android",
+    "osVersion": "16.4.9",
+    "model": "Xiaomi 12",
+    "manufacturer": "Xiaomi",
+    "appVersion": "3.3.9",
+    "pushNotificationToken": "f67c3681cc9e47edb2a8cdc426bdf7c0",
+    "status": "Approved"
+  },
+  {
+    "userId": "user4",
+    "deviceName": "\u0110i\u1ec7n tho\u1ea1i",
+    "platform": "Android",
+    "osVersion": "14.5.8",
+    "model": "Samsung S22",
+    "manufacturer": "Apple",
+    "appVersion": "1.0.7",
+    "pushNotificationToken": "efaf6619c46345d697daa3f917ee1d80",
+    "status": "Approved"
+  },
+  {
+    "userId": "user5",
+    "deviceName": "\u0110i\u1ec7n tho\u1ea1i",
+    "platform": "Android",
+    "osVersion": "10.4.8",
+    "model": "Pixel 6",
+    "manufacturer": "Samsung",
+    "appVersion": "2.5.4",
+    "pushNotificationToken": "c5fb7d978d634e1b95a335a88e442a9d",
+    "status": "Approved"
+  },
+  {
+    "userId": "user6",
+    "deviceName": "\u0110i\u1ec7n tho\u1ea1i",
+    "platform": "iOS",
+    "osVersion": "15.2.4",
+    "model": "iPhone 14",
+    "manufacturer": "Apple",
+    "appVersion": "3.5.0",
+    "pushNotificationToken": "9f23c71f6d164b9bbae74834f985cf5e",
+    "status": "Approved"
+  },
+  {
+    "userId": "user7",
+    "deviceName": "\u0110i\u1ec7n tho\u1ea1i",
+    "platform": "Android",
+    "osVersion": "9.5.6",
+    "model": "Xiaomi 12",
+    "manufacturer": "Apple",
+    "appVersion": "2.5.1",
+    "pushNotificationToken": "3b624b55188348cb952f5da210a70eed",
+    "status": "Approved"
+  },
+  {
+    "userId": "user8",
+    "deviceName": "\u0110i\u1ec7n tho\u1ea1i",
+    "platform": "iOS",
+    "osVersion": "11.3.9",
+    "model": "Samsung S22",
+    "manufacturer": "Xiaomi",
+    "appVersion": "2.0.5",
+    "pushNotificationToken": "dcd97f7a08d04c4e991e6b5681a5556d",
+    "status": "Approved"
+  },
+  {
+    "userId": "user9",
+    "deviceName": "\u0110i\u1ec7n tho\u1ea1i",
+    "platform": "iOS",
+    "osVersion": "16.2.7",
+    "model": "iPhone 14",
+    "manufacturer": "Xiaomi",
+    "appVersion": "1.2.3",
+    "pushNotificationToken": "206ddbc72a9544bca72cb5b7ff6471da",
+    "status": "Pending"
+  },
+  {
+    "userId": "user10",
+    "deviceName": "\u0110i\u1ec7n tho\u1ea1i",
+    "platform": "Android",
+    "osVersion": "16.1.6",
+    "model": "Pixel 6",
+    "manufacturer": "Xiaomi",
+    "appVersion": "3.0.6",
+    "pushNotificationToken": "2632a0d58b3d43e09339bdc7f2a5b319",
+    "status": "Pending"
+  },
+  {
+    "userId": "user11",
+    "deviceName": "\u0110i\u1ec7n tho\u1ea1i",
+    "platform": "iOS",
+    "osVersion": "10.2.7",
+    "model": "Xiaomi 12",
+    "manufacturer": "Samsung",
+    "appVersion": "3.0.0",
+    "pushNotificationToken": "6b9baac1a8074f77aba2f3c8a020cc3e",
+    "status": "Approved"
+  },
+  {
+    "userId": "user12",
+    "deviceName": "\u0110i\u1ec7n tho\u1ea1i",
+    "platform": "Android",
+    "osVersion": "14.3.2",
+    "model": "Pixel 6",
+    "manufacturer": "Apple",
+    "appVersion": "3.5.5",
+    "pushNotificationToken": "a704a39c78d54142a967b4ed020558d4",
+    "status": "Pending"
+  },
+  {
+    "userId": "user13",
+    "deviceName": "\u0110i\u1ec7n tho\u1ea1i",
+    "platform": "Android",
+    "osVersion": "12.5.9",
+    "model": "Pixel 6",
+    "manufacturer": "Google",
+    "appVersion": "3.2.4",
+    "pushNotificationToken": "8c4eab68d5934e598b13cf8d0a8de70a",
+    "status": "Rejected"
+  },
+  {
+    "userId": "user14",
+    "deviceName": "\u0110i\u1ec7n tho\u1ea1i",
+    "platform": "Android",
+    "osVersion": "12.4.8",
+    "model": "Xiaomi 12",
+    "manufacturer": "Xiaomi",
+    "appVersion": "1.2.3",
+    "pushNotificationToken": "5a753af5e7b04437ba908cec13f2ed30",
+    "status": "Rejected"
+  },
+  {
+    "userId": "user15",
+    "deviceName": "\u0110i\u1ec7n tho\u1ea1i",
+    "platform": "Android",
+    "osVersion": "10.4.8",
+    "model": "iPhone 14",
+    "manufacturer": "Apple",
+    "appVersion": "3.1.0",
+    "pushNotificationToken": "82dcc38f697d41d8833b3b1e3a6a8321",
+    "status": "Rejected"
+  },
+  {
+    "userId": "user16",
+    "deviceName": "\u0110i\u1ec7n tho\u1ea1i",
+    "platform": "iOS",
+    "osVersion": "12.2.3",
+    "model": "Pixel 6",
+    "manufacturer": "Samsung",
+    "appVersion": "3.0.3",
+    "pushNotificationToken": "271b97abbedd406999edb0f30420eb88",
+    "status": "Pending"
+  },
+  {
+    "userId": "user17",
+    "deviceName": "\u0110i\u1ec7n tho\u1ea1i",
+    "platform": "Android",
+    "osVersion": "16.3.0",
+    "model": "Pixel 6",
+    "manufacturer": "Apple",
+    "appVersion": "1.3.0",
+    "pushNotificationToken": "89c1b4c0bb34428ea6aa2c432b5590e8",
+    "status": "Approved"
+  },
+  {
+    "userId": "user18",
+    "deviceName": "\u0110i\u1ec7n tho\u1ea1i",
+    "platform": "Android",
+    "osVersion": "16.5.1",
+    "model": "iPhone 14",
+    "manufacturer": "Xiaomi",
+    "appVersion": "2.0.4",
+    "pushNotificationToken": "976793ac5e3748eb8de4b53743ef7756",
+    "status": "Rejected"
+  },
+  {
+    "userId": "user19",
+    "deviceName": "\u0110i\u1ec7n tho\u1ea1i",
+    "platform": "Android",
+    "osVersion": "11.4.7",
+    "model": "Samsung S22",
+    "manufacturer": "Apple",
+    "appVersion": "1.4.1",
+    "pushNotificationToken": "fa4651aa2d4d48d2b3318521f284db69",
+    "status": "Rejected"
+  },
+  {
+    "userId": "user20",
+    "deviceName": "\u0110i\u1ec7n tho\u1ea1i",
+    "platform": "iOS",
+    "osVersion": "17.1.7",
+    "model": "Xiaomi 12",
+    "manufacturer": "Xiaomi",
+    "appVersion": "3.4.6",
+    "pushNotificationToken": "091beb919cdc439dbc45214349ed4142",
+    "status": "Pending"
+  }
+];
