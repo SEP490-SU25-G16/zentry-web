@@ -30,7 +30,6 @@ const ExtAndIntCommon = {
   textDecoration: "none",
   justifyContent: "space-between",
   transition: "all 150ms ease-in",
-  "&:hover": { background: "rgba(255, 255, 255, 0.08)" },
   "&.compactNavItem": {
     overflow: "hidden",
     justifyContent: "center !important"
@@ -54,7 +53,8 @@ const InternalLink = styled(Box)(({ theme }) => ({
     color: theme.palette.text.primary
   },
   "& .navItemActive": {
-    backgroundColor: "rgba(255, 255, 255, 0.16)"
+    backgroundColor: "#635bff",
+    color: theme.palette.common.white
   }
 }));
 
@@ -105,7 +105,8 @@ export default function MatxVerticalNav({ items }) {
             href={item.path}
             className={`${mode === "compact" && "compactNavItem"}`}
             rel="noopener noreferrer"
-            target="_blank">
+            target="_blank"
+          >
             <ButtonBase key={item.name} name="child" sx={{ width: "100%" }}>
               {(() => {
                 if (item.icon) {
@@ -131,7 +132,9 @@ export default function MatxVerticalNav({ items }) {
                 isActive
                   ? `navItemActive ${mode === "compact" && "compactNavItem"}`
                   : `${mode === "compact" && "compactNavItem"}`
-              }>
+              }
+              style={{ borderRadius: "8px" }}
+            >
               <ButtonBase key={item.name} name="child" sx={{ width: "100%" }}>
                 {item?.icon ? (
                   <Icon className="icon" sx={{ width: 36 }}>
@@ -149,7 +152,8 @@ export default function MatxVerticalNav({ items }) {
                         ml: "20px",
                         fontSize: "11px",
                         display: mode !== "compact" && "none"
-                      }}>
+                      }}
+                    >
                       {item.iconText}
                     </Box>
                   </Fragment>

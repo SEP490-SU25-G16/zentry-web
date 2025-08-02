@@ -4,8 +4,25 @@ const navigations = [
   { label: "MANAGEMENT", type: "label" },
   {
     name: "Schedule Management",
-    path: "/schedules",
-    icon: "event"
+    // path: "/schedules",
+    icon: "event",
+    children: [
+      {
+        name: "Rooms",
+        path: "/schedules/rooms",
+        iconText: "SI"
+      },
+      {
+        name: "Courses",
+        path: "/schedules/courses",
+        iconText: "SU"
+      },
+      {
+        name: "Classes",
+        path: "/schedules/classes",
+        iconText: "SC"
+      }
+    ]
   },
   {
     name: "User Management",
@@ -13,9 +30,24 @@ const navigations = [
     icon: "people"
   },
   {
-    name: "Device & FaceID Management",
+    name: "Device",
     path: "/devices",
-    icon: "devices"
+    icon: "devices",
+    children: [
+      { name: "Current Devices", iconText: "CD", path: "/devices/current" },
+      { name: "Requests Devices", iconText: "RD", path: "/devices/requests" }
+    ]
+  },
+  {
+    name: "FaceID",
+    path: "/faceid",
+    icon: "face"
+  },
+
+  {
+    name: "Configuration",
+    path: "/configuration",
+    icon: "settings"
   },
 
   { label: "PAGES", type: "label" },

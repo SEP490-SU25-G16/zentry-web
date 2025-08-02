@@ -27,7 +27,7 @@ export default function LineChart({ height, color = [] }) {
       axisTick: { show: false },
       axisLabel: {
         fontSize: 14,
-        fontFamily: "roboto",
+        fontFamily: "Inter",
         color: theme.palette.text.secondary
       }
     },
@@ -38,7 +38,7 @@ export default function LineChart({ height, color = [] }) {
       splitLine: {
         lineStyle: { color: theme.palette.text.secondary, opacity: 0.15 }
       },
-      axisLabel: { color: theme.palette.text.secondary, fontSize: 13, fontFamily: "roboto" }
+      axisLabel: { color: theme.palette.text.secondary, fontSize: 13, fontFamily: "Inter" }
     },
     series: [
       {

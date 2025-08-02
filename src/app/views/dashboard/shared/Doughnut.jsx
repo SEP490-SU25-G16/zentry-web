@@ -10,7 +10,7 @@ export default function DoughnutChart({ height, color = [] }) {
       show: true,
       itemGap: 20,
       icon: "circle",
-      textStyle: { color: theme.palette.text.secondary, fontSize: 13, fontFamily: "roboto" }
+      textStyle: { color: theme.palette.text.secondary, fontSize: 13, fontFamily: "Inter" }
     },
     tooltip: { show: false, trigger: "item", formatter: "{a} <br/>{b}: {c} ({d}%)" },
     xAxis: [{ axisLine: { show: false }, splitLine: { show: false } }],
@@ -31,7 +31,7 @@ export default function DoughnutChart({ height, color = [] }) {
           fontSize: 13,
           formatter: "{a}",
           position: "center",
-          fontFamily: "roboto",
+          fontFamily: "Inter",
           color: theme.palette.text.secondary
         },
         emphasis: {
@@ -50,9 +50,8 @@ export default function DoughnutChart({ height, color = [] }) {
           }
         },
         data: [
-          { value: 65, name: "Google" },
-          { value: 20, name: "Facebook" },
-          { value: 15, name: "Others" }
+          { value: 65, name: "Absent" }, // red
+          { value: 20, name: "Present" } // green
         ]
       }
     ]

@@ -18,10 +18,10 @@ const SidebarNavRoot = styled("div", {
   left: 0,
   height: "100vh",
   width: width,
-  boxShadow: themeShadows[8],
   backgroundRepeat: "no-repeat",
   backgroundPosition: "top",
   backgroundSize: "cover",
+  borderRight: `1px solid ${theme.palette.divider}`,
   zIndex: 11111111,
   overflow: "hidden",
   color: theme.palette.text.primary,
@@ -68,17 +68,9 @@ const Layout1Sidenav = () => {
   };
 
   return (
-    <SidebarNavRoot image={bgImgURL} width={getSidenavWidth()}>
+    <SidebarNavRoot width={getSidenavWidth()}>
       <NavListBox>
-        <Brand>
-          <Switch
-            size="small"
-            color="secondary"
-            onChange={handleSidenavToggle}
-            checked={leftSidebar.mode !== "full"}
-            sx={{ [theme.breakpoints.down("md")]: { display: "none" } }}
-          />
-        </Brand>
+        <Brand />
         <Sidenav />
       </NavListBox>
     </SidebarNavRoot>

@@ -125,7 +125,7 @@ const Layout1 = () => {
               </MatxSuspense>
             </Box>
 
-            {settings.footer.show && !settings.footer.fixed && <Footer />}
+            {/* {settings.footer.show && !settings.footer.fixed && <Footer />} */}
           </StyledScrollBar>
         )}
 
@@ -143,14 +143,14 @@ const Layout1 = () => {
               </MatxSuspense>
             </Box>
 
-            {settings.footer.show && !settings.footer.fixed && <Footer />}
+            {/* {settings.footer.show && !settings.footer.fixed && <Footer />} */}
           </ContentBox>
         )}
 
-        {settings.footer.show && settings.footer.fixed && <Footer />}
+        {/* {settings.footer.show && settings.footer.fixed && <Footer />} */}
       </LayoutContainer>
 
-      {settings.secondarySidebar.show && <SecondarySidebar />}
+      {/* {settings.secondarySidebar.show && <SecondarySidebar />} */}
     </Layout1Root>
   );
 };

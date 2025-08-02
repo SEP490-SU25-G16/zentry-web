@@ -26,13 +26,13 @@ export default function ComparisonChart({ height, color = [] }) {
       axisLine: { show: false },
       splitLine: { show: false },
       axisTick: { show: false },
-      axisLabel: { fontSize: 13, fontFamily: "roboto", color: theme.palette.text.secondary }
+      axisLabel: { fontSize: 13, fontFamily: "Inter", color: theme.palette.text.secondary }
     },
     yAxis: {
       axisLine: { show: false },
       axisTick: { show: false },
       splitLine: { lineStyle: { color: theme.palette.text.secondary, opacity: 0.15 } },
-      axisLabel: { fontSize: 13, fontFamily: "roboto", color: theme.palette.text.secondary }
+      axisLabel: { fontSize: 13, fontFamily: "Inter", color: theme.palette.text.secondary }
     },
     // Declare several bar series, each will be mapped
     // to a column of dataset.source by default.

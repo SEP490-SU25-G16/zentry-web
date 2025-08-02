@@ -47,7 +47,21 @@ export const components = {
         height: "100%",
         width: "100%"
       },
-      body: { height: "100%" },
+      body: {
+        height: "100%",
+        fontFamily: [
+          "Inter",
+          "-apple-system",
+          "BlinkMacSystemFont",
+          '"Segoe UI"',
+          '"Helvetica Neue"',
+          "Arial",
+          "sans-serif",
+          '"Apple Color Emoji"',
+          '"Segoe UI Emoji"',
+          '"Segoe UI Symbol"'
+        ].join(",")
+      },
       a: { textDecoration: "none", color: "inherit" },
       "#root": { height: "100%" },
       "#nprogress .bar": { zIndex: "2000 !important" }

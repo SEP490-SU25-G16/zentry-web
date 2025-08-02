@@ -9,18 +9,24 @@ import { AuthProvider } from "./contexts/FirebaseAuthContext";
 import routes from "./routes";
 // FAKE SERVER
 import "../__api__";
+import AppLoadingProvider from "./contexts/AppLoadingContext";
+import { SnackbarProvider } from "notistack";
 
 export default function App() {
   const content = useRoutes(routes);
 
   return (
-    <SettingsProvider>
-      <AuthProvider>
-        <MatxTheme>
-          <CssBaseline />
-          {content}
-        </MatxTheme>
-      </AuthProvider>
-    </SettingsProvider>
+    <SnackbarProvider maxSnack={3} anchorOrigin={{ vertical: "top", horizontal: "right" }}>
+      <AppLoadingProvider>
+        <SettingsProvider>
+          <AuthProvider>
+            <MatxTheme>
+              <CssBaseline />
+              {content}
+            </MatxTheme>
+          </AuthProvider>
+        </SettingsProvider>
+      </AppLoadingProvider>
+    </SnackbarProvider>
   );
 }

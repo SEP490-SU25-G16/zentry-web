@@ -7,7 +7,7 @@ import useSettings from "app/hooks/useSettings";
 // STYLED COMPONENT
 const MenuButton = styled("div")(({ theme }) => ({
   display: "inline-block",
-  color: theme.palette.text.primary,
+  color: "black",
   "& div:hover": { backgroundColor: theme.palette.action.hover }
 }));
 
@@ -32,7 +32,12 @@ export default function MatxMenu(props) {
           onClose={handleClose}
           getContentAnchorEl={null}
           anchorOrigin={{ vertical: "bottom", horizontal: horizontalPosition }}
-          transformOrigin={{ vertical: "top", horizontal: horizontalPosition }}>
+          transformOrigin={{ vertical: "top", horizontal: horizontalPosition }}
+          style={{
+            borderRadius: "20px"
+            // display: "none"
+          }}
+        >
           {children.map((child, index) => (
             <div onClick={shouldCloseOnItemClick ? handleClose : () => {}} key={index}>
               {child}

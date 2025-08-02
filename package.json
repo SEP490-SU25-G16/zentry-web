@@ -18,6 +18,7 @@
     "@mui/lab": "^6.0.0-beta.12",
     "@mui/material": "^6.1.4",
     "@mui/x-date-pickers": "^7.21.0",
+    "@tailwindcss/vite": "^4.1.11",
     "autosuggest-highlight": "^3.3.4",
     "axios": "^1.7.7",
     "clsx": "^2.1.1",
@@ -30,10 +31,12 @@
     "lodash": "^4.17.21",
     "nanoid": "^5.0.7",
     "notistack": "^3.0.1",
+    "perfect-scrollbar": "^1.5.6",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-perfect-scrollbar": "^1.5.8",
     "react-router-dom": "^6.27.0",
+    "tailwindcss": "^4.1.11",
     "yup": "^1.4.0"
   },
   "devDependencies": {

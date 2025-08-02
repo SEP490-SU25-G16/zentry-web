@@ -40,10 +40,9 @@ const Heading = styled("h6")(({ theme }) => ({
 
 export default function StatCards() {
   const cardList = [
-    { name: "New Leads", amount: 3050, Icon: Group },
-    { name: "This week Sales", amount: "$80,500", Icon: AttachMoney },
-    { name: "Inventory Status", amount: "8.5% Stock Surplus", Icon: Store },
-    { name: "Orders to deliver", amount: "305 Orders", Icon: ShoppingCart }
+    { name: "Rooms", amount: 3050, Icon: Group },
+    { name: "Courses", amount: "500", Icon: AttachMoney },
+    { name: "Classes", amount: "20", Icon: Store }
   ];
 
   return (

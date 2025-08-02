@@ -7,8 +7,8 @@ import FaceIdRequestsTable from "./components/FaceIdRequestsTable";
 
 import { mockDeviceCurrent } from "./mock/mockDeviceCurrent";
 import { mockDeviceRequests } from "./mock/mockDeviceRequests";
-import { mockFaceIdCurrent } from "./mock/mockFaceIdCurrent";
-import { mockFaceIdRequests } from "./mock/mockFaceIdRequests";
+import { mockFaceIdCurrent } from "../faceid/mock/mockFaceIdCurrent";
+import { mockFaceIdRequests } from "../faceid/mock/mockFaceIdRequests";
 
 const DeviceFaceIdManagement = () => {
   const [mainTab, setMainTab] = useState(0); // Devices or FaceIDs

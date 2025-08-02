@@ -124,7 +124,8 @@ export default function MatxVerticalNavExpansionPanel({ item, children, mode }) 
           compactNavItem: mode === "compact",
           open: !collapsed
         })}
-        onClick={handleClick}>
+        onClick={handleClick}
+      >
         <Box display="flex" alignItems="center">
           {icon && <Icon className="icon">{icon}</Icon>}
           {iconText && <BulletIcon />}
@@ -138,7 +139,8 @@ export default function MatxVerticalNavExpansionPanel({ item, children, mode }) 
             sidenavHoverShow: true,
             collapseIcon: collapsed,
             expandIcon: !collapsed
-          })}>
+          })}
+        >
           <ChevronRight fontSize="small" sx={{ verticalAlign: "middle" }} />
         </div>
       </BaseButton>
@@ -146,7 +148,8 @@ export default function MatxVerticalNavExpansionPanel({ item, children, mode }) 
       <div
         ref={elementRef}
         className="expansion-panel submenu"
-        style={collapsed ? { maxHeight: "0px" } : { maxHeight: componentHeight.current + "px" }}>
+        style={collapsed ? { maxHeight: "0px" } : { maxHeight: componentHeight.current + "px" }}
+      >
         {children}
       </div>
     </NavExpandRoot>

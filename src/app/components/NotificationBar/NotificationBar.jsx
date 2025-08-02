@@ -83,7 +83,7 @@ export default function NotificationBar({ container }) {
     <Fragment>
       <IconButton onClick={handleDrawerToggle}>
         <Badge color="secondary" badgeContent={notifications?.length}>
-          <Notifications sx={{ color: "text.primary" }} />
+          <Notifications sx={{ color: "black" }} />
         </Badge>
       </IconButton>
 
@@ -95,7 +95,8 @@ export default function NotificationBar({ container }) {
           anchor={"right"}
           open={panelOpen}
           onClose={handleDrawerToggle}
-          ModalProps={{ keepMounted: true }}>
+          ModalProps={{ keepMounted: true }}
+        >
           <Box sx={{ width: sideNavWidth }}>
             <Notification>
               <Notifications color="primary" />
@@ -107,14 +108,16 @@ export default function NotificationBar({ container }) {
                 <DeleteButton
                   size="small"
                   className="deleteButton"
-                  onClick={() => deleteNotification(notification.id)}>
+                  onClick={() => deleteNotification(notification.id)}
+                >
                   <Clear className="icon" />
                 </DeleteButton>
 
                 <Link
                   to={`/${notification.path}`}
                   onClick={handleDrawerToggle}
-                  style={{ textDecoration: "none" }}>
+                  style={{ textDecoration: "none" }}
+                >
                   <Card sx={{ mx: 2, mb: 3 }} elevation={3}>
                     <CardLeftContent>
                       <Box display="flex">

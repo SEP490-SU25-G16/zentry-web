@@ -29,14 +29,14 @@ import { topBarHeight } from "app/utils/constant";
 
 // STYLED COMPONENTS
 const StyledIconButton = styled(IconButton)(({ theme }) => ({
-  color: theme.palette.text.primary
+  color: "black"
 }));
 
 const TopbarRoot = styled("div")({
   top: 0,
   zIndex: 96,
   height: topBarHeight,
-  boxShadow: themeShadows[8],
+  borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
   transition: "all 0.3s ease"
 });
 
@@ -48,7 +48,7 @@ const TopbarContainer = styled("div")(({ theme }) => ({
   display: "flex",
   alignItems: "center",
   justifyContent: "space-between",
-  background: theme.palette.primary.main,
+  background: "#fff",
   [theme.breakpoints.down("sm")]: { paddingLeft: 16, paddingRight: 16 },
   [theme.breakpoints.down("xs")]: { paddingLeft: 14, paddingRight: 16 }
 }));
@@ -108,20 +108,6 @@ const Layout1Topbar = () => {
           <StyledIconButton onClick={handleSidebarToggle}>
             <Menu />
           </StyledIconButton>
-
-          <IconBox>
-            <StyledIconButton>
-              <MailOutline />
-            </StyledIconButton>
-
-            <StyledIconButton>
-              <WebAsset />
-            </StyledIconButton>
-
-            <StyledIconButton>
-              <StarOutline />
-            </StyledIconButton>
-          </IconBox>
         </Box>
 
         <Box display="flex" alignItems="center">
@@ -131,18 +117,30 @@ const Layout1Topbar = () => {
             <NotificationBar />
           </NotificationProvider>
 
-          <ShoppingCart />
+          {/* <ShoppingCart /> */}
 
           <MatxMenu
             menuButton={
-              <UserMenu>
+              <UserMenu
+                style={{
+                  marginLeft: "16px"
+                }}
+              >
                 <Span>
                   Hi <strong>{user.name}</strong>
                 </Span>
 
-                <Avatar src={user.avatar} sx={{ cursor: "pointer" }} />
+                <Avatar
+                  src={user.avatar}
+                  sx={{ cursor: "pointer" }}
+                  style={{
+                    width: 32,
+                    height: 32
+                  }}
+                />
               </UserMenu>
-            }>
+            }
+          >
             <StyledItem>
               <Link to="/">
                 <Home />

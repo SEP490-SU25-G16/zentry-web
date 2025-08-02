@@ -3,31 +3,25 @@ import { Box, Paper, Tab, Tabs, Typography } from "@mui/material";
 
 import RoomTable from "./components/RoomTable";
 import CourseTable from "./components/CourseTable";
-import ClassTable from "./components/ClassTable";
 
 import RoomAddButton from "./components/RoomAddButton";
 import CourseAddButton from "./components/CourseAddButton";
-import ClassAddButton from "./components/ClassAddButton";
 
 import RoomEditDialog from "./components/RoomEditDialog";
 import CourseEditDialog from "./components/CourseEditDialog";
-import ClassEditDialog from "./components/ClassEditDialog";
 import ConfirmDeleteDialog from "./components/ConfirmDeleteDialog";
 
 import { mockRooms } from "./mock/mockRooms";
 import { mockCourses } from "./mock/mockCourses";
-import { mockClasses } from "./mock/mockClasses";
 
 const ScheduleManagement = () => {
   const [tabIndex, setTabIndex] = useState(0);
 
   const [rooms, setRooms] = useState(mockRooms);
   const [courses, setCourses] = useState(mockCourses);
-  const [classes, setClasses] = useState(mockClasses);
 
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [selectedCourse, setSelectedCourse] = useState(null);
-  const [selectedClass, setSelectedClass] = useState(null);
 
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [deleteType, setDeleteType] = useState("");
@@ -67,36 +61,11 @@ const ScheduleManagement = () => {
     setSelectedCourse(null);
   };
 
-  // ---------- CLASS ----------
-  const handleAddClass = () =>
-    setSelectedClass({
-      id: "",
-      courseName: "",
-      lecturerName: "",
-      sectionCode: "",
-      semester: ""
-    });
-  const handleEditClass = (cls) => setSelectedClass(cls);
-  const handleDeleteClass = (cls) => {
-    setDeleteTarget(cls);
-    setDeleteType("class");
-  };
-  const handleClassSave = (updated) => {
-    if (selectedClass?.id) {
-      setClasses((prev) => prev.map((c) => (c.id === selectedClass.id ? updated : c)));
-    } else {
-      setClasses((prev) => [...prev, updated]);
-    }
-    setSelectedClass(null);
-  };
-
   const handleConfirmDelete = () => {
     if (deleteType === "room") {
       setRooms((prev) => prev.filter((r) => r.roomName !== deleteTarget.roomName));
     } else if (deleteType === "course") {
       setCourses((prev) => prev.filter((c) => c.code !== deleteTarget.code));
-    } else if (deleteType === "class") {
-      setClasses((prev) => prev.filter((c) => c.id !== deleteTarget.id));
     }
     setDeleteTarget(null);
     setDeleteType("");
@@ -117,7 +86,6 @@ const ScheduleManagement = () => {
         >
           <Tab label="Rooms" />
           <Tab label="Courses" />
-          <Tab label="Classes" />
         </Tabs>
         <Box mt={2} p={2}>
           {tabIndex === 0 && (
@@ -130,12 +98,6 @@ const ScheduleManagement = () => {
             <>
               <CourseAddButton onClick={handleAddCourse} />
               <CourseTable data={courses} onEdit={handleEditCourse} onDelete={handleDeleteCourse} />
-            </>
-          )}
-          {tabIndex === 2 && (
-            <>
-              <ClassAddButton onClick={handleAddClass} />
-              <ClassTable data={classes} onEdit={handleEditClass} onDelete={handleDeleteClass} />
             </>
           )}
         </Box>
@@ -153,12 +115,6 @@ const ScheduleManagement = () => {
         initialData={selectedCourse}
         onClose={() => setSelectedCourse(null)}
         onSave={handleCourseSave}
-      />
-      <ClassEditDialog
-        open={Boolean(selectedClass)}
-        initialData={selectedClass}
-        onClose={() => setSelectedClass(null)}
-        onSave={handleClassSave}
       />
       <ConfirmDeleteDialog
         open={Boolean(deleteTarget)}

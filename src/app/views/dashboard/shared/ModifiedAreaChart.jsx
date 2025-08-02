@@ -26,7 +26,7 @@ const defaultOption = {
     type: "value",
     axisLine: { show: false },
     axisTick: { show: false },
-    axisLabel: { color: "#ccc", margin: 20, fontSize: 13, fontFamily: "roboto" },
+    axisLabel: { color: "#ccc", margin: 20, fontSize: 13, fontFamily: "Inter" },
     splitLine: { show: true, lineStyle: { color: "rgba(255, 255, 255, .1)" } }
   },
   color: [
