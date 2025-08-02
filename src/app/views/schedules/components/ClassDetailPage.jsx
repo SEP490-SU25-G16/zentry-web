@@ -29,7 +29,14 @@ import {
   MenuItem,
   Select,
   FormControl,
-  InputLabel
+  InputLabel,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  TablePagination
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ClassIcon from "@mui/icons-material/Class";
@@ -49,7 +56,7 @@ import RoomServices from "services/rooms.service";
 const ClassDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { getClass, enrollStudent, bulkEnrollStudents } = useClasses();
+  const { getClass, enrollStudent, bulkEnrollStudents, createSchedule } = useClasses();
   const { users, loading: usersLoading } = useUsers();
 
   const [classDetail, setClassDetail] = useState(null);
@@ -63,6 +70,12 @@ const ClassDetailPage = () => {
   // Rooms state
   const [rooms, setRooms] = useState([]);
   const [roomsLoading, setRoomsLoading] = useState(false);
+
+  // Table pagination state
+  const [enrollmentPage, setEnrollmentPage] = useState(0);
+  const [enrollmentRowsPerPage, setEnrollmentRowsPerPage] = useState(5);
+  const [schedulePage, setSchedulePage] = useState(0);
+  const [scheduleRowsPerPage, setScheduleRowsPerPage] = useState(5);
 
   console.log("rooms", rooms);
 
@@ -87,6 +100,7 @@ const ClassDetailPage = () => {
 
       try {
         const result = await getClass(id);
+        console.log(result);
 
         if (result.success) {
           setClassDetail(result?.data);
@@ -207,19 +221,18 @@ const ClassDetailPage = () => {
 
       console.log("Adding schedule with data:", scheduleData);
 
-      // TODO: Implement addSchedule API call when service is available
-      // const result = await addSchedule(scheduleData);
+      // Use the createSchedule service
+      const result = await createSchedule(scheduleData);
 
-      // For now, just show success message
-      // if (result.success) {
-      handleCloseAddScheduleModal();
+      if (result.success) {
+        handleCloseAddScheduleModal();
 
-      // Refresh class details to update schedules
-      const classResult = await getClass(id);
-      if (classResult.success) {
-        setClassDetail(classResult.data);
+        // Refresh class details to update schedules
+        const classResult = await getClass(id);
+        if (classResult.success) {
+          setClassDetail(classResult.data);
+        }
       }
-      // }
     } catch (error) {
       console.error("Error adding schedule:", error);
     } finally {
@@ -285,14 +298,19 @@ const ClassDetailPage = () => {
 
   // Filter students based on search term and exclude already enrolled
   const availableStudents = users
-    // .filter((user) => user.Role === "Student") // Only show students
+    .filter((user) => user.Role === "Student") // Only show students
     .filter(
       (user) =>
         user.FullName?.toLowerCase().includes(studentSearchTerm.toLowerCase()) ||
         (user.Email?.toLowerCase().includes(studentSearchTerm.toLowerCase()) &&
           user.Status === "Active") // Only show active students
     )
-    // TODO: Filter out already enrolled students when enrollment API is available
+    .filter((user) => {
+      // Filter out already enrolled students
+      const enrolledStudentIds =
+        classDetail?.original?.Enrollments?.map((enrollment) => enrollment.StudentId) || [];
+      return !enrolledStudentIds.includes(user.UserId);
+    })
     .slice(0, 20); // Limit to first 20 results for performance
 
   // Week days for schedule form
@@ -474,7 +492,8 @@ const ClassDetailPage = () => {
                 </Typography>
               </Box>
               <Typography variant="h6" fontWeight={500}>
-                {classDetail.numberOfStudents} students
+                {classDetail.original?.Enrollments?.length || classDetail.numberOfStudents || 0}{" "}
+                students
               </Typography>
             </Grid>
 
@@ -535,7 +554,8 @@ const ClassDetailPage = () => {
                 Enrollments
               </Typography>
               <Typography variant="body2" color="text.disabled" gutterBottom>
-                {classDetail.numberOfStudents || 0} enrolled students
+                {classDetail.original?.Enrollments?.length || classDetail.numberOfStudents || 0}{" "}
+                enrolled students
               </Typography>
               <Typography variant="caption" color="primary.main" sx={{ fontWeight: 500 }}>
                 Click to enroll students
@@ -590,7 +610,89 @@ const ClassDetailPage = () => {
         </Grid>
       </Grid>
 
-      {/* Schedules Section */}
+      {/* Enrollments Table */}
+      {classDetail.original?.Enrollments && classDetail.original.Enrollments.length > 0 && (
+        <Card sx={{ mt: 4, boxShadow: 3 }}>
+          <CardContent sx={{ p: 4 }}>
+            <Box
+              sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 3 }}
+            >
+              <Box sx={{ display: "flex", alignItems: "center" }}>
+                <PersonIcon sx={{ fontSize: 32, color: "primary.main", mr: 2 }} />
+                <Typography variant="h5" component="h2" fontWeight={600}>
+                  Enrolled Students ({classDetail.original.Enrollments.length})
+                </Typography>
+              </Box>
+              <Button
+                variant="contained"
+                onClick={handleEnrollStudent}
+                startIcon={<PersonAddIcon />}
+                sx={{
+                  borderRadius: "8px",
+                  textTransform: "none",
+                  px: 3,
+                  py: 1
+                }}
+              >
+                Enroll More Students
+              </Button>
+            </Box>
+
+            <TableContainer>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell sx={{ padding: "1em", fontWeight: 600 }}>Student ID</TableCell>
+                    <TableCell sx={{ padding: "1em", fontWeight: 600 }}>Student Name</TableCell>
+                    <TableCell sx={{ padding: "1em", fontWeight: 600 }}>Enrollment Date</TableCell>
+                    <TableCell sx={{ padding: "1em", fontWeight: 600 }}>Status</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {classDetail.original.Enrollments.slice(
+                    enrollmentPage * enrollmentRowsPerPage,
+                    enrollmentPage * enrollmentRowsPerPage + enrollmentRowsPerPage
+                  ).map((enrollment) => (
+                    <TableRow key={enrollment.EnrollmentId}>
+                      <TableCell sx={{ padding: "1em" }}>{enrollment.StudentId}</TableCell>
+                      <TableCell sx={{ padding: "1em" }}>{enrollment.StudentName}</TableCell>
+                      <TableCell sx={{ padding: "1em" }}>
+                        {new Date(enrollment.EnrollmentDate).toLocaleDateString("en-US", {
+                          year: "numeric",
+                          month: "short",
+                          day: "numeric"
+                        })}
+                      </TableCell>
+                      <TableCell sx={{ padding: "1em" }}>
+                        <Chip
+                          label={enrollment.Status}
+                          color={enrollment.Status === "Active" ? "success" : "default"}
+                          size="small"
+                        />
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+
+            <TablePagination
+              component="div"
+              count={classDetail.original.Enrollments.length}
+              page={enrollmentPage}
+              onPageChange={(event, newPage) => setEnrollmentPage(newPage)}
+              rowsPerPage={enrollmentRowsPerPage}
+              onRowsPerPageChange={(event) => {
+                setEnrollmentRowsPerPage(parseInt(event.target.value, 10));
+                setEnrollmentPage(0);
+              }}
+              rowsPerPageOptions={[5, 10, 25]}
+            />
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Schedules Table */}
       {classDetail.original?.Schedules && classDetail.original.Schedules.length > 0 && (
         <Card sx={{ mt: 4, boxShadow: 3 }}>
           <CardContent sx={{ p: 4 }}>
@@ -600,7 +702,7 @@ const ClassDetailPage = () => {
               <Box sx={{ display: "flex", alignItems: "center" }}>
                 <CalendarTodayIcon sx={{ fontSize: 32, color: "secondary.main", mr: 2 }} />
                 <Typography variant="h5" component="h2" fontWeight={600}>
-                  Class Schedules
+                  Class Schedules ({classDetail.original.Schedules.length})
                 </Typography>
               </Box>
               <Button
@@ -618,83 +720,91 @@ const ClassDetailPage = () => {
               </Button>
             </Box>
 
-            <Grid container spacing={2}>
-              {classDetail.original.Schedules.map((schedule, index) => (
-                <Grid item xs={12} md={6} lg={4} key={schedule.Id}>
-                  <Card
-                    variant="outlined"
-                    sx={{
-                      height: "100%",
-                      background: "linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)",
-                      border: "1px solid",
-                      borderColor: "divider",
-                      cursor: "pointer",
-                      transition: "all 0.2s ease-in-out",
-                      "&:hover": {
-                        boxShadow: 4,
-                        transform: "translateY(-2px)"
-                      }
-                    }}
-                    onClick={() => navigate(`/schedules/class/${id}/session/${schedule.Id}`)}
-                  >
-                    <CardContent>
-                      <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+            <TableContainer>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell sx={{ padding: "1em", fontWeight: 600 }}>Week Day</TableCell>
+                    <TableCell sx={{ padding: "1em", fontWeight: 600 }}>Time</TableCell>
+                    <TableCell sx={{ padding: "1em", fontWeight: 600 }}>Room</TableCell>
+                    <TableCell sx={{ padding: "1em", fontWeight: 600 }}>Date Range</TableCell>
+                    <TableCell sx={{ padding: "1em", fontWeight: 600 }}>Actions</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {classDetail.original.Schedules.slice(
+                    schedulePage * scheduleRowsPerPage,
+                    schedulePage * scheduleRowsPerPage + scheduleRowsPerPage
+                  ).map((schedule, index) => (
+                    <TableRow key={schedule.Id}>
+                      <TableCell sx={{ padding: "1em" }}>
                         <Chip
-                          label={`Session ${index + 1}`}
+                          label={schedule.WeekDay}
                           color="secondary"
                           size="small"
-                          sx={{ mr: 2 }}
+                          sx={{ mr: 1 }}
                         />
-                        <Typography variant="subtitle1" fontWeight={600} color="primary.main">
-                          {schedule.WeekDay}
-                        </Typography>
-                      </Box>
-
-                      <Box sx={{ mb: 2 }}>
-                        <Typography variant="body2" color="text.secondary" gutterBottom>
-                          Time
-                        </Typography>
-                        <Typography variant="h6" fontWeight={500}>
+                      </TableCell>
+                      <TableCell sx={{ padding: "1em" }}>
+                        <Box sx={{ display: "flex", alignItems: "center" }}>
+                          <AccessTimeIcon sx={{ fontSize: 16, mr: 1, color: "text.secondary" }} />
                           {schedule.StartTime.slice(0, 5)} - {schedule.EndTime.slice(0, 5)}
-                        </Typography>
-                      </Box>
-
-                      <Box sx={{ mb: 2 }}>
-                        <Typography variant="body2" color="text.secondary" gutterBottom>
-                          Room
-                        </Typography>
-                        <Typography variant="body1" fontWeight={500}>
+                        </Box>
+                      </TableCell>
+                      <TableCell sx={{ padding: "1em" }}>
+                        <Box sx={{ display: "flex", alignItems: "center" }}>
+                          <RoomIcon sx={{ fontSize: 16, mr: 1, color: "text.secondary" }} />
                           {schedule.RoomName}
-                        </Typography>
-                      </Box>
+                        </Box>
+                      </TableCell>
+                      <TableCell sx={{ padding: "1em" }}>
+                        {new Date(schedule.StartDate).toLocaleDateString("en-US", {
+                          year: "numeric",
+                          month: "short",
+                          day: "numeric"
+                        })}
+                        {schedule.StartDate !== schedule.EndDate && (
+                          <>
+                            {" - "}
+                            {new Date(schedule.EndDate).toLocaleDateString("en-US", {
+                              year: "numeric",
+                              month: "short",
+                              day: "numeric"
+                            })}
+                          </>
+                        )}
+                      </TableCell>
+                      <TableCell sx={{ padding: "1em" }}>
+                        <Button
+                          variant="outlined"
+                          size="small"
+                          onClick={() => navigate(`/schedules/class/${id}/session/${schedule.Id}`)}
+                          sx={{
+                            borderRadius: "6px",
+                            textTransform: "none"
+                          }}
+                        >
+                          View Details
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
 
-                      <Box>
-                        <Typography variant="body2" color="text.secondary" gutterBottom>
-                          Date
-                        </Typography>
-                        <Typography variant="body2">
-                          {new Date(schedule.StartDate).toLocaleDateString("en-US", {
-                            year: "numeric",
-                            month: "short",
-                            day: "numeric"
-                          })}
-                          {schedule.StartDate !== schedule.EndDate && (
-                            <>
-                              {" - "}
-                              {new Date(schedule.EndDate).toLocaleDateString("en-US", {
-                                year: "numeric",
-                                month: "short",
-                                day: "numeric"
-                              })}
-                            </>
-                          )}
-                        </Typography>
-                      </Box>
-                    </CardContent>
-                  </Card>
-                </Grid>
-              ))}
-            </Grid>
+            <TablePagination
+              component="div"
+              count={classDetail.original.Schedules.length}
+              page={schedulePage}
+              onPageChange={(event, newPage) => setSchedulePage(newPage)}
+              rowsPerPage={scheduleRowsPerPage}
+              onRowsPerPageChange={(event) => {
+                setScheduleRowsPerPage(parseInt(event.target.value, 10));
+                setSchedulePage(0);
+              }}
+              rowsPerPageOptions={[5, 10, 25]}
+            />
           </CardContent>
         </Card>
       )}

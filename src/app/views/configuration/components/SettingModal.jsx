@@ -83,11 +83,18 @@ const SettingModal = ({
                 borderRadius: "8px"
               }}
             >
-              {selectedDefinition.options?.map((option) => (
-                <MenuItem key={option.value} value={option.value}>
-                  {option.displayLabel}
+              {!formData.value && (
+                <MenuItem value="" disabled>
+                  Select an option...
                 </MenuItem>
-              ))}
+              )}
+              {selectedDefinition.options
+                ?.sort((a, b) => a.SortOrder - b.SortOrder)
+                ?.map((option) => (
+                  <MenuItem key={option.Id} value={option.Value}>
+                    {option.DisplayLabel}
+                  </MenuItem>
+                ))}
             </Select>
           </FormControl>
         );
@@ -333,6 +340,16 @@ const SettingModal = ({
                       <strong>Unit:</strong> {selectedDefinition.unit}
                     </Typography>
                   )}
+                  {selectedDefinition.dataType === "Selection" &&
+                    selectedDefinition.options?.length > 0 && (
+                      <Typography variant="body2" color="text.secondary">
+                        <strong>Available Options:</strong>{" "}
+                        {selectedDefinition.options
+                          .sort((a, b) => a.SortOrder - b.SortOrder)
+                          .map((option) => option.DisplayLabel)
+                          .join(", ")}
+                      </Typography>
+                    )}
                 </Box>
               </Grid>
             )}

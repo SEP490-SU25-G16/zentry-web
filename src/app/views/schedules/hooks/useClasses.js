@@ -226,6 +226,28 @@ const useClasses = () => {
     }
   };
 
+  const createSchedule = async (scheduleData) => {
+    setSubmitting(true);
+    try {
+      const result = await ClassServices.createSchedule(scheduleData);
+
+      if (result.error) {
+        enqueueSnackbar(result.error, { variant: "error" });
+        return { success: false, error: result.error };
+      } else {
+        enqueueSnackbar("Schedule created successfully", { variant: "success" });
+        return { success: true, data: result.data };
+      }
+    } catch (error) {
+      console.error("Error creating schedule:", error);
+      const errorMessage = "Failed to create schedule";
+      enqueueSnackbar(errorMessage, { variant: "error" });
+      return { success: false, error: errorMessage };
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   const refreshClasses = () => {
     fetchClasses();
   };
@@ -241,6 +263,7 @@ const useClasses = () => {
     deleteClass,
     enrollStudent,
     bulkEnrollStudents,
+    createSchedule,
     refreshClasses,
     fetchClasses
   };

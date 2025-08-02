@@ -31,7 +31,6 @@ import {
 } from "@mui/icons-material";
 import { useSnackbar } from "notistack";
 import DeviceServices from "services/devices.service";
-import { mockDeviceRequests } from "../mock/mockDeviceRequests";
 
 const PAGE_SIZE = 5;
 
@@ -57,27 +56,36 @@ const RequestsDevicesPage = () => {
 
   const fetchDevices = async () => {
     setLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate network delay
     try {
-      // For now, using mock data directly
-      // const result = await DeviceServices.getDevices();
-
-      // Simulating API response with mock data - show pending and rejected requests
-      const requestsToShow = mockDeviceRequests.filter(
-        (device) => device.status === "Pending" || device.status === "Rejected"
-      );
-      const result = {
-        data: requestsToShow,
-        error: null
-      };
+      const result = await DeviceServices.getDevices();
 
       if (result.error) {
         enqueueSnackbar(result.error, { variant: "error" });
         setDevices([]);
         setTotalCount(0);
       } else {
-        setDevices(result.data || []);
-        setTotalCount(result.data?.length || 0);
+        // Transform the API data to match the expected format, filter for Pending devices only
+        const transformedDevices = (result.data || [])
+          .map((device) => ({
+            userId: device.UserFullName || device.UserId,
+            deviceName: device.DeviceName,
+            platform: device.Platform,
+            osVersion: device.OsVersion,
+            model: device.Model,
+            manufacturer: device.Manufacturer,
+            appVersion: device.AppVersion,
+            status: device.Status,
+            deviceId: device.DeviceId,
+            userEmail: device.UserEmail,
+            macAddress: device.MacAddress,
+            createdAt: device.CreatedAt,
+            updatedAt: device.UpdatedAt,
+            lastVerifiedAt: device.LastVerifiedAt
+          }))
+          .filter((device) => device.status === "Pending"); // Only show Pending devices
+
+        setDevices(transformedDevices);
+        setTotalCount(transformedDevices.length);
       }
     } catch (error) {
       console.error("Error in fetchDevices:", error);
@@ -173,10 +181,8 @@ const RequestsDevicesPage = () => {
 
     // Handle special cases for specific fields
     if (orderBy === "userId") {
-      // Extract numeric part for proper sorting
-      const numA = parseInt(valueA.replace(/\D/g, ""), 10);
-      const numB = parseInt(valueB.replace(/\D/g, ""), 10);
-      return numA - numB;
+      // For user names, use string comparison
+      return valueA.localeCompare(valueB);
     }
 
     if (valueA < valueB) {
@@ -254,10 +260,10 @@ const RequestsDevicesPage = () => {
       >
         <Box>
           <Typography variant="h4" component="h1" gutterBottom>
-            Device Requests Management
+            Pending Device Requests
           </Typography>
           <Typography variant="body1" color="text.secondary">
-            Review and manage pending and rejected device registration requests
+            Review and manage pending device registration requests
           </Typography>
         </Box>
       </Box>
@@ -284,7 +290,7 @@ const RequestsDevicesPage = () => {
                   >
                     <Box sx={{ display: "flex", alignItems: "center" }}>
                       <SmartphoneIcon sx={{ mr: 1, fontSize: 20 }} />
-                      User ID
+                      User Name
                     </Box>
                   </TableSortLabel>
                 </TableCell>
@@ -354,7 +360,7 @@ const RequestsDevicesPage = () => {
                 <TableRow>
                   <TableCell colSpan={9} align="center" sx={{ py: 3 }}>
                     <Typography variant="body1" color="text.secondary">
-                      No device requests found
+                      No pending device requests found
                     </Typography>
                   </TableCell>
                 </TableRow>
@@ -406,7 +412,6 @@ const RequestsDevicesPage = () => {
                           <IconButton
                             color="success"
                             onClick={() => handleApprove(device)}
-                            disabled={device.status !== "Pending"}
                             size="small"
                           >
                             <CheckIcon />
@@ -416,7 +421,6 @@ const RequestsDevicesPage = () => {
                           <IconButton
                             color="error"
                             onClick={() => handleReject(device)}
-                            disabled={device.status !== "Pending"}
                             size="small"
                           >
                             <CloseIcon />

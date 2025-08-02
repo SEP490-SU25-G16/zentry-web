@@ -65,7 +65,7 @@ const CurrentDevicesPage = () => {
           model: device.Model,
           manufacturer: device.Manufacturer,
           appVersion: device.AppVersion,
-          status: device.Status?.Id === 1 ? "Active" : "Inactive", // Map status ID to readable status
+          status: device.Status, // Map status ID to readable status
           deviceId: device.DeviceId,
           userEmail: device.UserEmail,
           macAddress: device.MacAddress,

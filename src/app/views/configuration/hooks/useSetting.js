@@ -60,10 +60,8 @@ export const useSetting = () => {
           attributeId: def.AttributeId,
           displayName: def.DisplayName,
           description: def.Description,
-          dataType: dataTypeMap[def.DataType.Id] || "String",
-          allowedScopeTypes: def.AllowedScopeTypes.map((scope) => scopeTypeMap[scope.Id]).filter(
-            Boolean
-          ),
+          dataType: def.DataType, // DataType is already a string in the new API response
+          allowedScopeTypes: def.AllowedScopeTypes || [], // Handle case where it's already an array of strings
           unit: def.Unit,
           defaultValue: def.DefaultValue,
           isDeletable: def.IsDeletable,
@@ -121,9 +119,20 @@ export const useSetting = () => {
     if (field === "attributeKey") {
       const selectedDefinition = attributeDefinitions.find((def) => def.key === value);
       if (selectedDefinition) {
+        let defaultValue = selectedDefinition.defaultValue;
+
+        // For Selection type, ensure the default value is a valid option
+        if (selectedDefinition.dataType === "Selection") {
+          const validOptions = selectedDefinition.options?.map((option) => option.Value) || [];
+          if (!validOptions.includes(defaultValue)) {
+            // If default value is not valid, use the first available option or empty string
+            defaultValue = validOptions.length > 0 ? validOptions[0] : "";
+          }
+        }
+
         setFormData((prev) => ({
           ...prev,
-          value: selectedDefinition.defaultValue
+          value: defaultValue
         }));
       }
     }
@@ -201,7 +210,13 @@ export const useSetting = () => {
             errors.value = "Value must be a valid JSON string";
           }
           break;
-        // String and Selection types don't need additional validation
+        case "Selection":
+          const validOptions = selectedDefinition.options?.map((option) => option.Value) || [];
+          if (validOptions.length > 0 && !validOptions.includes(value)) {
+            errors.value = "Value must be one of the available options";
+          }
+          break;
+        // String type doesn't need additional validation
       }
     }
 

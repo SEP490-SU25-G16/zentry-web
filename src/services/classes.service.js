@@ -122,6 +122,23 @@ const ClassServices = {
         error: error.response ? error.response.data?.errors : "Network Error"
       };
     }
+  },
+  createSchedule: async (scheduleData) => {
+    try {
+      const { data } = await instance.post(`/schedules`, {
+        ...scheduleData
+      });
+      return {
+        data,
+        error: null
+      };
+    } catch (error) {
+      console.error("Error creating schedule:", error);
+      return {
+        data: null,
+        error: error.response ? error.response.data?.errors : "Network Error"
+      };
+    }
   }
 };
 

@@ -88,10 +88,8 @@ export const useConfigurationData = () => {
           attributeId: def.AttributeId,
           displayName: def.DisplayName,
           description: def.Description,
-          dataType: dataTypeMap[def.DataType.Id] || "String",
-          allowedScopeTypes: def.AllowedScopeTypes.map((scope) => scopeTypeMap[scope.Id]).filter(
-            Boolean
-          ),
+          dataType: def.DataType, // DataType is already a string in the new API response
+          allowedScopeTypes: def.AllowedScopeTypes || [], // Handle case where it's already an array of strings
           unit: def.Unit,
           defaultValue: def.DefaultValue,
           isDeletable: def.IsDeletable,

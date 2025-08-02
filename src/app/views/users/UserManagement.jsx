@@ -249,6 +249,7 @@ const UserManagement = () => {
   };
 
   const getRoleName = (role) => {
+    console.log(role);
     switch (role.Id) {
       case 1:
         return "Admin";
@@ -543,7 +544,7 @@ const UserManagement = () => {
                     </TableCell>
                     <TableCell sx={{ py: 2, px: 3 }}>
                       <Chip
-                        label={getRoleName(user.Role)}
+                        label={user.Role}
                         variant="outlined"
                         size="small"
                         color={getRoleColor(user.Role)}
