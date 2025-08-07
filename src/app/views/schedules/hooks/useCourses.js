@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
 import { useSnackbar } from "notistack";
+import { useEffect, useState } from "react";
 import CourseServices from "services/courses.service";
 
 const PAGE_SIZE = 5;
@@ -105,9 +105,9 @@ const useCourses = () => {
   const getSortedAndFilteredCourses = () => {
     const filteredCourses = courses.filter(
       (course) =>
-        course.Name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        course.Code?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        course.Description?.toLowerCase().includes(searchTerm.toLowerCase())
+        course.Name?.toLowerCase().includes(searchTerm.toLowerCase().trim()) ||
+        course.Code?.toLowerCase().includes(searchTerm.toLowerCase().trim()) ||
+        course.Description?.toLowerCase().includes(searchTerm.toLowerCase().trim())
     );
 
     return filteredCourses.sort((a, b) => {

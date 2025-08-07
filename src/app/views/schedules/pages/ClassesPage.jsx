@@ -1,30 +1,28 @@
-import React, { useState, useMemo } from "react";
+import AddIcon from "@mui/icons-material/Add";
+import SearchIcon from "@mui/icons-material/Search";
 import {
   Box,
-  Typography,
   Button,
-  TextField,
   Chip,
-  Stack,
+  CircularProgress,
+  Divider,
   List,
   ListItem,
   ListItemButton,
   ListItemText,
-  Paper,
-  Divider,
-  CircularProgress,
-  Tooltip
+  Stack,
+  TextField,
+  Tooltip,
+  Typography
 } from "@mui/material";
-import AddIcon from "@mui/icons-material/Add";
-import SearchIcon from "@mui/icons-material/Search";
+import { useMemo, useState } from "react";
 
-import ClassTable from "../components/ClassTable";
 import ClassEditDialog from "../components/ClassEditDialog";
+import ClassTable from "../components/ClassTable";
 import ConfirmDeleteDialog from "../components/ConfirmDeleteDialog";
 
-import { mockClasses } from "../mock/mockClasses";
-import { useCourses, useClasses } from "../hooks";
 import { useUsers } from "../../users/hooks";
+import { useClasses, useCourses } from "../hooks";
 
 const ClassesPage = () => {
   // Use hooks to get real data
@@ -96,7 +94,7 @@ const ClassesPage = () => {
     // Filter by search term (course name)
     if (searchTerm.trim()) {
       filtered = filtered.filter((cls) =>
-        cls.courseName.toLowerCase().includes(searchTerm.toLowerCase())
+        cls.courseName.toLowerCase().includes(searchTerm.toLowerCase().trim())
       );
     }
 

@@ -1,6 +1,24 @@
-import React, { useEffect, useState } from "react";
+import {
+  Add as AddIcon,
+  Business as BusinessIcon,
+  Delete as DeleteIcon,
+  Edit as EditIcon,
+  People as PeopleIcon,
+  Search as SearchIcon
+} from "@mui/icons-material";
 import {
   Box,
+  Button,
+  Chip,
+  CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  FormControl,
+  FormHelperText,
+  IconButton,
+  InputAdornment,
   Paper,
   Table,
   TableBody,
@@ -9,33 +27,14 @@ import {
   TableHead,
   TablePagination,
   TableRow,
-  Typography,
-  Chip,
-  CircularProgress,
-  IconButton,
-  Tooltip,
   TableSortLabel,
   TextField,
-  InputAdornment,
-  Button,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  FormControl,
-  FormHelperText
+  Tooltip,
+  Typography
 } from "@mui/material";
-import {
-  Edit as EditIcon,
-  Delete as DeleteIcon,
-  Business as BusinessIcon,
-  People as PeopleIcon,
-  Search as SearchIcon,
-  Add as AddIcon
-} from "@mui/icons-material";
-import RoomServices from "services/rooms.service";
-import { useAppLoadingContext } from "app/contexts/AppLoadingContext";
 import { useSnackbar } from "notistack";
+import { useEffect, useState } from "react";
+import RoomServices from "services/rooms.service";
 
 const PAGE_SIZE = 5;
 
@@ -195,10 +194,11 @@ const RoomsPage = () => {
 
   const getSortedAndFilteredRooms = () => {
     // Filter rooms by search term first
+    console.log("🚀 ~ getSortedAndFilteredRooms ~ rooms:", searchTerm)
     let filteredRooms = rooms.filter(
       (room) =>
-        room.RoomName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        room.Building?.toLowerCase().includes(searchTerm.toLowerCase())
+        room.RoomName?.toLowerCase().includes(searchTerm.toLowerCase().trim()) ||
+        room.Building?.toLowerCase().includes(searchTerm.toLowerCase().trim())
     );
 
     // Then sort the filtered data

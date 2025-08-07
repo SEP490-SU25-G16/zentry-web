@@ -1,16 +1,16 @@
-import { useRoutes } from "react-router-dom";
 import CssBaseline from "@mui/material/CssBaseline";
+import { useRoutes } from "react-router-dom";
 // ROOT THEME PROVIDER
 import { MatxTheme } from "./components";
 // ALL CONTEXTS
+import { AuthProvider } from "./contexts/ApiAuthContext";
 import SettingsProvider from "./contexts/SettingsContext";
-import { AuthProvider } from "./contexts/FirebaseAuthContext";
 // ROUTES
 import routes from "./routes";
 // FAKE SERVER
+import { SnackbarProvider } from "notistack";
 import "../__api__";
 import AppLoadingProvider from "./contexts/AppLoadingContext";
-import { SnackbarProvider } from "notistack";
 
 export default function App() {
   const content = useRoutes(routes);

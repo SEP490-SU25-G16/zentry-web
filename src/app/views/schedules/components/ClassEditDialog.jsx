@@ -1,16 +1,16 @@
-import React, { useState, useEffect } from "react";
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
   Button,
-  TextField,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   FormControl,
   InputLabel,
+  MenuItem,
   Select,
-  MenuItem
+  TextField
 } from "@mui/material";
+import { useEffect, useState } from "react";
 
 const ClassEditDialog = ({ open, initialData, onClose, onSave, courses = [], lecturers = [] }) => {
   const [formData, setFormData] = useState({
@@ -80,7 +80,7 @@ const ClassEditDialog = ({ open, initialData, onClose, onSave, courses = [], lec
           </Select>
         </FormControl>
 
-        <FormControl fullWidth margin="dense">
+        {formData.id && <FormControl fullWidth margin="dense">
           <InputLabel>Lecturer</InputLabel>
           <Select
             name="lecturerName"
@@ -94,7 +94,7 @@ const ClassEditDialog = ({ open, initialData, onClose, onSave, courses = [], lec
               </MenuItem>
             ))}
           </Select>
-        </FormControl>
+        </FormControl>}
 
         <TextField
           margin="dense"
