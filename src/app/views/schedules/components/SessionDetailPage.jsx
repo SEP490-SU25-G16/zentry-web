@@ -1,38 +1,36 @@
-import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import BookIcon from "@mui/icons-material/Book";
+import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
+import CancelIcon from "@mui/icons-material/Cancel";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import HelpIcon from "@mui/icons-material/Help";
+import PersonIcon from "@mui/icons-material/Person";
+import RoomIcon from "@mui/icons-material/Room";
 import {
-  Box,
-  Typography,
-  Paper,
-  Grid,
-  Chip,
-  CircularProgress,
   Alert,
+  Avatar,
+  Box,
   Button,
   Card,
   CardContent,
+  Chip,
+  CircularProgress,
   Divider,
+  FormControl,
+  Grid,
   List,
   ListItem,
-  ListItemButton,
-  ListItemText,
   ListItemAvatar,
-  Avatar,
-  Select,
+  ListItemText,
   MenuItem,
-  FormControl,
-  InputLabel,
-  Snackbar
+  Select,
+  Snackbar,
+  Typography
 } from "@mui/material";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
-import AccessTimeIcon from "@mui/icons-material/AccessTime";
-import RoomIcon from "@mui/icons-material/Room";
-import PersonIcon from "@mui/icons-material/Person";
-import BookIcon from "@mui/icons-material/Book";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import CancelIcon from "@mui/icons-material/Cancel";
-import HelpIcon from "@mui/icons-material/Help";
+import React, { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { useClasses } from "../hooks";
 
 // Mock API service for session attendance
 const SessionAttendanceService = {
@@ -162,6 +160,7 @@ const SessionAttendanceService = {
 const SessionDetailPage = () => {
   const { classId, sessionId } = useParams();
   const navigate = useNavigate();
+  const { changeAttendance } = useClasses();
 
   const [sessionDetail, setSessionDetail] = useState(null);
   const [loading, setLoading] = useState(true);

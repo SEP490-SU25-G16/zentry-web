@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
 import { useSnackbar } from "notistack";
+import { useEffect, useState } from "react";
 import ClassServices from "services/classes.service";
 
 const useClasses = () => {
@@ -230,6 +230,30 @@ const useClasses = () => {
     setSubmitting(true);
     try {
       const result = await ClassServices.createSchedule(scheduleData);
+      console.log("🚀 ~ createSchedule ~ result:", result)
+
+      if (result.error) {
+        enqueueSnackbar(result.error, { variant: "error" });
+        return { success: false, error: result.error };
+      } else {
+        enqueueSnackbar("Schedule created successfully", { variant: "success" });
+        return { success: true, data: result.data };
+      }
+    } catch (error) {
+      console.error("Error creating schedule:", error);
+      const errorMessage = "Failed to create schedule";
+      enqueueSnackbar(errorMessage, { variant: "error" });
+      return { success: false, error: errorMessage };
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const changeAttendance = async (sectionId, studentId, status) => {
+    setSubmitting(true);
+    try {
+      const result = await ClassServices.changeAttendance(sectionId, studentId, status);
+      console.log("🚀 ~ createSchedule ~ result:", result)
 
       if (result.error) {
         enqueueSnackbar(result.error, { variant: "error" });
@@ -265,7 +289,8 @@ const useClasses = () => {
     bulkEnrollStudents,
     createSchedule,
     refreshClasses,
-    fetchClasses
+    fetchClasses,
+    changeAttendance
   };
 };
 

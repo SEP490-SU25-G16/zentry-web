@@ -128,6 +128,7 @@ const ClassServices = {
       const { data } = await instance.post(`/schedules`, {
         ...scheduleData
       });
+      console.log(data);
       return {
         data,
         error: null
@@ -136,7 +137,25 @@ const ClassServices = {
       console.error("Error creating schedule:", error);
       return {
         data: null,
-        error: error.response ? error.response.data?.errors : "Network Error"
+        error: error.response ? error.response.data?.Error?.Message : "Network Error"
+      };
+    }
+  },
+  changeAttendance: async (sectionId, studentId, status) => {
+    try {
+      const { data } = await instance.put(`/attendance/sessions/${sectionId}/students/${studentId}/status`, {
+        status
+      });
+      console.log('run day hehe');
+      return {
+        data,
+        error: null
+      };
+    } catch (error) {
+      console.error("Error changing attendance:", error);
+      return {
+        data: null,
+        error: error.response ? error.response.data?.Error?.Message : "Network Error"
       };
     }
   }
