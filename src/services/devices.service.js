@@ -76,7 +76,7 @@ const DeviceServices = {
   },
   approveDevice: async (deviceId) => {
     try {
-      const { data } = await instance.put(`/devices/${deviceId}/approve`);
+      const { data } = await instance.put(`/devices/change-request/${deviceId}/accept`);
       return {
         data,
         error: null
@@ -85,13 +85,13 @@ const DeviceServices = {
       console.error("Error approving device:", error);
       return {
         data: null,
-        error: error.response ? error.response.data?.errors : "Network Error"
+        error: error.response ? error.response.data?.Error?.Message : "Network Error"
       };
     }
   },
   rejectDevice: async (deviceId) => {
     try {
-      const { data } = await instance.put(`/devices/${deviceId}/reject`);
+      const { data } = await instance.put(`/devices/change-request/${deviceId}/reject`);
       return {
         data,
         error: null
@@ -100,7 +100,7 @@ const DeviceServices = {
       console.error("Error rejecting device:", error);
       return {
         data: null,
-        error: error.response ? error.response.data?.errors : "Network Error"
+        error: error.response ? error.response.data?.Error?.Message : "Network Error"
       };
     }
   }

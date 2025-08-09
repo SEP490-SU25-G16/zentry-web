@@ -77,7 +77,23 @@ const UserServices = {
       console.error("Error deleting user:", error);
       return {
         data: null,
-        error: error.response ? error.response.data?.errors : "Network Error"
+        error: error.response ? error.response.data?.Error?.Message : "Network Error"
+      };
+    }
+  },
+  importUsers: async (file) => {
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const { data } = await instance.post("/user/import", formData, {
+        headers: { "Content-Type": "multipart/form-data" }
+      });
+      return { data, error: null };
+    } catch (error) {
+      console.error("Error importing users:", error);
+      return {
+        data: null,
+        error: error.response ? error.response.data?.Error?.Message || error.response.data : "Network Error"
       };
     }
   }

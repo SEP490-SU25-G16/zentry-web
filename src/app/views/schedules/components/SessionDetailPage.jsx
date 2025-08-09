@@ -28,6 +28,7 @@ import {
   Snackbar,
   Typography
 } from "@mui/material";
+import { instance } from "lib/axios";
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useClasses } from "../hooks";
@@ -146,6 +147,22 @@ const SessionAttendanceService = {
     };
   },
 
+  getSessionDetailReal: async (sessionId) => {
+    try {
+      const { data } = await instance.get(`/attendance/sessions/${sessionId}/final`);
+      return {
+        data,
+        error: null
+      };
+    } catch (error) {
+      console.error("Error changing attendance:", error);
+      return {
+        data: null,
+        error: error.response ? error.response.data?.Error?.Message : "Network Error"
+      };
+    }
+  },
+
   updateAttendance: async (sessionId, studentId, status) => {
     // Simulate API delay
     await new Promise((resolve) => setTimeout(resolve, 500));
@@ -184,7 +201,7 @@ const SessionDetailPage = () => {
     setError(null);
 
     try {
-      const result = await SessionAttendanceService.getSessionDetail(sessionId, classId);
+      const result = await SessionAttendanceService.getSessionDetailReal(sessionId);
 
       if (result.success) {
         // Normalize all student statuses to ensure they have valid values
@@ -211,7 +228,7 @@ const SessionDetailPage = () => {
     setUpdating((prev) => ({ ...prev, [studentId]: true }));
 
     try {
-      const result = await SessionAttendanceService.updateAttendance(
+      const result = await changeAttendance(
         sessionId,
         studentId,
         newStatus
@@ -541,7 +558,7 @@ const SessionDetailPage = () => {
                       {getStatusIcon(normalizedStatus)}
                       <FormControl size="small" sx={{ minWidth: 120 }}>
                         <Select
-                          value={normalizedStatus}
+                          value={student.status || "future"}
                           onChange={(e) =>
                             handleAttendanceChange(student.studentId, e.target.value)
                           }

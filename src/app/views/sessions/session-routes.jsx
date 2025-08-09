@@ -1,10 +1,11 @@
+import Loadable from "app/components/Loadable";
 import { lazy } from "react";
 
-const NotFound = lazy(() => import("./NotFound"));
-const ForgotPassword = lazy(() => import("./ForgotPassword"));
+const NotFound = Loadable(lazy(() => import("./NotFound")));
+const ForgotPassword = Loadable(lazy(() => import("./ForgotPassword")));
 
-const ApiLogin = lazy(() => import("./login/FirebaseLogin"));
-const FirebaseRegister = lazy(() => import("./register/FirebaseRegister"));
+const ApiLogin = Loadable(lazy(() => import("./login/FirebaseLogin")));
+const FirebaseRegister = Loadable(lazy(() => import("./register/FirebaseRegister")));
 
 // const JwtLogin = Loadable(lazy(() => import("./login/JwtLogin")));
 // const JwtRegister = Loadable(lazy(() => import("./register/JwtRegister")));

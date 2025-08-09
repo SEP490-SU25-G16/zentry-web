@@ -200,6 +200,28 @@ const useClasses = () => {
     }
   };
 
+  const enrollLecturer = async (classSectionId, lecturerId) => {
+    setSubmitting(true);
+    try {
+      const result = await ClassServices.enrollLecturer(classSectionId, lecturerId);
+
+      if (result.error) {
+        enqueueSnackbar(result.error, { variant: "error" });
+        return { success: false, error: result.error };
+      } else {
+        enqueueSnackbar("Lecturer assigned successfully", { variant: "success" });
+        return { success: true, data: result.data };
+      }
+    } catch (error) {
+      console.error("Error assigning lecturer:", error);
+      const errorMessage = "Failed to assign lecturer";
+      enqueueSnackbar(errorMessage, { variant: "error" });
+      return { success: false, error: errorMessage };
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   const bulkEnrollStudents = async (classSectionId, studentIds) => {
     setSubmitting(true);
     try {
@@ -253,7 +275,6 @@ const useClasses = () => {
     setSubmitting(true);
     try {
       const result = await ClassServices.changeAttendance(sectionId, studentId, status);
-      console.log("🚀 ~ createSchedule ~ result:", result)
 
       if (result.error) {
         enqueueSnackbar(result.error, { variant: "error" });
@@ -286,6 +307,7 @@ const useClasses = () => {
     updateClass,
     deleteClass,
     enrollStudent,
+    enrollLecturer,
     bulkEnrollStudents,
     createSchedule,
     refreshClasses,

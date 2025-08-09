@@ -4,18 +4,18 @@ import { Navigate } from "react-router-dom";
 import AuthGuard from "./auth/AuthGuard";
 import { authRoles } from "./auth/authRoles";
 
+import materialRoutes from "app/views/material-kit/MaterialRoutes";
 import Loadable from "./components/Loadable";
 import MatxLayout from "./components/MatxLayout/MatxLayout";
-import sessionRoutes from "./views/sessions/session-routes";
-import materialRoutes from "app/views/material-kit/MaterialRoutes";
-import RoomsPage from "./views/schedules/pages/RoomsPage";
-import CoursesPage from "./views/schedules/pages/CoursesPage";
-import ClassesPage from "./views/schedules/pages/ClassesPage";
+import ConfigurationPage from "./views/configuration/pages";
+import AdminDashboard from "./views/dashboard/AdminDashboard";
 import CurrentDevicesPage from "./views/devices/pages/CurrentDevicesPage";
 import RequestsDevicesPage from "./views/devices/pages/RequestsDevicesPage";
 import CurrentFaceIdPage from "./views/faceid/pages/CurrentFaceIdPage";
-import RequestFaceIdPage from "./views/faceid/pages/RequestFaceIdPage";
-import ConfigurationPage from "./views/configuration/pages";
+import ClassesPage from "./views/schedules/pages/ClassesPage";
+import CoursesPage from "./views/schedules/pages/CoursesPage";
+import RoomsPage from "./views/schedules/pages/RoomsPage";
+import sessionRoutes from "./views/sessions/session-routes";
 
 // Existing pages
 const AppEchart = Loadable(lazy(() => import("app/views/charts/echarts/AppEchart")));
@@ -25,9 +25,9 @@ const Analytics = Loadable(lazy(() => import("app/views/dashboard/Analytics")));
 const ScheduleManagement = Loadable(lazy(() => import("app/views/schedules/ScheduleManagement")));
 
 const UserManagement = Loadable(lazy(() => import("app/views/users/UserManagement")));
-const DeviceFaceIdManagement = Loadable(
-  lazy(() => import("app/views/devices/DeviceFaceIdManagement"))
-);
+// const DeviceFaceIdManagement = Loadable(
+//   lazy(() => import("app/views/devices/DeviceFaceIdManagement"))
+// );
 const UserViewPage = Loadable(lazy(() => import("app/views/users/components/UserViewPage")));
 const UserEditPage = Loadable(lazy(() => import("app/views/users/components/UserEditPage")));
 const ClassDetailPage = Loadable(
@@ -48,7 +48,8 @@ const routes = [
     ),
     children: [
       ...materialRoutes,
-      { path: "/dashboard/default", element: <Analytics />, auth: authRoles.admin },
+      { path: "/dashboard/default2", element: <Analytics />, auth: authRoles.admin },
+      { path: "/dashboard/default", element: <AdminDashboard />, auth: authRoles.admin },
       { path: "/charts/echarts", element: <AppEchart />, auth: authRoles.editor },
 
       // Management Pages

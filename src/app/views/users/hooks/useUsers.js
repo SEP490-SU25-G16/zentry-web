@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
 import { useSnackbar } from "notistack";
+import { useEffect, useState } from "react";
 import UserServices from "services/user.service";
 
 const PAGE_SIZE = 5;

@@ -1,20 +1,19 @@
-import React from "react";
 import {
+  Box,
+  Button,
+  CircularProgress,
   Dialog,
-  DialogTitle,
-  DialogContent,
   DialogActions,
-  TextField,
+  DialogContent,
+  DialogTitle,
   FormControl,
   FormHelperText,
-  Select,
-  MenuItem,
+  Grid,
   InputLabel,
-  CircularProgress,
-  Typography,
-  Button,
-  Box,
-  Grid
+  MenuItem,
+  Select,
+  TextField,
+  Typography
 } from "@mui/material";
 
 const SettingModal = ({

@@ -1,17 +1,16 @@
-import React from "react";
 import {
+  Box,
+  Chip,
+  CircularProgress,
+  Paper,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
-  Paper,
-  Chip,
-  Typography,
-  Box,
-  CircularProgress,
-  Tooltip
+  Tooltip,
+  Typography
 } from "@mui/material";
 
 const SettingsTable = ({ settings, loading, pagination, searchTerm }) => {

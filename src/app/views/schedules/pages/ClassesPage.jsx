@@ -51,7 +51,6 @@ const ClassesPage = () => {
     return users.filter((user) => user.Role === "Lecturer");
   }, [users]);
 
-  console.log(lecturers);
 
   // Helper function to get course name by courseId
   const getCourseNameById = (courseId) => {

@@ -1,24 +1,23 @@
-import React from "react";
+import { Search as SearchIcon } from "@mui/icons-material";
 import {
   Box,
-  Typography,
-  Tabs,
-  Tab,
-  Paper,
-  TextField,
   InputAdornment,
-  TablePagination
+  Paper,
+  Tab,
+  TablePagination,
+  Tabs,
+  TextField,
+  Typography
 } from "@mui/material";
-import { Search as SearchIcon } from "@mui/icons-material";
-import { useAttributeDefinition } from "../hooks/useAttributeDefinition";
-import { useSetting } from "../hooks/useSetting";
-import { useConfigurationData } from "../hooks/useConfigurationData";
-import QuickActionsSection from "../components/QuickActionsSection";
 import AttributeDefinitionModal from "../components/AttributeDefinitionModal";
-import SettingModal from "../components/SettingModal";
 import DefinitionsTable from "../components/DefinitionsTable";
-import SettingsTable from "../components/SettingsTable";
 import NotificationSnackbar from "../components/NotificationSnackbar";
+import QuickActionsSection from "../components/QuickActionsSection";
+import SettingModal from "../components/SettingModal";
+import SettingsTable from "../components/SettingsTable";
+import { useAttributeDefinition } from "../hooks/useAttributeDefinition";
+import { useConfigurationData } from "../hooks/useConfigurationData";
+import { useSetting } from "../hooks/useSetting";
 
 const ConfigurationPage = () => {
   const {

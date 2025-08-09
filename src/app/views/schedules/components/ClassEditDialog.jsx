@@ -80,7 +80,7 @@ const ClassEditDialog = ({ open, initialData, onClose, onSave, courses = [], lec
           </Select>
         </FormControl>
 
-        {formData.id && <FormControl fullWidth margin="dense">
+        {/* {formData.id && <FormControl fullWidth margin="dense">
           <InputLabel>Lecturer</InputLabel>
           <Select
             name="lecturerName"
@@ -94,7 +94,7 @@ const ClassEditDialog = ({ open, initialData, onClose, onSave, courses = [], lec
               </MenuItem>
             ))}
           </Select>
-        </FormControl>}
+        </FormControl>} */}
 
         <TextField
           margin="dense"

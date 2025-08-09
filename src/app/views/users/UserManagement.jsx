@@ -1,42 +1,45 @@
-import React, { useState } from "react";
+import {
+  Add as AddIcon,
+  Badge as BadgeIcon,
+  Delete as DeleteIcon,
+  Edit as EditIcon,
+  Email as EmailIcon,
+  ImportExport,
+  Person as PersonIcon,
+  Search as SearchIcon,
+  Visibility as VisibilityIcon
+} from "@mui/icons-material";
 import {
   Box,
-  Typography,
+  Button,
+  Chip,
+  CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  FormControl,
+  FormHelperText,
+  IconButton,
+  InputAdornment,
+  MenuItem,
   Paper,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
-  TableRow,
   TablePagination,
+  TableRow,
   TableSortLabel,
-  IconButton,
-  Chip,
-  CircularProgress,
   TextField,
-  InputAdornment,
-  Button,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  FormControl,
-  FormHelperText,
-  MenuItem,
-  Tooltip
+  Tooltip,
+  Typography
 } from "@mui/material";
-import {
-  Search as SearchIcon,
-  Add as AddIcon,
-  Edit as EditIcon,
-  Delete as DeleteIcon,
-  Person as PersonIcon,
-  Email as EmailIcon,
-  Badge as BadgeIcon,
-  Visibility as VisibilityIcon
-} from "@mui/icons-material";
+import { useSnackbar } from "notistack";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import UserServices from "services/user.service";
 import { useUsers } from "./hooks";
 
 const UserManagement = () => {
@@ -90,6 +93,12 @@ const UserManagement = () => {
   const [formErrors, setFormErrors] = useState({});
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState(null);
+
+  // Import users modal state
+  const [importModalOpen, setImportModalOpen] = useState(false);
+  const [importFile, setImportFile] = useState(null);
+  const [importing, setImporting] = useState(false);
+  const { enqueueSnackbar } = useSnackbar();
 
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
@@ -160,6 +169,39 @@ const UserManagement = () => {
     setFormErrors({});
     setIsEditMode(false);
     setEditingUserId(null);
+  };
+
+  const handleOpenImportModal = () => {
+    setImportModalOpen(true);
+    setImportFile(null);
+  };
+
+  const handleCloseImportModal = () => {
+    setImportModalOpen(false);
+    setImportFile(null);
+  };
+
+  const handleImportSubmit = async () => {
+    if (!importFile) return;
+    const isCsv = importFile.type === "text/csv" || importFile.name.toLowerCase().endsWith(".csv");
+    if (!isCsv) {
+      enqueueSnackbar("Only CSV files are allowed", { variant: "warning" });
+      return;
+    }
+    setImporting(true);
+    try {
+      const res = await UserServices.importUsers(importFile);
+      if (res.error) {
+        enqueueSnackbar(typeof res.error === "string" ? res.error : "Import failed", { variant: "error" });
+      } else {
+        enqueueSnackbar(res.data?.Message || "Users imported successfully", { variant: "success" });
+        handleCloseImportModal();
+      }
+    } catch {
+      enqueueSnackbar("Some error occurred", { variant: "error" });
+    } finally {
+      setImporting(false);
+    }
   };
 
   const handleFormChange = (field) => (event) => {
@@ -248,19 +290,18 @@ const UserManagement = () => {
     }
   };
 
-  const getRoleName = (role) => {
-    console.log(role);
-    switch (role.Id) {
-      case 1:
-        return "Admin";
-      case 2:
-        return "Lecture";
-      case 3:
-        return "Student";
-      default:
-        return "Unknown";
-    }
-  };
+  // const getRoleName = (role) => {
+  //   switch (role.Id) {
+  //     case 1:
+  //       return "Admin";
+  //     case 2:
+  //       return "Lecture";
+  //     case 3:
+  //       return "Student";
+  //     default:
+  //       return "Unknown";
+  //   }
+  // };
 
   return (
     <Box
@@ -292,6 +333,7 @@ const UserManagement = () => {
             Manage and organize all users in your system
           </Typography>
         </Box>
+        <Box sx={{ display: "flex", gap: 2 }}>
         <Button
           variant="contained"
           startIcon={<AddIcon />}
@@ -306,6 +348,21 @@ const UserManagement = () => {
         >
           Add User
         </Button>
+        <Button
+          variant="contained"
+          startIcon={<ImportExport />}
+          onClick={handleOpenImportModal}
+          sx={{
+            borderRadius: "8px",
+            textTransform: "none",
+            px: 3,
+            py: 1,
+            mt: 1
+          }}
+        >
+          Import User
+        </Button>
+        </Box>
       </Box>
 
       <Box sx={{ mb: 2, width: "100%", maxWidth: "1400px" }}>
@@ -785,6 +842,52 @@ const UserManagement = () => {
             }}
           >
             {submitting ? <CircularProgress size={20} color="inherit" /> : "Delete"}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Import Users Modal */}
+      <Dialog
+        open={importModalOpen}
+        onClose={handleCloseImportModal}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{
+          sx: { borderRadius: "12px", p: 1 }
+        }}
+      >
+        <DialogTitle sx={{ pb: 2 }}>
+          <Typography variant="h6" component="div">
+            Import Users
+          </Typography>
+        </DialogTitle>
+        <DialogContent sx={{ pb: 2 }}>
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+            <Button variant="outlined" component="label" sx={{ alignSelf: "flex-start" }}>
+              Choose CSV File
+              <input
+                hidden
+                type="file"
+                accept=".csv"
+                onChange={(e) => setImportFile(e.target.files?.[0] || null)}
+              />
+            </Button>
+            <Typography variant="body2" color="text.secondary">
+              {importFile ? `Selected: ${importFile.name}` : "No file selected"}
+            </Typography>
+          </Box>
+        </DialogContent>
+        <DialogActions sx={{ p: 3, pt: 1 }}>
+          <Button onClick={handleCloseImportModal} color="inherit" sx={{ borderRadius: "8px", textTransform: "none", px: 3 }}>
+            Cancel
+          </Button>
+          <Button
+            onClick={handleImportSubmit}
+            variant="contained"
+            sx={{ borderRadius: "8px", textTransform: "none", px: 3 }}
+            disabled={!importFile || importing}
+          >
+            {importing ? "Importing..." : "Import"}
           </Button>
         </DialogActions>
       </Dialog>

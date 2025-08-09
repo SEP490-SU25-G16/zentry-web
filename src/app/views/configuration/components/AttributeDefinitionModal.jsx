@@ -1,25 +1,23 @@
-import React from "react";
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
-  FormControl,
-  FormHelperText,
-  Select,
-  MenuItem,
-  InputLabel,
-  Chip,
-  OutlinedInput,
-  FormControlLabel,
-  Switch,
-  CircularProgress,
-  Typography,
-  Button,
   Box,
+  Button,
+  Chip,
+  CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  FormControl,
+  FormControlLabel,
+  FormHelperText,
   Grid,
-  Divider
+  InputLabel,
+  MenuItem,
+  OutlinedInput,
+  Select,
+  Switch,
+  TextField,
+  Typography
 } from "@mui/material";
 import SelectionOptionsSection from "./SelectionOptionsSection";
 

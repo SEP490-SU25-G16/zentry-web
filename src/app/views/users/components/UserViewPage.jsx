@@ -1,12 +1,20 @@
-import React from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { Typography, Box, Button, Paper, Divider, Grid, Chip } from "@mui/material";
-import { mockUsers } from "../mock/mockUsers";
+import { Box, Button, Chip, Divider, Grid, Paper, Typography } from "@mui/material";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import UserServices from "services/user.service";
 
 const UserViewPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const user = mockUsers.find((u) => u.UserId.toString() === id);
+  const [user, setUser] = useState(null);
+  useEffect(() => {
+    const fetchUser = async () => {
+      const res = await UserServices.getUserById(id);
+      setUser(res.data?.Data || null);
+    };
+    fetchUser();
+   
+  }, [id]);
 
   if (!user) return <Typography>User not found</Typography>;
 

@@ -1,19 +1,18 @@
-import React from "react";
 import {
+  Box,
+  Card,
+  CardContent,
+  Chip,
+  CircularProgress,
+  Grid,
+  Paper,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
-  Paper,
-  Chip,
-  Typography,
-  Box,
-  CircularProgress,
-  Card,
-  CardContent,
-  Grid
+  Typography
 } from "@mui/material";
 
 const DefinitionsTable = ({ definitions, loading, searchTerm }) => {

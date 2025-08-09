@@ -1,35 +1,35 @@
-import React, { useState, useEffect } from "react";
+import {
+  Android as AndroidIcon,
+  Apple as AppleIcon,
+  Check as CheckIcon,
+  Close as CloseIcon,
+  Computer as ComputerIcon,
+  Smartphone as SmartphoneIcon
+} from "@mui/icons-material";
 import {
   Box,
-  Typography,
+  Button,
+  Chip,
+  CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  IconButton,
   Paper,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
-  TableRow,
   TablePagination,
+  TableRow,
   TableSortLabel,
-  Chip,
-  CircularProgress,
-  Button,
-  IconButton,
   Tooltip,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions
+  Typography
 } from "@mui/material";
-import {
-  Smartphone as SmartphoneIcon,
-  Computer as ComputerIcon,
-  Android as AndroidIcon,
-  Apple as AppleIcon,
-  Check as CheckIcon,
-  Close as CloseIcon
-} from "@mui/icons-material";
 import { useSnackbar } from "notistack";
+import { useEffect, useState } from "react";
 import DeviceServices from "services/devices.service";
 
 const PAGE_SIZE = 5;
@@ -38,7 +38,6 @@ const RequestsDevicesPage = () => {
   const { enqueueSnackbar } = useSnackbar();
   // states
   const [devices, setDevices] = useState([]);
-  console.log(devices);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [page, setPage] = useState(0);
@@ -64,10 +63,12 @@ const RequestsDevicesPage = () => {
         setDevices([]);
         setTotalCount(0);
       } else {
+        console.log("🚀 ~ fetchDevices ~ result:", result.data)
         // Transform the API data to match the expected format, filter for Pending devices only
         const transformedDevices = (result.data || [])
           .map((device) => ({
-            userId: device.UserFullName || device.UserId,
+            userId: device.UserId,
+            userName: device.UserFullName,
             deviceName: device.DeviceName,
             platform: device.Platform,
             osVersion: device.OsVersion,
@@ -130,6 +131,7 @@ const RequestsDevicesPage = () => {
 
   const handleConfirmAction = async () => {
     if (!selectedDevice || !actionType) return;
+    console.log("🚀 ~ handleConfirmAction ~ selectedDevice:", selectedDevice)
 
     setSubmitting(true);
     try {
@@ -372,7 +374,7 @@ const RequestsDevicesPage = () => {
                   >
                     <TableCell component="th" scope="row" sx={{ py: 2, px: 3 }}>
                       <Typography variant="subtitle1" fontWeight="medium">
-                        {device.userId}
+                        {device.userName ?? ''}
                       </Typography>
                     </TableCell>
                     <TableCell sx={{ py: 2, px: 3 }}>

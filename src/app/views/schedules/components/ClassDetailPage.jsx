@@ -1,62 +1,61 @@
-import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import AddIcon from "@mui/icons-material/Add";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import BookIcon from "@mui/icons-material/Book";
+import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
+import ClassIcon from "@mui/icons-material/Class";
+import CloseIcon from "@mui/icons-material/Close";
+import PersonIcon from "@mui/icons-material/Person";
+import PersonAddIcon from "@mui/icons-material/PersonAdd";
+import RoomIcon from "@mui/icons-material/Room";
+import SearchIcon from "@mui/icons-material/Search";
 import {
-  Box,
-  Typography,
-  Paper,
-  Grid,
-  Chip,
-  CircularProgress,
   Alert,
+  Avatar,
+  Box,
   Button,
   Card,
   CardContent,
-  Divider,
+  Checkbox,
+  Chip,
+  CircularProgress,
   Dialog,
-  DialogTitle,
-  DialogContent,
   DialogActions,
+  DialogContent,
+  DialogTitle,
+  Divider,
+  FormControl,
+  FormControlLabel,
+  Grid,
+  InputAdornment,
+  InputLabel,
   List,
   ListItem,
+  ListItemAvatar,
   ListItemButton,
   ListItemText,
-  ListItemAvatar,
-  Avatar,
-  TextField,
-  InputAdornment,
-  Checkbox,
-  FormControlLabel,
   MenuItem,
   Select,
-  FormControl,
-  InputLabel,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
+  TablePagination,
   TableRow,
-  TablePagination
+  TextField,
+  Typography
 } from "@mui/material";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import ClassIcon from "@mui/icons-material/Class";
-import PersonIcon from "@mui/icons-material/Person";
-import BookIcon from "@mui/icons-material/Book";
-import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
-import PersonAddIcon from "@mui/icons-material/PersonAdd";
-import SearchIcon from "@mui/icons-material/Search";
-import CloseIcon from "@mui/icons-material/Close";
-import AddIcon from "@mui/icons-material/Add";
-import AccessTimeIcon from "@mui/icons-material/AccessTime";
-import RoomIcon from "@mui/icons-material/Room";
-import { useClasses } from "../hooks";
-import { useUsers } from "../../users/hooks";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import RoomServices from "services/rooms.service";
+import { useUsers } from "../../users/hooks";
+import { useClasses } from "../hooks";
 
 const ClassDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { getClass, enrollStudent, bulkEnrollStudents, createSchedule } = useClasses();
+  const { getClass, enrollStudent, bulkEnrollStudents, createSchedule, enrollLecturer } = useClasses();
   const { users, loading: usersLoading } = useUsers();
 
   const [classDetail, setClassDetail] = useState(null);
@@ -90,6 +89,13 @@ const ClassDetailPage = () => {
     weekDay: ""
   });
   const [addingSchedule, setAddingSchedule] = useState(false);
+
+  // Assign lecturer state
+  const [assignLecturerOpen, setAssignLecturerOpen] = useState(false);
+  const [selectedLecturerId, setSelectedLecturerId] = useState("");
+  const [assigningLecturer, setAssigningLecturer] = useState(false);
+
+  const lecturers = users.filter((user) => user.Role === "Lecturer");
 
   useEffect(() => {
     const fetchClassDetail = async () => {
@@ -172,6 +178,37 @@ const ClassDetailPage = () => {
     });
     // Always fetch rooms when opening the modal to ensure fresh data
     fetchRooms();
+  };
+
+  const handleOpenAssignLecturer = () => {
+    setSelectedLecturerId(
+      classDetail?.lecturerId || classDetail?.original?.LecturerId || ""
+    );
+    setAssignLecturerOpen(true);
+  };
+
+  const handleCloseAssignLecturer = () => {
+    setAssignLecturerOpen(false);
+    setSelectedLecturerId("");
+  };
+
+  const handleConfirmAssignLecturer = async () => {
+    if (!selectedLecturerId) return;
+    setAssigningLecturer(true);
+    try {
+      const result = await enrollLecturer(id, selectedLecturerId);
+      if (result.success) {
+        handleCloseAssignLecturer();
+        const classResult = await getClass(id);
+        if (classResult.success) {
+          setClassDetail(classResult.data);
+        }
+      }
+    } catch (error) {
+      console.error("Error assigning lecturer:", error);
+    } finally {
+      setAssigningLecturer(false);
+    }
   };
 
   const handleCloseAddScheduleModal = () => {
@@ -406,6 +443,20 @@ const ClassDetailPage = () => {
           }}
         >
           Enroll Students
+        </Button>
+        <Button
+          variant="outlined"
+          onClick={handleOpenAssignLecturer}
+          startIcon={<PersonIcon />}
+          sx={{
+            borderRadius: "8px",
+            textTransform: "none",
+            px: 3,
+            py: 1
+          }}
+          disabled={usersLoading || lecturers.length === 0}
+        >
+          Assign Lecturer
         </Button>
         <Chip label={classDetail.semester} color="primary" variant="outlined" size="medium" />
       </Box>
@@ -735,7 +786,7 @@ const ClassDetailPage = () => {
                   {classDetail.original.Schedules.slice(
                     schedulePage * scheduleRowsPerPage,
                     schedulePage * scheduleRowsPerPage + scheduleRowsPerPage
-                  ).map((schedule, index) => (
+                  ).map((schedule) => (
                     <TableRow key={schedule.Id}>
                       <TableCell sx={{ padding: "1em" }}>
                         <Chip
@@ -993,6 +1044,89 @@ const ClassDetailPage = () => {
               : `Enroll ${selectedStudents.length} Student${
                   selectedStudents.length > 1 ? "s" : ""
                 }`}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Assign Lecturer Modal */}
+      <Dialog
+        open={assignLecturerOpen}
+        onClose={handleCloseAssignLecturer}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{
+          sx: { borderRadius: "12px" }
+        }}
+      >
+        <DialogTitle
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            pb: 1
+          }}
+        >
+          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+            <PersonIcon sx={{ color: "primary.main" }} />
+            <Typography variant="h6">Assign Lecturer for {classDetail?.sectionCode}</Typography>
+          </Box>
+          <Button onClick={handleCloseAssignLecturer} sx={{ minWidth: "auto", p: 1 }}>
+            <CloseIcon />
+          </Button>
+        </DialogTitle>
+
+        <DialogContent sx={{ pt: 2 }}>
+          <Grid container spacing={3}>
+            <Grid item xs={12}>
+              <FormControl fullWidth>
+                <InputLabel>Lecturer</InputLabel>
+                <Select
+                  label="Lecturer"
+                  value={selectedLecturerId}
+                  onChange={(e) => setSelectedLecturerId(e.target.value)}
+                  startAdornment={
+                    <InputAdornment position="start">
+                      <PersonIcon />
+                    </InputAdornment>
+                  }
+                >
+                  {usersLoading ? (
+                    <MenuItem disabled>
+                      <CircularProgress size={20} sx={{ mr: 1 }} /> Loading lecturers...
+                    </MenuItem>
+                  ) : lecturers.length > 0 ? (
+                    lecturers.map((lec) => (
+                      <MenuItem key={lec.UserId} value={lec.UserId}>
+                        <Box sx={{ display: "flex", flexDirection: "column" }}>
+                          <Typography variant="body1">{lec.FullName}</Typography>
+                          {lec.Email && (
+                            <Typography variant="caption" color="text.secondary">
+                              {lec.Email}
+                            </Typography>
+                          )}
+                        </Box>
+                      </MenuItem>
+                    ))
+                  ) : (
+                    <MenuItem disabled>No lecturers available</MenuItem>
+                  )}
+                </Select>
+              </FormControl>
+            </Grid>
+          </Grid>
+        </DialogContent>
+
+        <DialogActions sx={{ p: 3, pt: 1 }}>
+          <Button onClick={handleCloseAssignLecturer} variant="outlined" disabled={assigningLecturer}>
+            Cancel
+          </Button>
+          <Button
+            onClick={handleConfirmAssignLecturer}
+            variant="contained"
+            disabled={!selectedLecturerId || assigningLecturer}
+            startIcon={assigningLecturer ? <CircularProgress size={16} /> : <PersonIcon />}
+          >
+            {assigningLecturer ? "Assigning..." : "Assign Lecturer"}
           </Button>
         </DialogActions>
       </Dialog>

@@ -123,6 +123,24 @@ const ClassServices = {
       };
     }
   },
+  enrollLecturer: async (classSectionId, lecturerId) => {
+    try {
+      const { data } = await instance.post(
+        `/class-sections/${classSectionId}/lecturers/${lecturerId}`,
+        {}
+      );
+      return {
+        data,
+        error: null
+      };
+    } catch (error) {
+      console.error("Error enrolling lecturer:", error);
+      return {
+        data: null,
+        error: error.response ? error.response.data?.errors : "Network Error"
+      };
+    }
+  },
   createSchedule: async (scheduleData) => {
     try {
       const { data } = await instance.post(`/schedules`, {

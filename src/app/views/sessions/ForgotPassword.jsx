@@ -1,9 +1,12 @@
+import Button from "@mui/material/Button";
+import Card from "@mui/material/Card";
+import TextField from "@mui/material/TextField";
+import Typography from "@mui/material/Typography";
+import { styled } from "@mui/material/styles";
+import { useSnackbar } from "notistack";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Card from "@mui/material/Card";
-import Button from "@mui/material/Button";
-import TextField from "@mui/material/TextField";
-import { styled } from "@mui/material/styles";
+import AuthService from "services/auth.service";
 
 // STYLED COMPONENTS
 const StyledRoot = styled("div")(() => ({
@@ -32,10 +35,33 @@ const ContentBox = styled("div")(({ theme }) => ({
 
 export default function ForgotPassword() {
   const navigate = useNavigate();
-  const [email, setEmail] = useState("admin@example.com");
+  const { enqueueSnackbar } = useSnackbar();
+  const [email, setEmail] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleFormSubmit = () => {
-    console.log(email);
+  const handleFormSubmit = async (e) => {
+    e.preventDefault();
+    if (!email.trim()) {
+      enqueueSnackbar("Please enter your email", { variant: "warning" });
+      return;
+    }
+    setSubmitting(true);
+    try {
+      const res = await AuthService.requestPasswordReset(email.trim());
+      if (res.error) {
+        enqueueSnackbar(typeof res.error === "string" ? res.error : "Network error", {
+          variant: "error"
+        });
+      } else {
+        enqueueSnackbar("Password reset email sent if account exists.", {
+          variant: "success"
+        });
+      }
+    } catch {
+      enqueueSnackbar("Some error occurred", { variant: "error" });
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -47,6 +73,9 @@ export default function ForgotPassword() {
 
         <ContentBox>
           <form onSubmit={handleFormSubmit}>
+            <Typography variant="h6" sx={{ mb: 2 }}>
+              Forgot Password
+            </Typography>
             <TextField
               type="email"
               name="email"
@@ -56,10 +85,11 @@ export default function ForgotPassword() {
               variant="outlined"
               onChange={(e) => setEmail(e.target.value)}
               sx={{ mb: 3, width: "100%" }}
+              required
             />
 
-            <Button fullWidth variant="contained" color="primary" type="submit">
-              Reset Password
+            <Button fullWidth variant="contained" color="primary" type="submit" disabled={submitting}>
+              {submitting ? "Sending..." : "Reset Password"}
             </Button>
 
             <Button
