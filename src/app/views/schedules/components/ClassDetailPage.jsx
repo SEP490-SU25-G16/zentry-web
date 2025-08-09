@@ -431,7 +431,7 @@ const ClassDetailPage = () => {
         <Typography variant="h4" component="h1" sx={{ flexGrow: 1 }}>
           Class Details
         </Typography>
-        <Button
+        {/* <Button
           variant="contained"
           onClick={handleEnrollStudent}
           startIcon={<PersonAddIcon />}
@@ -443,7 +443,7 @@ const ClassDetailPage = () => {
           }}
         >
           Enroll Students
-        </Button>
+        </Button> */}
         <Button
           variant="outlined"
           onClick={handleOpenAssignLecturer}

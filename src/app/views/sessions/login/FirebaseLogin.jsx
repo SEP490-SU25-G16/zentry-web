@@ -1,24 +1,19 @@
-import { NavLink, useLocation, useNavigate } from "react-router-dom";
-import { useSnackbar } from "notistack";
 import { Formik } from "formik";
+import { useSnackbar } from "notistack";
+import { useLocation, useNavigate } from "react-router-dom";
 import * as Yup from "yup";
 
+import LoadingButton from "@mui/lab/LoadingButton";
 import Box from "@mui/material/Box";
-import Card from "@mui/material/Card";
-import Grid from "@mui/material/Grid2";
 import Button from "@mui/material/Button";
 import Checkbox from "@mui/material/Checkbox";
-import TextField from "@mui/material/TextField";
-import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import Paper from "@mui/material/Paper";
-import Divider from "@mui/material/Divider";
 import { styled, useTheme } from "@mui/material/styles";
-import LoadingButton from "@mui/lab/LoadingButton";
+import TextField from "@mui/material/TextField";
+import Typography from "@mui/material/Typography";
 // GLOBAL CUSTOM COMPONENTS
 import MatxLogo from "app/components/MatxLogo";
-import MatxDivider from "app/components/MatxDivider";
-import { Paragraph, Span } from "app/components/Typography";
 // GLOBAL CUSTOM HOOKS
 import useAuth from "app/hooks/useAuth";
 
@@ -222,7 +217,7 @@ export default function FirebaseLogin() {
             </Typography>
           </Box>
 
-          <GoogleButton
+          {/* <GoogleButton
             fullWidth
             variant="outlined"
             onClick={handleGoogleLogin}
@@ -230,15 +225,15 @@ export default function FirebaseLogin() {
             sx={{ mb: 3, py: 1.5 }}
           >
             Continue with Google
-          </GoogleButton>
+          </GoogleButton> */}
 
-          <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
+          {/* <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
             <Divider sx={{ flex: 1 }} />
             <Typography variant="body2" sx={{ mx: 2, color: "text.secondary" }}>
               or
             </Typography>
             <Divider sx={{ flex: 1 }} />
-          </Box>
+          </Box> */}
 
           <Formik
             onSubmit={handleFormSubmit}
@@ -301,7 +296,7 @@ export default function FirebaseLogin() {
                     <Typography variant="body2">Remember me</Typography>
                   </Box>
 
-                  <NavLink
+                  {/* <NavLink
                     to="/session/forgot-password"
                     style={{
                       color: theme.palette.primary.main,
@@ -310,7 +305,7 @@ export default function FirebaseLogin() {
                     }}
                   >
                     Forgot password?
-                  </NavLink>
+                  </NavLink> */}
                 </Box>
 
                 <LoadingButton
