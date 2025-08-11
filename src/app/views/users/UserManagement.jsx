@@ -1,7 +1,6 @@
 import {
   Add as AddIcon,
   Badge as BadgeIcon,
-  Delete as DeleteIcon,
   Edit as EditIcon,
   Email as EmailIcon,
   ImportExport,
@@ -24,6 +23,8 @@ import {
   InputAdornment,
   MenuItem,
   Paper,
+  Stack,
+  Switch,
   Table,
   TableBody,
   TableCell,
@@ -78,7 +79,7 @@ const UserManagement = () => {
     // Computed values
     getPaginatedUsers,
     getFilteredCount
-  } = useUsers();
+  , changeUserStatus } = useUsers();
 
   // Modal states
   const [openModal, setOpenModal] = useState(false);
@@ -609,12 +610,24 @@ const UserManagement = () => {
                       />
                     </TableCell>
                     <TableCell sx={{ py: 2, px: 3 }}>
-                      <Chip
-                        label={user.Status}
-                        variant="filled"
-                        size="small"
-                        color={getStatusColor(user.Status)}
-                      />
+                      <Stack direction="row" spacing={1} alignItems="center">
+                        <Chip
+                          label={user.Status}
+                          variant="filled"
+                          size="small"
+                          color={getStatusColor(user.Status)}
+                        />
+                        <Tooltip title="Toggle status">
+                          <Switch
+                            size="small"
+                            checked={(user.Status || "").toLowerCase() === "active"}
+                            onChange={async (e) => {
+                              const next = e.target.checked ? "Active" : "Inactive";
+                              await changeUserStatus(user.UserId, next);
+                            }}
+                          />
+                        </Tooltip>
+                      </Stack>
                     </TableCell>
                     <TableCell sx={{ py: 2, px: 3 }}>
                       <Typography variant="body2" color="text.secondary">
@@ -632,7 +645,7 @@ const UserManagement = () => {
                           <EditIcon fontSize="small" />
                         </IconButton>
                       </Tooltip>
-                      <Tooltip title="Delete User">
+                      {/* <Tooltip title="Delete User">
                         <IconButton
                           size="small"
                           color="error"
@@ -640,7 +653,7 @@ const UserManagement = () => {
                         >
                           <DeleteIcon fontSize="small" />
                         </IconButton>
-                      </Tooltip>
+                      </Tooltip> */}
                     </TableCell>
                   </TableRow>
                 ))

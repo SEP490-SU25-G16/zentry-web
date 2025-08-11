@@ -1,31 +1,22 @@
-import { memo } from "react";
-import { Link } from "react-router-dom";
-import Box from "@mui/material/Box";
+import Menu from "@mui/icons-material/Menu";
+import PowerSettingsNew from "@mui/icons-material/PowerSettingsNew";
 import Avatar from "@mui/material/Avatar";
-import MenuItem from "@mui/material/MenuItem";
+import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
+import MenuItem from "@mui/material/MenuItem";
 import styled from "@mui/material/styles/styled";
 import useTheme from "@mui/material/styles/useTheme";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import Home from "@mui/icons-material/Home";
-import Menu from "@mui/icons-material/Menu";
-import Person from "@mui/icons-material/Person";
-import Settings from "@mui/icons-material/Settings";
-import WebAsset from "@mui/icons-material/WebAsset";
-import MailOutline from "@mui/icons-material/MailOutline";
-import StarOutline from "@mui/icons-material/StarOutline";
-import PowerSettingsNew from "@mui/icons-material/PowerSettingsNew";
+import { memo } from "react";
 
 import useAuth from "app/hooks/useAuth";
 import useSettings from "app/hooks/useSettings";
-import { NotificationProvider } from "app/contexts/NotificationContext";
 
-import { Span } from "app/components/Typography";
-import ShoppingCart from "app/components/ShoppingCart";
+import { Home } from "@mui/icons-material";
 import { MatxMenu, MatxSearchBox } from "app/components";
-import { NotificationBar } from "app/components/NotificationBar";
-import { themeShadows } from "app/components/MatxTheme/themeColors";
+import { Span } from "app/components/Typography";
 import { topBarHeight } from "app/utils/constant";
+import { Link } from "react-router-dom";
 
 // STYLED COMPONENTS
 const StyledIconButton = styled(IconButton)(({ theme }) => ({
@@ -113,9 +104,9 @@ const Layout1Topbar = () => {
         <Box display="flex" alignItems="center">
           <MatxSearchBox />
 
-          <NotificationProvider>
+          {/* <NotificationProvider>
             <NotificationBar />
-          </NotificationProvider>
+          </NotificationProvider> */}
 
           {/* <ShoppingCart /> */}
 
@@ -141,14 +132,14 @@ const Layout1Topbar = () => {
               </UserMenu>
             }
           >
-            <StyledItem>
-              <Link to="/">
+             <StyledItem>
+              <Link to="/dashboard/default">
                 <Home />
                 <Span sx={{ marginInlineStart: 1 }}>Home</Span>
               </Link>
             </StyledItem>
 
-            <StyledItem>
+            {/*<StyledItem>
               <Link to="/page-layouts/user-profile">
                 <Person />
                 <Span sx={{ marginInlineStart: 1 }}>Profile</Span>
@@ -158,7 +149,7 @@ const Layout1Topbar = () => {
             <StyledItem>
               <Settings />
               <Span sx={{ marginInlineStart: 1 }}>Settings</Span>
-            </StyledItem>
+            </StyledItem> */}
 
             <StyledItem onClick={logout}>
               <PowerSettingsNew />

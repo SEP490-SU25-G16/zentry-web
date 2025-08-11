@@ -211,6 +211,26 @@ export const useUsers = () => {
     }
   };
 
+  const changeUserStatus = async (userId, status) => {
+    setSubmitting(true);
+    try {
+      const result = await UserServices.changeUserStatus(userId, status);
+      if (result.error) {
+        enqueueSnackbar(result.error, { variant: "error" });
+        return { success: false, error: result.error };
+      } else {
+        enqueueSnackbar("User status updated", { variant: "success" });
+        await fetchUsers();
+        return { success: true };
+      }
+    } catch {
+      enqueueSnackbar("Failed to update status", { variant: "error" });
+      return { success: false, error: "Failed to update status" };
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   return {
     // State
     users,
@@ -232,6 +252,7 @@ export const useUsers = () => {
     createUser,
     updateUser,
     deleteUser,
+    changeUserStatus,
 
     // Handlers
     handleChangePage,

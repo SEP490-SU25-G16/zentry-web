@@ -97,6 +97,18 @@ const UserServices = {
       };
     }
   }
+  ,
+  changeUserStatus: async (userId, status) => {
+    try {
+      const { data } = await instance.put(`/user/${userId}/status`, { status });
+      return { data, error: null };
+    } catch (error) {
+      return {
+        data: null,
+        error: error.response ? error.response.data?.Error?.Message || error.response.data : "Network Error"
+      };
+    }
+  }
 };
 
 export default UserServices;

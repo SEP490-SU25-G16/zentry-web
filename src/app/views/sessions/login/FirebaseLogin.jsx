@@ -194,14 +194,6 @@ export default function FirebaseLogin() {
               <Typography variant="body1">Limitless Pages & Components</Typography>
             </FeatureItem>
           </Box>
-
-          <Box sx={{ mt: "auto" }}>
-            <img
-              src="/assets/images/logos/ui-lib.png"
-              alt="UI Lib Logo"
-              style={{ width: 40, height: 40, opacity: 0.8 }}
-            />
-          </Box>
         </Container>
       </LeftPanel>
 
