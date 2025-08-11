@@ -9,6 +9,7 @@ import PersonIcon from "@mui/icons-material/Person";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import RoomIcon from "@mui/icons-material/Room";
 import SearchIcon from "@mui/icons-material/Search";
+import UploadFileIcon from "@mui/icons-material/UploadFile";
 import {
   Alert,
   Avatar,
@@ -46,7 +47,9 @@ import {
   TextField,
   Typography
 } from "@mui/material";
-import { useEffect, useState } from "react";
+import { instance } from "lib/axios";
+import { enqueueSnackbar } from "notistack";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import RoomServices from "services/rooms.service";
 import { useUsers } from "../../users/hooks";
@@ -75,8 +78,7 @@ const ClassDetailPage = () => {
   const [enrollmentRowsPerPage, setEnrollmentRowsPerPage] = useState(5);
   const [schedulePage, setSchedulePage] = useState(0);
   const [scheduleRowsPerPage, setScheduleRowsPerPage] = useState(5);
-
-  console.log("rooms", rooms);
+  // const [sessions, setSessions] = useState([]);
 
   // Add Schedule Modal state
   const [addScheduleModalOpen, setAddScheduleModalOpen] = useState(false);
@@ -95,7 +97,17 @@ const ClassDetailPage = () => {
   const [selectedLecturerId, setSelectedLecturerId] = useState("");
   const [assigningLecturer, setAssigningLecturer] = useState(false);
 
+  // Import students state
+  const [importStudentsOpen, setImportStudentsOpen] = useState(false);
+  const [importStudentsFile, setImportStudentsFile] = useState(null);
+  const [importingStudents, setImportingStudents] = useState(false);
+
   const lecturers = users.filter((user) => user.Role === "Lecturer");
+
+  const fetchSessions = useCallback(async () => {
+    const result = await instance.get(`class-sections/${id}/sessions`);
+    console.log("🚀 ~ fetchSessions ~ result:", result);
+  }, [id]);
 
   useEffect(() => {
     const fetchClassDetail = async () => {
@@ -120,6 +132,10 @@ const ClassDetailPage = () => {
         setLoading(false);
       }
     };
+
+    (async () => {
+      await fetchSessions();
+    })();
 
     fetchClassDetail();
   }, []);
@@ -158,6 +174,43 @@ const ClassDetailPage = () => {
     setEnrollModalOpen(true);
     setSelectedStudents([]);
     setStudentSearchTerm("");
+  };
+
+  const handleOpenImportStudents = () => {
+    setImportStudentsOpen(true);
+    setImportStudentsFile(null);
+  };
+
+  const handleCloseImportStudents = () => {
+    setImportStudentsOpen(false);
+    setImportStudentsFile(null);
+  };
+
+  const handleImportStudentsSubmit = async () => {
+    if (!importStudentsFile) return;
+    const isCsv = importStudentsFile.type === "text/csv" || importStudentsFile.name.toLowerCase().endsWith(".csv");
+    if (!isCsv) return;
+    setImportingStudents(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", importStudentsFile);
+      formData.append("classSectionId", id);
+      const res = await instance.post("/enrollments/import", formData, {
+        headers: { "Content-Type": "multipart/form-data" }
+      });
+      enqueueSnackbar(res.data?.Message, { variant: "success" });
+      if (res?.data) {
+        handleCloseImportStudents();
+        const classResult = await getClass(id);
+        if (classResult.success) {
+          setClassDetail(classResult.data);
+        }
+      }
+    } catch (error) {
+      enqueueSnackbar(error.response?.data?.Message, { variant: "error" });
+    } finally {
+      setImportingStudents(false);
+    }
   };
 
   const handleCloseEnrollModal = () => {
@@ -431,9 +484,9 @@ const ClassDetailPage = () => {
         <Typography variant="h4" component="h1" sx={{ flexGrow: 1 }}>
           Class Details
         </Typography>
-        {/* <Button
+        <Button
           variant="contained"
-          onClick={handleEnrollStudent}
+          onClick={handleOpenImportStudents}
           startIcon={<PersonAddIcon />}
           sx={{
             borderRadius: "8px",
@@ -442,8 +495,8 @@ const ClassDetailPage = () => {
             py: 1
           }}
         >
-          Enroll Students
-        </Button> */}
+          Import Students
+        </Button>
         <Button
           variant="outlined"
           onClick={handleOpenAssignLecturer}
@@ -686,6 +739,19 @@ const ClassDetailPage = () => {
                 }}
               >
                 Enroll More Students
+              </Button>
+              <Button
+                variant="outlined"
+                onClick={handleOpenImportStudents}
+                startIcon={<UploadFileIcon />}
+                sx={{
+                  borderRadius: "8px",
+                  textTransform: "none",
+                  px: 3,
+                  py: 1
+                }}
+              >
+                Import Students
               </Button>
             </Box>
 
@@ -1363,6 +1429,43 @@ const ClassDetailPage = () => {
             startIcon={addingSchedule ? <CircularProgress size={16} /> : <AddIcon />}
           >
             {addingSchedule ? "Adding..." : "Add Schedule"}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Import Students Modal */}
+      <Dialog
+        open={importStudentsOpen}
+        onClose={handleCloseImportStudents}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{ sx: { borderRadius: "12px", p: 1 } }}
+      >
+        <DialogTitle sx={{ pb: 2 }}>
+          <Typography variant="h6" component="div">Import Students</Typography>
+        </DialogTitle>
+        <DialogContent sx={{ pb: 2 }}>
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+            <Button variant="outlined" component="label" sx={{ alignSelf: "flex-start" }} startIcon={<UploadFileIcon />}>
+              Choose CSV File
+              <input hidden type="file" accept=".csv" onChange={(e) => setImportStudentsFile(e.target.files?.[0] || null)} />
+            </Button>
+            <Typography variant="body2" color="text.secondary">
+              {importStudentsFile ? `Selected: ${importStudentsFile.name}` : "No file selected"}
+            </Typography>
+          </Box>
+        </DialogContent>
+        <DialogActions sx={{ p: 3, pt: 1 }}>
+          <Button onClick={handleCloseImportStudents} color="inherit" sx={{ borderRadius: "8px", textTransform: "none", px: 3 }}>
+            Cancel
+          </Button>
+          <Button
+            onClick={handleImportStudentsSubmit}
+            variant="contained"
+            disabled={!importStudentsFile || importingStudents}
+            sx={{ borderRadius: "8px", textTransform: "none", px: 3 }}
+          >
+            {importingStudents ? <CircularProgress size={20} color="inherit" /> : "Import"}
           </Button>
         </DialogActions>
       </Dialog>
