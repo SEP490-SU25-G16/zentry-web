@@ -1,3 +1,4 @@
+import { enqueueSnackbar } from "notistack";
 import { useEffect, useState } from "react";
 import DefinitionServices from "../services/difinition.service";
 import SettingServices from "../services/setting.service";
@@ -6,6 +7,7 @@ export const useSetting = () => {
   const [openSettingModal, setOpenSettingModal] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [editingId, setEditingId] = useState(null);
   const [formData, setFormData] = useState({
     attributeKey: "",
     scopeType: "",
@@ -15,30 +17,7 @@ export const useSetting = () => {
   const [formErrors, setFormErrors] = useState({});
   const [attributeDefinitions, setAttributeDefinitions] = useState([]);
 
-  // Data type mapping
-  const dataTypeMap = {
-    1: "String",
-    2: "Int",
-    3: "Boolean",
-    4: "Decimal",
-    5: "Date",
-    6: "Json",
-    7: "Selection"
-  };
-
-  // Scope type mapping
-  const scopeTypeMap = {
-    1: "Global",
-    2: "Course",
-    3: "Session"
-  };
-
-  // Reverse mapping for API calls
-  const reverseScopeTypeMap = {
-    Global: 1,
-    Course: 2,
-    Session: 3
-  };
+  // (Mappings not needed here; settings API uses string values)
 
   // Fetch attribute definitions when component mounts
   useEffect(() => {
@@ -78,6 +57,7 @@ export const useSetting = () => {
 
   const handleOpenModal = () => {
     setOpenSettingModal(true);
+    setEditingId(null);
   };
 
   const handleCloseModal = () => {
@@ -89,6 +69,7 @@ export const useSetting = () => {
       value: ""
     });
     setFormErrors({});
+    setEditingId(null);
   };
 
   const handleFormChange = (field) => (event) => {
@@ -206,14 +187,16 @@ export const useSetting = () => {
         case "Json":
           try {
             JSON.parse(value);
-          } catch (e) {
+          } catch {
             errors.value = "Value must be a valid JSON string";
           }
           break;
         case "Selection":
-          const validOptions = selectedDefinition.options?.map((option) => option.Value) || [];
-          if (validOptions.length > 0 && !validOptions.includes(value)) {
-            errors.value = "Value must be one of the available options";
+          {
+            const validOptions = selectedDefinition.options?.map((option) => option.Value) || [];
+            if (validOptions.length > 0 && !validOptions.includes(value)) {
+              errors.value = "Value must be one of the available options";
+            }
           }
           break;
         // String type doesn't need additional validation
@@ -244,11 +227,13 @@ export const useSetting = () => {
 
       console.log("Creating setting:", settingData);
 
-      // Call API to create setting
-      const result = await SettingServices.createSetting(settingData);
+      const result = editingId
+        ? await SettingServices.updateSetting(editingId, settingData)
+        : await SettingServices.createSetting(settingData);
 
       if (result.error) {
         console.error("API Error:", result.error);
+        enqueueSnackbar(result.error, { variant: "error" });
 
         // Set specific field errors based on the error message
         if (result.error.includes("ScopeId")) {
@@ -271,16 +256,46 @@ export const useSetting = () => {
         // TODO: Show error message in snackbar
         // showSnackbar(result.error, "error");
       } else {
-        console.log("Setting created successfully:", result.data);
+        console.log(editingId ? "Setting updated successfully:" : "Setting created successfully:", result.data);
         handleCloseModal();
         // TODO: Show success message and refresh data
         // showSnackbar("Setting created successfully!", "success");
         // refreshData();
       }
     } catch (error) {
-      console.error("Unexpected error creating setting:", error);
+      console.error("Unexpected error submitting setting:", error);
       // TODO: Show error message
       // showSnackbar("An unexpected error occurred. Please try again.", "error");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const beginEdit = (setting) => {
+    setEditingId(setting.id || setting.Id);
+    setOpenSettingModal(true);
+    setFormData({
+      attributeKey: setting.attributeKey,
+      scopeType: setting.scopeType,
+      scopeId: setting.scopeId || "",
+      value: String(setting.value ?? "")
+    });
+  };
+
+  const deleteSetting = async (settingId) => {
+    setSubmitting(true);
+    try {
+      const result = await SettingServices.deleteSetting(settingId);
+      if (result.error) {
+        enqueueSnackbar(result.error, { variant: "error" });
+        return { success: false };
+      }
+      enqueueSnackbar("Setting deleted", { variant: "success" });
+      return { success: true };
+    } catch (error) {
+      console.error("Failed to delete setting", error);
+      enqueueSnackbar("Failed to delete setting", { variant: "error" });
+      return { success: false };
     } finally {
       setSubmitting(false);
     }
@@ -294,12 +309,15 @@ export const useSetting = () => {
     formData,
     formErrors,
     attributeDefinitions,
+    editingId,
 
     // Handlers
     handleOpenModal,
     handleCloseModal,
     handleFormChange,
     handleSubmit,
-    fetchAttributeDefinitions
+    fetchAttributeDefinitions,
+    beginEdit,
+    deleteSetting
   };
 };

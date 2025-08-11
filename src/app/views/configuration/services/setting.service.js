@@ -72,6 +72,44 @@ const SettingServices = {
       };
     }
   },
+  updateSetting: async (settingId, setting) => {
+    const { attributeKey, scopeType, scopeId, value } = setting;
+    try {
+      const { data } = await instance.put(`/configurations/settings/${settingId}`, {
+        attributeKey,
+        scopeType,
+        scopeId,
+        value: String(value)
+      });
+      return { data, error: null };
+    } catch (error) {
+      return {
+        data: null,
+        error:
+          error.response?.data?.error?.message ||
+          error.response?.data?.message ||
+          "Failed to update setting."
+      };
+    } finally {
+      window.location.reload();
+    }
+  },
+  deleteSetting: async (settingId) => {
+    try {
+      const { data } = await instance.delete(`/configurations/settings/${settingId}`);
+      return { data, error: null };
+    } catch (error) {
+      return {
+        data: null,
+        error:
+          error.response?.data?.error?.message ||
+          error.response?.data?.message ||
+          "Failed to delete setting."
+      };
+    }finally {
+      window.location.reload();
+    }
+  },
   getSettings: async () => {
     try {
       const { data } = await instance.get("/configurations/settings", {

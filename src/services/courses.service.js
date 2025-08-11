@@ -62,7 +62,7 @@ const CourseServices = {
       console.error("Error deleting course:", error);
       return {
         data: null,
-        error: error.response ? error.response.data?.errors : "Network Error"
+        error: error.response ? error.response.data?.Error?.Message : "Network Error"
       };
     }
   }

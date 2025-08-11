@@ -1,10 +1,18 @@
+import { Delete as DeleteIcon, Edit as EditIcon } from "@mui/icons-material";
 import {
   Box,
+  Button,
   Card,
   CardContent,
   Chip,
   CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   Grid,
+  IconButton,
   Paper,
   Table,
   TableBody,
@@ -14,8 +22,27 @@ import {
   TableRow,
   Typography
 } from "@mui/material";
+import { useState } from "react";
 
-const DefinitionsTable = ({ definitions, loading, searchTerm }) => {
+const DefinitionsTable = ({ definitions, loading, searchTerm, onEdit, onDelete }) => {
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [pendingDelete, setPendingDelete] = useState(null);
+
+  const openConfirm = (definition) => {
+    setPendingDelete(definition);
+    setConfirmOpen(true);
+  };
+
+  const closeConfirm = () => {
+    setConfirmOpen(false);
+    setPendingDelete(null);
+  };
+
+  const confirmDelete = async () => {
+    if (!pendingDelete) return;
+    await onDelete?.(pendingDelete);
+    closeConfirm();
+  };
   const getDataTypeColor = (dataType) => {
     const colors = {
       String: "primary",
@@ -54,13 +81,14 @@ const DefinitionsTable = ({ definitions, loading, searchTerm }) => {
       <TableContainer component={Paper} sx={{ boxShadow: "none", border: "1px solid #e0e0e0" }}>
         <Table>
           <TableHead>
-            <TableRow sx={{ backgroundColor: "#f5f5f5" }}>
+              <TableRow sx={{ backgroundColor: "#f5f5f5" }}>
               <TableCell sx={{ fontWeight: 600, padding: "16px" }}>Key</TableCell>
               <TableCell sx={{ fontWeight: 600, padding: "16px" }}>Display Name</TableCell>
               <TableCell sx={{ fontWeight: 600, padding: "16px" }}>Data Type</TableCell>
               <TableCell sx={{ fontWeight: 600, padding: "16px" }}>Allowed Scopes</TableCell>
               <TableCell sx={{ fontWeight: 600, padding: "16px" }}>Default Value</TableCell>
-              <TableCell sx={{ fontWeight: 600, padding: "16px" }}>Description</TableCell>
+                <TableCell sx={{ fontWeight: 600, padding: "16px" }}>Description</TableCell>
+                <TableCell sx={{ fontWeight: 600, padding: "16px", width: 120 }}>Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -108,6 +136,22 @@ const DefinitionsTable = ({ definitions, loading, searchTerm }) => {
                     {definition.description}
                   </Typography>
                 </TableCell>
+                <TableCell sx={{ padding: "16px" }}>
+                  <Box sx={{ display: "flex", gap: 1 }}>
+                    <IconButton size="small" onClick={() => onEdit?.(definition)}>
+                      <EditIcon fontSize="small" />
+                    </IconButton>
+                    <IconButton
+                      size="small"
+                      color="error"
+                      onClick={() => openConfirm(definition)}
+                      disabled={definition.isDeletable === false}
+                      title={definition.isDeletable === false ? "This definition cannot be deleted" : "Delete"}
+                    >
+                      <DeleteIcon fontSize="small" />
+                    </IconButton>
+                  </Box>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -137,6 +181,19 @@ const DefinitionsTable = ({ definitions, loading, searchTerm }) => {
             </CardContent>
           </Card>
         ))}
+
+      <Dialog open={confirmOpen} onClose={closeConfirm}>
+        <DialogTitle>Confirm Delete</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Bạn có chắc muốn xóa definition "{pendingDelete?.displayName}"? Hành động này không thể hoàn tác.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={closeConfirm} color="inherit">Hủy</Button>
+          <Button onClick={confirmDelete} color="error" variant="contained">Xóa</Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };

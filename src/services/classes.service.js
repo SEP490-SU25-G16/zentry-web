@@ -12,7 +12,7 @@ const ClassServices = {
       console.error("Error creating class:", error);
       return {
         data: null,
-        error: error.response ? error.response.data : "Network Error"
+        error: error.response ? error.response.data?.Error?.Message : "Network Error"
       };
     }
   },
@@ -83,7 +83,7 @@ const ClassServices = {
       console.error("Error deleting class:", error);
       return {
         data: null,
-        error: error.response ? error.response.data?.errors : "Network Error"
+        error: error.response ? error.response.data?.Error?.Message : "Network Error"
       };
     }
   },

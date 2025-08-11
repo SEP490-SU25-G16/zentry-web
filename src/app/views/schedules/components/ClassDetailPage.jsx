@@ -335,7 +335,7 @@ const ClassDetailPage = () => {
 
   // Filter students based on search term and exclude already enrolled
   const availableStudents = users
-    .filter((user) => user.Role === "Student") // Only show students
+    .filter((user) => user.Role === "Student" && user.Status === "Active") // Only show students
     .filter(
       (user) =>
         user.FullName?.toLowerCase().includes(studentSearchTerm.toLowerCase()) ||

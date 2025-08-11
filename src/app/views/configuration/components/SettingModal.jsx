@@ -25,7 +25,8 @@ const SettingModal = ({
   loading,
   attributeDefinitions,
   onFormChange,
-  onSubmit
+  onSubmit,
+  isEditing
 }) => {
   const scopeTypes = ["Global", "Course", "Session"];
 
@@ -208,7 +209,7 @@ const SettingModal = ({
     >
       <DialogTitle sx={{ pb: 2 }}>
         <Typography variant="h6" component="div">
-          Create Setting
+          {isEditing ? "Update Setting" : "Create Setting"}
         </Typography>
       </DialogTitle>
       <DialogContent sx={{ pb: 2 }}>
@@ -377,7 +378,13 @@ const SettingModal = ({
           }}
           disabled={submitting}
         >
-          {submitting ? <CircularProgress size={20} color="inherit" /> : "Create Setting"}
+          {submitting ? (
+            <CircularProgress size={20} color="inherit" />
+          ) : isEditing ? (
+            "Update Setting"
+          ) : (
+            "Create Setting"
+          )}
         </Button>
       </DialogActions>
     </Dialog>

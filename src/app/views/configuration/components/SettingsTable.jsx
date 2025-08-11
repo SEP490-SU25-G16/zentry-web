@@ -1,7 +1,15 @@
+import { Delete as DeleteIcon, Edit as EditIcon } from "@mui/icons-material";
 import {
   Box,
+  Button,
   Chip,
   CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  IconButton,
   Paper,
   Table,
   TableBody,
@@ -12,8 +20,27 @@ import {
   Tooltip,
   Typography
 } from "@mui/material";
+import { useState } from "react";
 
-const SettingsTable = ({ settings, loading, pagination, searchTerm }) => {
+const SettingsTable = ({ settings, loading, searchTerm, onEdit, onDelete }) => {
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [pendingDelete, setPendingDelete] = useState(null);
+
+  const openConfirm = (setting) => {
+    setPendingDelete(setting);
+    setConfirmOpen(true);
+  };
+
+  const closeConfirm = () => {
+    setConfirmOpen(false);
+    setPendingDelete(null);
+  };
+
+  const confirmDelete = async () => {
+    if (!pendingDelete) return;
+    await onDelete?.(pendingDelete);
+    closeConfirm();
+  };
   const getScopeTypeColor = (scopeType) => {
     const colors = {
       Global: "primary",
@@ -78,6 +105,7 @@ const SettingsTable = ({ settings, loading, pagination, searchTerm }) => {
               <TableCell sx={{ fontWeight: 600, padding: "16px" }}>Scope ID</TableCell>
               <TableCell sx={{ fontWeight: 600, padding: "16px" }}>Value</TableCell>
               <TableCell sx={{ fontWeight: 600, padding: "16px" }}>Updated At</TableCell>
+              <TableCell sx={{ fontWeight: 600, padding: "16px", width: 120 }}>Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -130,11 +158,34 @@ const SettingsTable = ({ settings, loading, pagination, searchTerm }) => {
                     {formatDate(setting.updatedAt)}
                   </Typography>
                 </TableCell>
+                <TableCell sx={{ padding: "16px" }}>
+                  <Box sx={{ display: "flex", gap: 1 }}>
+                    <IconButton size="small" onClick={() => onEdit?.(setting)}>
+                      <EditIcon fontSize="small" />
+                    </IconButton>
+                    <IconButton size="small" color="error" onClick={() => openConfirm(setting)}>
+                      <DeleteIcon fontSize="small" />
+                    </IconButton>
+                  </Box>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
       </TableContainer>
+
+      <Dialog open={confirmOpen} onClose={closeConfirm}>
+        <DialogTitle>Confirm Delete</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Bạn có chắc muốn xóa setting cho "{pendingDelete?.attributeKey}" ở scope "{pendingDelete?.scopeType}"?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={closeConfirm} color="inherit">Hủy</Button>
+          <Button onClick={confirmDelete} color="error" variant="contained">Xóa</Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };

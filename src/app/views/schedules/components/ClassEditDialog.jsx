@@ -105,15 +105,19 @@ const ClassEditDialog = ({ open, initialData, onClose, onSave, courses = [], lec
           onChange={handleChange}
         />
 
-        <TextField
-          margin="dense"
-          label="Semester"
-          name="semester"
-          fullWidth
-          value={formData.semester || ""}
-          onChange={handleChange}
-          placeholder="e.g., SP25, FA24, SU25"
-        />
+        <FormControl fullWidth margin="dense">
+          <InputLabel>Semester</InputLabel>
+          <Select
+            name="semester"
+            value={formData.semester || ""}
+            label="Semester"
+            onChange={handleChange}
+          >
+            <MenuItem value="SP25">SP25</MenuItem>
+            <MenuItem value="FA24">FA25</MenuItem>
+            <MenuItem value="SU25">SU25</MenuItem>
+          </Select>
+        </FormControl>
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Cancel</Button>

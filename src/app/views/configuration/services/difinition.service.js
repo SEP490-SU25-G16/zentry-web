@@ -57,6 +57,28 @@ const DefinitionServices = {
           : "An error occurred while fetching definitions."
       };
     }
+  },
+  updateDefinition: async (definitionId, definition) => {
+    try {
+      const { data } = await instance.put(`/configurations/definitions/${definitionId}`, definition);
+      return { data, error: null };
+    } catch (error) {
+      return {
+        data: null,
+        error: error.response ? error.response.data?.error?.message : "Failed to update definition"
+      };
+    }
+  },
+  deleteDefinition: async (definitionId) => {
+    try {
+      const { data } = await instance.delete(`/configurations/definitions/${definitionId}`);
+      return { data, error: null };
+    } catch (error) {
+      return {
+        data: null,
+        error: error.response ? error.response.data?.error?.message : "Failed to delete definition"
+      };
+    }
   }
 };
 

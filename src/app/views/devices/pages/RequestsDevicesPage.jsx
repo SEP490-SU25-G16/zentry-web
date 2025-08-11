@@ -28,6 +28,7 @@ import {
   Tooltip,
   Typography
 } from "@mui/material";
+import { instance } from "lib/axios";
 import { useSnackbar } from "notistack";
 import { useEffect, useState } from "react";
 import DeviceServices from "services/devices.service";
@@ -48,10 +49,23 @@ const RequestsDevicesPage = () => {
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const [actionType, setActionType] = useState(null); // 'approve' or 'reject'
   const [selectedDevice, setSelectedDevice] = useState(null);
+  const [userRequests, setUserRequests] = useState([]);
 
   useEffect(() => {
     fetchDevices();
+    (async () => {
+      const result = await fetchUserRequest();
+      console.log("🚀 ~ useEffect ~ result:", result.Data?.UserRequests)
+      setUserRequests(result.Data?.UserRequests);
+    })();
+
+
   }, []);
+
+  const fetchUserRequest = async () => {
+    const result = await instance.get("/user-requests");
+    return result.data;
+  }
 
   const fetchDevices = async () => {
     setLoading(true);
@@ -63,7 +77,6 @@ const RequestsDevicesPage = () => {
         setDevices([]);
         setTotalCount(0);
       } else {
-        console.log("🚀 ~ fetchDevices ~ result:", result.data)
         // Transform the API data to match the expected format, filter for Pending devices only
         const transformedDevices = (result.data || [])
           .map((device) => ({
@@ -84,6 +97,7 @@ const RequestsDevicesPage = () => {
             lastVerifiedAt: device.LastVerifiedAt
           }))
           .filter((device) => device.status === "Pending"); // Only show Pending devices
+        console.log("🚀 ~ fetchDevices ~ transformedDevices:", transformedDevices)
 
         setDevices(transformedDevices);
         setTotalCount(transformedDevices.length);
@@ -131,15 +145,15 @@ const RequestsDevicesPage = () => {
 
   const handleConfirmAction = async () => {
     if (!selectedDevice || !actionType) return;
-    console.log("🚀 ~ handleConfirmAction ~ selectedDevice:", selectedDevice)
 
     setSubmitting(true);
     try {
       let result;
+      const id = userRequests.find((user) => user.TargetUserId === selectedDevice.userId)?.Id;
       if (actionType === "approve") {
-        result = await DeviceServices.approveDevice(selectedDevice.userId);
+        result = await DeviceServices.approveDevice(id);
       } else {
-        result = await DeviceServices.rejectDevice(selectedDevice.userId);
+        result = await DeviceServices.rejectDevice(id);
       }
 
       if (result.error) {

@@ -49,7 +49,6 @@ const UserManagement = () => {
   // Use the custom hook for user management
   const {
     // State
-    users,
     loading,
     submitting,
     page,
@@ -94,6 +93,9 @@ const UserManagement = () => {
   const [formErrors, setFormErrors] = useState({});
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState(null);
+  const [confirmStatusOpen, setConfirmStatusOpen] = useState(false);
+  const [userToToggle, setUserToToggle] = useState(null);
+  const [nextStatus, setNextStatus] = useState(null);
 
   // Import users modal state
   const [importModalOpen, setImportModalOpen] = useState(false);
@@ -125,11 +127,11 @@ const UserManagement = () => {
     setOpenModal(true);
   };
 
-  const handleDelete = async (userId) => {
-    const user = users.find((u) => u.UserId === userId);
-    setUserToDelete(user);
-    setConfirmDeleteOpen(true);
-  };
+  // const handleDelete = async (userId) => {
+  //   const user = users.find((u) => u.UserId === userId);
+  //   setUserToDelete(user);
+  //   setConfirmDeleteOpen(true);
+  // };
 
   const handleConfirmDelete = async () => {
     if (!userToDelete) return;
@@ -617,16 +619,6 @@ const UserManagement = () => {
                           size="small"
                           color={getStatusColor(user.Status)}
                         />
-                        <Tooltip title="Toggle status">
-                          <Switch
-                            size="small"
-                            checked={(user.Status || "").toLowerCase() === "active"}
-                            onChange={async (e) => {
-                              const next = e.target.checked ? "Active" : "Inactive";
-                              await changeUserStatus(user.UserId, next);
-                            }}
-                          />
-                        </Tooltip>
                       </Stack>
                     </TableCell>
                     <TableCell sx={{ py: 2, px: 3 }}>
@@ -654,6 +646,18 @@ const UserManagement = () => {
                           <DeleteIcon fontSize="small" />
                         </IconButton>
                       </Tooltip> */}
+                      <Tooltip title="Toggle status">
+                          <Switch
+                            size="small"
+                            checked={(user.Status || "").toLowerCase() === "active"}
+                            onChange={async (e) => {
+                              const next = e.target.checked ? "Active" : "Inactive";
+                              setUserToToggle(user);
+                              setNextStatus(next);
+                              setConfirmStatusOpen(true);
+                            }}
+                          />
+                        </Tooltip>
                     </TableCell>
                   </TableRow>
                 ))
@@ -855,6 +859,60 @@ const UserManagement = () => {
             }}
           >
             {submitting ? <CircularProgress size={20} color="inherit" /> : "Delete"}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Status Change Confirmation Modal */}
+      <Dialog
+        open={confirmStatusOpen}
+        onClose={() => {
+          setConfirmStatusOpen(false);
+          setUserToToggle(null);
+          setNextStatus(null);
+        }}
+        maxWidth="xs"
+        fullWidth
+        PaperProps={{
+          sx: { borderRadius: "12px", p: 1 }
+        }}
+      >
+        <DialogTitle sx={{ pb: 2 }}>
+          <Typography variant="h6" component="div">
+            Confirm Status Change
+          </Typography>
+        </DialogTitle>
+        <DialogContent>
+          <Typography variant="body1">
+            Change status of <strong>{userToToggle?.FullName}</strong> ({userToToggle?.Email}) to
+            <strong> {nextStatus}</strong>?
+          </Typography>
+        </DialogContent>
+        <DialogActions sx={{ p: 3, pt: 1 }}>
+          <Button
+            onClick={() => {
+              setConfirmStatusOpen(false);
+              setUserToToggle(null);
+              setNextStatus(null);
+            }}
+            color="inherit"
+            sx={{ borderRadius: "8px", textTransform: "none", px: 3 }}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={async () => {
+              if (!userToToggle || !nextStatus) return;
+              await changeUserStatus(userToToggle.UserId, nextStatus);
+              setConfirmStatusOpen(false);
+              setUserToToggle(null);
+              setNextStatus(null);
+            }}
+            variant="contained"
+            disabled={submitting}
+            sx={{ borderRadius: "8px", textTransform: "none", px: 3 }}
+          >
+            {submitting ? <CircularProgress size={20} color="inherit" /> : "Confirm"}
           </Button>
         </DialogActions>
       </Dialog>

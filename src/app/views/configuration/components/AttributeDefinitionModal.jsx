@@ -40,7 +40,8 @@ const AttributeDefinitionModal = ({
   onDragEnter,
   onDrop,
   onDragEnd,
-  onSubmit
+  onSubmit,
+  isEditing
 }) => {
   const dataTypes = [
     { id: 1, name: "String" },
@@ -68,7 +69,7 @@ const AttributeDefinitionModal = ({
     >
       <DialogTitle sx={{ pb: 2 }}>
         <Typography variant="h6" component="div">
-          Create Attribute Definition
+          {isEditing ? "Update Attribute Definition" : "Create Attribute Definition"}
         </Typography>
       </DialogTitle>
       <DialogContent sx={{ pb: 2 }}>
@@ -313,7 +314,13 @@ const AttributeDefinitionModal = ({
           }}
           disabled={submitting}
         >
-          {submitting ? <CircularProgress size={20} color="inherit" /> : "Create Definition"}
+          {submitting ? (
+            <CircularProgress size={20} color="inherit" />
+          ) : isEditing ? (
+            "Update Definition"
+          ) : (
+            "Create Definition"
+          )}
         </Button>
       </DialogActions>
     </Dialog>

@@ -21,6 +21,7 @@ export const useAttributeDefinition = () => {
     options: []
   });
   const [formErrors, setFormErrors] = useState({});
+  const [editingId, setEditingId] = useState(null);
   const [optionInput, setOptionInput] = useState({
     value: "",
     displayLabel: ""
@@ -44,6 +45,7 @@ export const useAttributeDefinition = () => {
 
   const handleOpenModal = () => {
     setOpenAttributeModal(true);
+    setEditingId(null);
   };
 
   const handleCloseModal = () => {
@@ -60,6 +62,7 @@ export const useAttributeDefinition = () => {
       options: []
     });
     setFormErrors({});
+    setEditingId(null);
     setOptionInput({
       value: "",
       displayLabel: ""
@@ -265,10 +268,19 @@ export const useAttributeDefinition = () => {
         delete attributeDefinition.options;
       }
 
-      console.log("Creating attribute definition:", attributeDefinition);
-
-      // Call API to create attribute definition
-      const result = await DefinitionServices.createDefinition(attributeDefinition);
+      const result = editingId
+        ? await DefinitionServices.updateDefinition(editingId, {
+          Key: attributeDefinition.key,
+          DisplayName: attributeDefinition.displayName,
+          Description: attributeDefinition.description,
+          DataType: attributeDefinition.dataType,
+          AllowedScopeTypes: attributeDefinition.allowedScopeTypes || [],
+          Unit: attributeDefinition.unit || "",
+          DefaultValue: String(attributeDefinition.defaultValue ?? ""),
+          IsDeletable: Boolean(attributeDefinition.isDeletable),
+          Options: attributeDefinition.options || []
+        })
+        : await DefinitionServices.createDefinition(attributeDefinition);
 
       if (result.error) {
         // Handle API error
@@ -281,8 +293,10 @@ export const useAttributeDefinition = () => {
         );
       } else {
         // Success
-        console.log("Definition created successfully:", result.data);
-        showSnackbar("Attribute definition created successfully!", "success");
+        showSnackbar(
+          editingId ? "Attribute definition updated successfully!" : "Attribute definition created successfully!",
+          "success"
+        );
         handleCloseModal();
       }
     } catch (error) {
@@ -291,6 +305,42 @@ export const useAttributeDefinition = () => {
     } finally {
       setSubmitting(false);
       window.location.reload();
+    }
+  };
+
+  const beginEdit = (definition) => {
+    setEditingId(definition.attributeId || definition.id || definition.Id);
+    setFormData({
+      key: definition.key,
+      displayName: definition.displayName,
+      description: definition.description,
+      dataType: definition.dataType,
+      allowedScopeTypes: definition.allowedScopeTypes || [],
+      unit: definition.unit || "",
+      defaultValue: String(definition.defaultValue ?? ""),
+      isDeletable: Boolean(definition.isDeletable),
+      options: definition.options || []
+    });
+    setOpenAttributeModal(true);
+  };
+
+  const deleteDefinition = async (definitionId) => {
+    setSubmitting(true);
+    try {
+      const result = await DefinitionServices.deleteDefinition(definitionId);
+      if (result.error) {
+        showSnackbar(result.error, "error");
+        return { success: false };
+      } else {
+        showSnackbar("Attribute definition deleted", "success");
+        return { success: true };
+      }
+    } catch (error) {
+      console.error("Delete definition error:", error);
+      showSnackbar("Failed to delete definition", "error");
+      return { success: false };
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -320,6 +370,9 @@ export const useAttributeDefinition = () => {
     handleDragEnd,
     handleSubmit,
     handleCloseSnackbar,
-    showSnackbar
+    showSnackbar,
+    beginEdit,
+    deleteDefinition,
+    editingId
   };
 };

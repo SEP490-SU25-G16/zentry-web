@@ -45,7 +45,10 @@ const ConfigurationPage = () => {
     handleDrop,
     handleDragEnd,
     handleSubmit,
-    handleCloseSnackbar
+    handleCloseSnackbar,
+    beginEdit,
+    deleteDefinition,
+    editingId
   } = useAttributeDefinition();
 
   const {
@@ -56,19 +59,21 @@ const ConfigurationPage = () => {
     formData: settingFormData,
     formErrors: settingFormErrors,
     attributeDefinitions,
+    editingId: editingSettingId,
 
     // Setting Handlers
     handleOpenModal: handleOpenSettingModal,
     handleCloseModal: handleCloseSettingModal,
     handleFormChange: handleSettingFormChange,
-    handleSubmit: handleSettingSubmit
+    handleSubmit: handleSettingSubmit,
+    beginEdit: beginEditSetting,
+    deleteSetting
   } = useSetting();
 
   const {
     // Configuration Data State
     loading: dataLoading,
-    attributeDefinitions: tableDefinitions,
-    settings,
+    
     settingsPagination,
     activeTab,
     page,
@@ -191,6 +196,15 @@ const ConfigurationPage = () => {
               definitions={paginatedDefinitions}
               loading={dataLoading}
               searchTerm={searchTerm}
+              onEdit={beginEdit}
+              onDelete={async (def) => {
+                const id = def.attributeId || def.id || def.Id;
+                if (!id) return;
+                const res = await deleteDefinition(id);
+                if (res?.success) {
+                  window.location.reload();
+                }
+              }}
             />
           )}
           {activeTab === 1 && (
@@ -199,6 +213,16 @@ const ConfigurationPage = () => {
               loading={dataLoading}
               pagination={settingsPagination}
               searchTerm={searchTerm}
+              onEdit={beginEditSetting}
+              onDelete={async (setting) => {
+                const id = setting.id || setting.Id;
+                if (!id) return;
+                const res = await deleteSetting(id);
+                if (res?.success) {
+                  // refresh only settings
+                  await fetchSettings();
+                }
+              }}
             />
           )}
         </Box>
@@ -241,6 +265,7 @@ const ConfigurationPage = () => {
         onDrop={handleDrop}
         onDragEnd={handleDragEnd}
         onSubmit={handleSubmit}
+        isEditing={Boolean(editingId)}
       />
 
       <SettingModal
@@ -253,6 +278,7 @@ const ConfigurationPage = () => {
         attributeDefinitions={attributeDefinitions}
         onFormChange={handleSettingFormChange}
         onSubmit={handleSettingSubmit}
+        isEditing={Boolean(editingSettingId)}
       />
 
       <NotificationSnackbar snackbar={snackbar} onClose={handleCloseSnackbar} />
