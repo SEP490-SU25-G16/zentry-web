@@ -5,13 +5,29 @@ import MeetingRoomIcon from "@mui/icons-material/MeetingRoom";
 import SchoolIcon from "@mui/icons-material/School";
 import SearchIcon from "@mui/icons-material/Search";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
-import { Box, Card, CardContent, Chip, Divider, Grid, IconButton, InputAdornment, List, ListItem, ListItemText, Stack, TextField, Typography } from "@mui/material";
+import {
+  Box,
+  Card,
+  CardContent,
+  Chip,
+  Divider,
+  Grid,
+  IconButton,
+  InputAdornment,
+  List,
+  ListItem,
+  ListItemText,
+  Stack,
+  TextField,
+  Typography
+} from "@mui/material";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import dayjs from "dayjs";
 import ReactECharts from "echarts-for-react";
-import { useMemo, useState } from "react";
+import { instance } from "lib/axios";
+import { useEffect, useMemo, useState } from "react";
 
 // (Legacy mini chart via MUI Box was here; replaced with ECharts option above)
 
@@ -42,7 +58,9 @@ const MetricCard = ({ icon, label, value }) => (
       <Stack direction="row" spacing={2} alignItems="center">
         <Box sx={{ p: 1.2, bgcolor: "grey.100", borderRadius: 2 }}>{icon}</Box>
         <Box>
-          <Typography variant="subtitle2" color="text.secondary">{label}</Typography>
+          <Typography variant="subtitle2" color="text.secondary">
+            {label}
+          </Typography>
           <Typography variant="h6">{value}</Typography>
         </Box>
       </Stack>
@@ -64,17 +82,70 @@ const SideCard = ({ title, children, sx }) => (
 const AdminDashboard = () => {
   const [year, setYear] = useState(new Date().getFullYear());
   const [tab, setTab] = useState("students");
+  const [totals, setTotals] = useState({ rooms: 0, courses: 0, classes: 0, devices: 0, faceId: 0 });
 
   const primaryData = useMemo(() => {
-    if (tab === "students") return [{ label: "Spring", value: 220 }, { label: "Summer", value: 180 }, { label: "Fall", value: 210 }];
-    if (tab === "classes") return [{ label: "Spring", value: 45 }, { label: "Summer", value: 38 }, { label: "Fall", value: 42 }];
-    return [{ label: "Spring", value: 85 }, { label: "Summer", value: 88 }, { label: "Fall", value: 87 }];
+    if (tab === "students")
+      return [
+        { label: "Spring", value: 220 },
+        { label: "Summer", value: 180 },
+        { label: "Fall", value: 210 }
+      ];
+    if (tab === "classes")
+      return [
+        { label: "Spring", value: 45 },
+        { label: "Summer", value: 38 },
+        { label: "Fall", value: 42 }
+      ];
+    return [
+      { label: "Spring", value: 85 },
+      { label: "Summer", value: 88 },
+      { label: "Fall", value: 87 }
+    ];
   }, [tab]);
+
+  useEffect(() => {
+    (async () => {
+      const data = await fetchData();
+      setTotals(data);
+    })();
+  }, []);
+
+  const getAttendance = async (year) => {
+    const data = await instance.get(`/class-sections/attendance-rate/year/${year}`);
+    return data.data?.Data;
+  };
+
+  const getStudent = async (year) => {
+    const data = await instance.get(`/enrollments/student-count/year/${year}`);
+    return data.data?.Data;
+  };
+
+  const getClass = async (year) => {
+    const data = await instance.get(`/class-sections/class-section-count/year/${year}`);
+    return data.data?.Data;
+  };
+
+  const fetchData = async () => {
+    const [rooms, courses, classes, devices] = await Promise.all([
+      instance.get("/rooms/total-rooms"),
+      instance.get("/courses/total-courses"),
+      instance.get("/class-sections/total-class-sections"),
+      instance.get("/devices/total-devices")
+    ]);
+    return {
+      rooms: rooms.data?.Data,
+      courses: courses.data?.Data,
+      classes: classes.data?.Data,
+      devices: devices.data?.Data,
+      faceId: 0
+    };
+  };
 
   // No separate dataset; when tab === 'attendance', primaryData are % values
 
   const chartOption = useMemo(() => {
-    const categories = ["Spring", "Summer", "Fall"]; 
+    const categories = ["Spring", "Summer", "Fall"];
     const isAttendance = tab === "attendance";
     const xName = tab.charAt(0).toUpperCase() + tab.slice(1);
     const grid = { left: 56, right: 20, top: 30, bottom: 50 };
@@ -159,9 +230,9 @@ const AdminDashboard = () => {
   return (
     <Box sx={{ p: 3, pt: 10 }}>
       <Grid container spacing={3}>
-        <Grid item xs={12} md={8} lg={9}>
+        <Grid item xs={12} md={8}>
           {/* Greeting + quick search */}
-          <Card sx={{ borderRadius: 3, mb: 3 }}>
+          <Card sx={{ borderRadius: 3, mb: 2 }}>
             <CardContent>
               <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={2}>
                 <Box>
@@ -169,49 +240,60 @@ const AdminDashboard = () => {
                   <TextField
                     placeholder="Sub......"
                     size="small"
-                    sx={{ mt: 1, width: 320 }}
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <SearchIcon />
-                        </InputAdornment>
-                      )
-                    }}
+                    sx={{ mt: 1, width: 320, "& .MuiOutlinedInput-root": { borderRadius: 3 } }}
                   />
                 </Box>
-                <Box sx={{ textAlign: "center" }}>
-                  <Typography variant="subtitle2" color="text.secondary">
-                    Week
-                  </Typography>
-                  <Typography variant="h5">11</Typography>
+                <Box>
+                  <Chip
+                    label="Week 11"
+                    variant="outlined"
+                    sx={{ borderRadius: 2, px: 1.5, py: 3, fontWeight: 500 }}
+                  />
                 </Box>
               </Stack>
-              <TextField
-                fullWidth
-                placeholder="Search here..."
-                sx={{ mt: 3 }}
-                InputProps={{ startAdornment: <SearchIcon sx={{ mr: 1 }} /> }}
-              />
             </CardContent>
           </Card>
+          <Box sx={{ mb: 3 }}>
+            <TextField
+              fullWidth
+              placeholder="Search here..."
+              sx={{ "& .MuiOutlinedInput-root": { borderRadius: 9999 } }}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton edge="end">
+                      <SearchIcon />
+                    </IconButton>
+                  </InputAdornment>
+                )
+              }}
+            />
+          </Box>
 
           {/* Metrics */}
           <Grid container spacing={3}>
             <Grid item xs={12} md={4}>
-              <MetricCard icon={<MeetingRoomIcon />} label="Rooms" value={50} />
+              <MetricCard icon={<MeetingRoomIcon />} label="Rooms" value={totals.rooms} />
             </Grid>
             <Grid item xs={12} md={4}>
-              <MetricCard icon={<SchoolIcon />} label="Courses" value={76} />
+              <MetricCard icon={<SchoolIcon />} label="Courses" value={totals.courses} />
             </Grid>
             <Grid item xs={12} md={4}>
-              <MetricCard icon={<ClassIcon />} label="Classes" value={235} />
+              <MetricCard icon={<ClassIcon />} label="Classes" value={totals.classes} />
             </Grid>
           </Grid>
 
           {/* Chart section (single area, changes by tab) */}
           <Card sx={{ borderRadius: 3, mt: 3 }}>
             <CardContent>
-              <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  mb: 2
+                }}
+              >
                 <Typography variant="h6">Biểu đồ</Typography>
                 <TogglePills value={tab} onChange={setTab} />
                 <Stack direction="row" spacing={1} alignItems="center">
@@ -232,7 +314,7 @@ const AdminDashboard = () => {
         </Grid>
 
         {/* Right sidebar */}
-        <Grid item xs={12} md={4} lg={3}>
+        <Grid item xs={12} md={4}>
           <SideCard title="Calendar">
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DateCalendar
@@ -251,13 +333,17 @@ const AdminDashboard = () => {
             <Stack spacing={2}>
               <Card variant="outlined" sx={{ borderRadius: 2 }}>
                 <CardContent>
-                  <Typography variant="caption" color="text.secondary">Devices</Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    Devices
+                  </Typography>
                   <Typography variant="h6">2034/2980</Typography>
                 </CardContent>
               </Card>
               <Card variant="outlined" sx={{ borderRadius: 2 }}>
                 <CardContent>
-                  <Typography variant="caption" color="text.secondary">Face ID</Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    Face ID
+                  </Typography>
                   <Typography variant="h6">2034/2980</Typography>
                 </CardContent>
               </Card>
@@ -266,7 +352,13 @@ const AdminDashboard = () => {
 
           <SideCard title="Top 5 courses" sx={{ mt: 3 }}>
             <List dense>
-              {["SE101 - 12 lớp", "SE102 - 10 lớp", "PRJ301 - 8 lớp", "MAD101 - 7 lớp", "CSD201 - 6 lớp"].map((txt) => (
+              {[
+                "SE101 - 12 lớp",
+                "SE102 - 10 lớp",
+                "PRJ301 - 8 lớp",
+                "MAD101 - 7 lớp",
+                "CSD201 - 6 lớp"
+              ].map((txt) => (
                 <ListItem key={txt} sx={{ px: 0 }}>
                   <TrendingUpIcon fontSize="small" color="primary" style={{ marginRight: 8 }} />
                   <ListItemText primaryTypographyProps={{ variant: "body2" }} primary={txt} />
@@ -283,5 +375,3 @@ const AdminDashboard = () => {
 };
 
 export default AdminDashboard;
-
-
