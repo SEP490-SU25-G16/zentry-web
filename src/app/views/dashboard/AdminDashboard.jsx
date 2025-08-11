@@ -83,6 +83,7 @@ const AdminDashboard = () => {
   const [year, setYear] = useState(new Date().getFullYear());
   const [tab, setTab] = useState("students");
   const [totals, setTotals] = useState({ rooms: 0, courses: 0, classes: 0, devices: 0, faceId: 0 });
+  const [topFiveCourse, setTopFiveCourse] = useState([]);
 
   const primaryData = useMemo(() => {
     if (tab === "students")
@@ -108,6 +109,8 @@ const AdminDashboard = () => {
     (async () => {
       const data = await fetchData();
       setTotals(data);
+      const courses = await getTopFiveCourse();
+      setTopFiveCourse(courses);
     })();
   }, []);
 
@@ -123,6 +126,11 @@ const AdminDashboard = () => {
 
   const getClass = async (year) => {
     const data = await instance.get(`/class-sections/class-section-count/year/${year}`);
+    return data.data?.Data;
+  };
+
+  const getTopFiveCourse = async () => {
+    const data = await instance.get("/courses/top-courses?=5");
     return data.data?.Data;
   };
 
@@ -352,16 +360,13 @@ const AdminDashboard = () => {
 
           <SideCard title="Top 5 courses" sx={{ mt: 3 }}>
             <List dense>
-              {[
-                "SE101 - 12 lớp",
-                "SE102 - 10 lớp",
-                "PRJ301 - 8 lớp",
-                "MAD101 - 7 lớp",
-                "CSD201 - 6 lớp"
-              ].map((txt) => (
-                <ListItem key={txt} sx={{ px: 0 }}>
+              {topFiveCourse.map((course) => (
+                <ListItem key={course.courseId} sx={{ px: 0 }}>
                   <TrendingUpIcon fontSize="small" color="primary" style={{ marginRight: 8 }} />
-                  <ListItemText primaryTypographyProps={{ variant: "body2" }} primary={txt} />
+                  <ListItemText
+                    primaryTypographyProps={{ variant: "body2" }}
+                    primary={`${course.CourseName}`}
+                  />
                 </ListItem>
               ))}
             </List>
