@@ -486,7 +486,6 @@ const SessionDetailPage = () => {
 
           <List>
             {students.map((student, index) => {
-              const normalizedStatus = normalizeStatus(student.AttendanceStatus);
               return (
                 <React.Fragment key={student.StudentId}>
                   <ListItem
@@ -514,7 +513,10 @@ const SessionDetailPage = () => {
                       }
                     />
                     <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                      {getStatusIcon(normalizedStatus)}
+                      {/* {getStatusIcon(normalizedStatus)} */}
+                      {student.AttendanceStatus === "future" ? <>
+                      <Chip label="Future" color="warning" />
+                      </> : (
                       <FormControl size="small" sx={{ minWidth: 120 }}>
                         <Select
                           value={student.AttendanceStatus || "future"}
@@ -527,7 +529,7 @@ const SessionDetailPage = () => {
                           <MenuItem value="attended">attended</MenuItem>
                           <MenuItem value="absented">absented</MenuItem>
                         </Select>
-                      </FormControl>
+                      </FormControl>)}
                       {updating[student.StudentId] && <CircularProgress size={20} />}
                     </Box>
                   </ListItem>
