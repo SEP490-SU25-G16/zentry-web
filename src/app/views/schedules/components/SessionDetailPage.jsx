@@ -521,7 +521,7 @@ const SessionDetailPage = () => {
                           onChange={(e) =>
                             handleAttendanceChange(student.StudentId, e.target.value)
                           }
-                          disabled={updating[student.StudentId]}
+                          disabled={updating[student.StudentId] || student.AttendanceStatus === "future"}
                         >
                           <MenuItem value="future">future</MenuItem>
                           <MenuItem value="attended">attended</MenuItem>
