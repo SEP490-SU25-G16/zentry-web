@@ -158,7 +158,7 @@ const useClasses = () => {
       const result = await ClassServices.deleteClass(classId);
 
       if (result.error) {
-        enqueueSnackbar(result.error, { variant: "error" });
+        enqueueSnackbar('Class has started, cannot be deleted', { variant: "error" });
         return { success: false, error: result.error };
       } else {
         enqueueSnackbar("Class deleted successfully", { variant: "success" });

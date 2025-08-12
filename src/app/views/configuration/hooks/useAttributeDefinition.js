@@ -126,6 +126,12 @@ export const useAttributeDefinition = () => {
       sortOrder: formData.options.length + 1
     };
 
+    const isExist = formData.options.some((op) => op.value === newOption.value);
+    if (isExist) {
+      showSnackbar("Option already exists", "error");
+      return;
+    }
+
     setFormData((prev) => ({
       ...prev,
       options: [...prev.options, newOption]

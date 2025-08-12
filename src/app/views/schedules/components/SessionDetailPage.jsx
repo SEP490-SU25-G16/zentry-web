@@ -29,7 +29,7 @@ import {
   Typography
 } from "@mui/material";
 import { instance } from "lib/axios";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useClasses } from "../hooks";
 
@@ -149,7 +149,7 @@ const SessionAttendanceService = {
 
   getSessionDetailReal: async (sessionId) => {
     try {
-      const { data } = await instance.get(`/attendance/sessions/${sessionId}/final`);
+      const { data } = await instance.get(`/attendance/sessions/${sessionId}/details`);
       return {
         data,
         error: null
@@ -163,19 +163,11 @@ const SessionAttendanceService = {
     }
   },
 
-  updateAttendance: async (sessionId, studentId, status) => {
-    // Simulate API delay
-    await new Promise((resolve) => setTimeout(resolve, 500));
-
-    return {
-      success: true,
-      message: `Attendance updated successfully`
-    };
-  }
+  // updateAttendance removed (unused)
 };
 
 const SessionDetailPage = () => {
-  const { classId, sessionId } = useParams();
+  const { sessionId } = useParams();
   const navigate = useNavigate();
   const { changeAttendance } = useClasses();
 
@@ -186,15 +178,9 @@ const SessionDetailPage = () => {
   const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
 
   // Helper function to normalize attendance status
-  const normalizeStatus = (status) => {
-    return status || "future";
-  };
+  const normalizeStatus = (status) => status || "future";
 
-  useEffect(() => {
-    fetchSessionDetail();
-  }, [sessionId]);
-
-  const fetchSessionDetail = async () => {
+  const fetchSessionDetail = useCallback(async () => {
     if (!sessionId) return;
 
     setLoading(true);
@@ -202,27 +188,18 @@ const SessionDetailPage = () => {
 
     try {
       const result = await SessionAttendanceService.getSessionDetailReal(sessionId);
-
-      if (result.success) {
-        // Normalize all student statuses to ensure they have valid values
-        const normalizedSessionDetail = {
-          ...result.data,
-          attendance: result.data.attendance.map((student) => ({
-            ...student,
-            status: normalizeStatus(student.status)
-          }))
-        };
-        setSessionDetail(normalizedSessionDetail);
-      } else {
-        setError(result.error || "Failed to fetch session details");
-      }
+      setSessionDetail(result.data?.Data);
     } catch (err) {
       console.error("Error fetching session details:", err);
       setError("An unexpected error occurred");
     } finally {
       setLoading(false);
     }
-  };
+  }, [sessionId]);
+
+  useEffect(() => {
+    fetchSessionDetail();
+  }, [fetchSessionDetail]);
 
   const handleAttendanceChange = async (studentId, newStatus) => {
     setUpdating((prev) => ({ ...prev, [studentId]: true }));
@@ -238,9 +215,9 @@ const SessionDetailPage = () => {
         // Update local state
         setSessionDetail((prev) => ({
           ...prev,
-          attendance: prev.attendance.map((student) =>
-            student.studentId === studentId
-              ? { ...student, status: normalizeStatus(newStatus) }
+          Students: (prev?.Students || []).map((student) =>
+            student.StudentId === studentId
+              ? { ...student, AttendanceStatus: normalizeStatus(newStatus) }
               : student
           )
         }));
@@ -282,27 +259,24 @@ const SessionDetailPage = () => {
     }
   };
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case "attended":
-        return "success";
-      case "absented":
-        return "error";
-      case "future":
-        return "default";
-      default:
-        return "default";
-    }
-  };
+  // Removed getStatusColor (unused)
 
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
     return new Date(dateString).toLocaleDateString("en-US", {
       year: "numeric",
       month: "long",
-      day: "numeric"
+      day: "numeric",
     });
   };
+
+  // Derive normalized view model from API shape { SessionInfo, Students }
+  const info = sessionDetail?.SessionInfo;
+  const students = sessionDetail?.Students || [];
+  const weekDay = info?.SessionDate
+    ? new Date(info.SessionDate).toLocaleDateString("en-US", { weekday: "long" })
+    : "";
+  const classInfo = students?.[0]?.ClassInfo || "";
 
   if (loading) {
     return (
@@ -350,12 +324,10 @@ const SessionDetailPage = () => {
 
   // Calculate attendance statistics
   const attendanceStats = {
-    total: sessionDetail.attendance.length,
-    attended: sessionDetail.attendance.filter((s) => normalizeStatus(s.status) === "attended")
-      .length,
-    absented: sessionDetail.attendance.filter((s) => normalizeStatus(s.status) === "absented")
-      .length,
-    future: sessionDetail.attendance.filter((s) => normalizeStatus(s.status) === "future").length
+    total: students.length,
+    attended: students.filter((s) => normalizeStatus(s.AttendanceStatus) === "attended").length,
+    absented: students.filter((s) => normalizeStatus(s.AttendanceStatus) === "absented").length,
+    future: students.filter((s) => normalizeStatus(s.AttendanceStatus) === "future").length,
   };
 
   return (
@@ -371,9 +343,14 @@ const SessionDetailPage = () => {
           Back
         </Button>
         <Typography variant="h4" component="h1" sx={{ flexGrow: 1 }}>
-          Session Detail
+          {info?.SessionName || `Session ${info?.SessionNumber || ""}` || "Session Detail"}
         </Typography>
-        <Chip label={sessionDetail.weekDay} color="primary" variant="outlined" size="medium" />
+        {weekDay && (
+          <Chip label={weekDay} color="primary" variant="outlined" size="medium" sx={{ mr: 1 }} />
+        )}
+        {info?.Status && (
+          <Chip label={info.Status} color={info.Status === "Completed" ? "success" : "warning"} size="medium" />
+        )}
       </Box>
 
       {/* Session Information Card */}
@@ -396,7 +373,7 @@ const SessionDetailPage = () => {
                 </Typography>
               </Box>
               <Typography variant="h6" fontWeight={500}>
-                {formatDate(sessionDetail.date)}
+                {formatDate(info?.SessionDate)}
               </Typography>
             </Grid>
 
@@ -409,20 +386,7 @@ const SessionDetailPage = () => {
                 </Typography>
               </Box>
               <Typography variant="h6" fontWeight={500}>
-                {sessionDetail.startTime} - {sessionDetail.endTime}
-              </Typography>
-            </Grid>
-
-            {/* Topic */}
-            <Grid item xs={12} md={6}>
-              <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                <BookIcon sx={{ color: "text.secondary", mr: 1 }} />
-                <Typography variant="subtitle2" color="text.secondary">
-                  Topic
-                </Typography>
-              </Box>
-              <Typography variant="h6" fontWeight={500}>
-                {sessionDetail.topic}
+                {info?.SessionTime} - {info?.EndTime}
               </Typography>
             </Grid>
 
@@ -435,37 +399,32 @@ const SessionDetailPage = () => {
                 </Typography>
               </Box>
               <Typography variant="h6" fontWeight={500}>
-                {sessionDetail.roomName}
+                {info?.RoomInfo || "N/A"}
               </Typography>
             </Grid>
 
-            {/* Course */}
+            {/* Class / Course Info (if available) */}
             <Grid item xs={12} md={6}>
               <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
                 <BookIcon sx={{ color: "text.secondary", mr: 1 }} />
                 <Typography variant="subtitle2" color="text.secondary">
-                  Course
+                  Class / Course
                 </Typography>
               </Box>
               <Typography variant="h6" fontWeight={500}>
-                {sessionDetail.courseName}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {sessionDetail.courseCode} - {sessionDetail.sectionCode}
+                {classInfo || "N/A"}
               </Typography>
             </Grid>
 
-            {/* Lecturer */}
+            {/* Status */}
             <Grid item xs={12} md={6}>
               <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                <PersonIcon sx={{ color: "text.secondary", mr: 1 }} />
+                <HelpIcon sx={{ color: "text.secondary", mr: 1 }} />
                 <Typography variant="subtitle2" color="text.secondary">
-                  Lecturer
+                  Status
                 </Typography>
               </Box>
-              <Typography variant="h6" fontWeight={500}>
-                {sessionDetail.lecturerName}
-              </Typography>
+              <Chip label={info?.Status || "Unknown"} color={info?.Status === "Completed" ? "success" : "warning"} />
             </Grid>
           </Grid>
         </CardContent>
@@ -526,10 +485,10 @@ const SessionDetailPage = () => {
           </Box>
 
           <List>
-            {sessionDetail.attendance.map((student, index) => {
-              const normalizedStatus = normalizeStatus(student.status);
+            {students.map((student, index) => {
+              const normalizedStatus = normalizeStatus(student.AttendanceStatus);
               return (
-                <React.Fragment key={student.studentId}>
+                <React.Fragment key={student.StudentId}>
                   <ListItem
                     sx={{
                       py: 2,
@@ -540,17 +499,17 @@ const SessionDetailPage = () => {
                     }}
                   >
                     <ListItemAvatar>
-                      <Avatar sx={{ bgcolor: "primary.main" }}>{student.name.charAt(0)}</Avatar>
+                      <Avatar sx={{ bgcolor: "primary.main" }}>{(student.FullName || "").charAt(0) || "S"}</Avatar>
                     </ListItemAvatar>
                     <ListItemText
                       primary={
                         <Typography variant="subtitle1" fontWeight={500}>
-                          {student.name}
+                          {student.FullName}
                         </Typography>
                       }
                       secondary={
                         <Typography variant="body2" color="text.secondary">
-                          {student.email}
+                          {student.Email}
                         </Typography>
                       }
                     />
@@ -558,21 +517,21 @@ const SessionDetailPage = () => {
                       {getStatusIcon(normalizedStatus)}
                       <FormControl size="small" sx={{ minWidth: 120 }}>
                         <Select
-                          value={student.status || "future"}
+                          value={student.AttendanceStatus || "future"}
                           onChange={(e) =>
-                            handleAttendanceChange(student.studentId, e.target.value)
+                            handleAttendanceChange(student.StudentId, e.target.value)
                           }
-                          disabled={updating[student.studentId]}
+                          disabled={updating[student.StudentId]}
                         >
                           <MenuItem value="future">future</MenuItem>
                           <MenuItem value="attended">attended</MenuItem>
                           <MenuItem value="absented">absented</MenuItem>
                         </Select>
                       </FormControl>
-                      {updating[student.studentId] && <CircularProgress size={20} />}
+                      {updating[student.StudentId] && <CircularProgress size={20} />}
                     </Box>
                   </ListItem>
-                  {index < sessionDetail.attendance.length - 1 && <Divider />}
+                  {index < students.length - 1 && <Divider />}
                 </React.Fragment>
               );
             })}

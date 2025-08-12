@@ -262,7 +262,9 @@ const useCourses = () => {
       const result = await CourseServices.deleteCourse(courseToDelete.Id);
 
       if (result.error) {
-        enqueueSnackbar(result.error, { variant: "error" });
+        enqueueSnackbar("This course is being taught in the current semester and cannot be deleted.", {
+          variant: "error"
+        });
       } else {
         enqueueSnackbar("Course deleted successfully", { variant: "success" });
         fetchCourses();

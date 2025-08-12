@@ -78,7 +78,10 @@ const ClassDetailPage = () => {
   const [enrollmentRowsPerPage, setEnrollmentRowsPerPage] = useState(5);
   const [schedulePage, setSchedulePage] = useState(0);
   const [scheduleRowsPerPage, setScheduleRowsPerPage] = useState(5);
-  // const [sessions, setSessions] = useState([]);
+  const [sessions, setSessions] = useState([]);
+  const [sessionsLoading, setSessionsLoading] = useState(false);
+  const [sessionsPage, setSessionsPage] = useState(0);
+  const [sessionsRowsPerPage, setSessionsRowsPerPage] = useState(5);
 
   // Add Schedule Modal state
   const [addScheduleModalOpen, setAddScheduleModalOpen] = useState(false);
@@ -105,8 +108,19 @@ const ClassDetailPage = () => {
   const lecturers = users.filter((user) => user.Role === "Lecturer");
 
   const fetchSessions = useCallback(async () => {
-    const result = await instance.get(`class-sections/${id}/sessions`);
-    console.log("🚀 ~ fetchSessions ~ result:", result);
+    if (!id) return;
+    setSessionsLoading(true);
+    try {
+      const result = await instance.get(`class-sections/${id}/sessions`);
+      const sessionsData =
+        result.data?.Data?.Sessions || result.data?.Data || result.data || [];
+      setSessions(Array.isArray(sessionsData) ? sessionsData : []);
+    } catch (err) {
+      console.error("Error fetching sessions:", err);
+      setSessions([]);
+    } finally {
+      setSessionsLoading(false);
+    }
   }, [id]);
 
   useEffect(() => {
@@ -845,7 +859,7 @@ const ClassDetailPage = () => {
                     <TableCell sx={{ padding: "1em", fontWeight: 600 }}>Time</TableCell>
                     <TableCell sx={{ padding: "1em", fontWeight: 600 }}>Room</TableCell>
                     <TableCell sx={{ padding: "1em", fontWeight: 600 }}>Date Range</TableCell>
-                    <TableCell sx={{ padding: "1em", fontWeight: 600 }}>Actions</TableCell>
+                    {/* <TableCell sx={{ padding: "1em", fontWeight: 600 }}>Actions</TableCell> */}
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -891,7 +905,7 @@ const ClassDetailPage = () => {
                           </>
                         )}
                       </TableCell>
-                      <TableCell sx={{ padding: "1em" }}>
+                      {/* <TableCell sx={{ padding: "1em" }}>
                         <Button
                           variant="outlined"
                           size="small"
@@ -903,7 +917,7 @@ const ClassDetailPage = () => {
                         >
                           View Details
                         </Button>
-                      </TableCell>
+                      </TableCell> */}
                     </TableRow>
                   ))}
                 </TableBody>
@@ -925,6 +939,121 @@ const ClassDetailPage = () => {
           </CardContent>
         </Card>
       )}
+
+      {/* Sessions Table - right below Class Schedules */}
+      <Card sx={{ mt: 4, boxShadow: 3 }}>
+        <CardContent sx={{ p: 4 }}>
+          <Box
+            sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 3 }}
+          >
+            <Box sx={{ display: "flex", alignItems: "center" }}>
+              <CalendarTodayIcon sx={{ fontSize: 32, color: "secondary.main", mr: 2 }} />
+              <Typography variant="h5" component="h2" fontWeight={600}>
+                Sessions ({sessions?.length || 0})
+              </Typography>
+            </Box>
+          </Box>
+
+          {sessionsLoading ? (
+            <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", py: 4 }}>
+              <CircularProgress size={24} />
+              <Typography variant="body2" sx={{ ml: 2 }}>
+                Loading sessions...
+              </Typography>
+            </Box>
+          ) : sessions.length > 0 ? (
+            <>
+              <TableContainer>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell sx={{ padding: "1em", fontWeight: 600 }}>Week Day</TableCell>
+                      <TableCell sx={{ padding: "1em", fontWeight: 600 }}>Time</TableCell>
+                      <TableCell sx={{ padding: "1em", fontWeight: 600 }}>Date</TableCell>
+                      <TableCell sx={{ padding: "1em", fontWeight: 600 }}>Status</TableCell>
+                      <TableCell sx={{ padding: "1em", fontWeight: 600 }}>Actions</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {sessions
+                      .slice(
+                        sessionsPage * sessionsRowsPerPage,
+                        sessionsPage * sessionsRowsPerPage + sessionsRowsPerPage
+                      )
+                      .map((session) => {
+                        const start = new Date(String(session.StartTime).replace(" ", "T"));
+                        const end = new Date(String(session.EndTime).replace(" ", "T"));
+                        const statusColor =
+                          session.Status === "Completed"
+                            ? "success"
+                            : session.Status === "Cancelled"
+                            ? "error"
+                            : "warning";
+                        return (
+                          <TableRow key={session.Id}>
+                            <TableCell sx={{ padding: "1em" }}>
+                              <Chip label={session.WeekDay} color="secondary" size="small" />
+                            </TableCell>
+                            <TableCell sx={{ padding: "1em" }}>
+                              <Box sx={{ display: "flex", alignItems: "center" }}>
+                                <AccessTimeIcon sx={{ fontSize: 16, mr: 1, color: "text.secondary" }} />
+                                {start.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                                {" - "}
+                                {end.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                              </Box>
+                            </TableCell>
+                            <TableCell sx={{ padding: "1em" }}>
+                              {start.toLocaleDateString("en-US", {
+                                year: "numeric",
+                                month: "short",
+                                day: "numeric",
+                              })}
+                            </TableCell>
+                            <TableCell sx={{ padding: "1em" }}>
+                              <Chip label={session.Status} color={statusColor} size="small" />
+                            </TableCell>
+                            <TableCell sx={{ padding: "1em" }}>
+                        <Button
+                          variant="outlined"
+                          size="small"
+                          onClick={() => navigate(`/schedules/class/${id}/session/${session.Id}`)}
+                          sx={{
+                            borderRadius: "6px",
+                            textTransform: "none"
+                          }}
+                        >
+                          View Details
+                        </Button>
+                      </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+
+              <TablePagination
+                component="div"
+                count={sessions.length}
+                page={sessionsPage}
+                onPageChange={(event, newPage) => setSessionsPage(newPage)}
+                rowsPerPage={sessionsRowsPerPage}
+                onRowsPerPageChange={(event) => {
+                  setSessionsRowsPerPage(parseInt(event.target.value, 10));
+                  setSessionsPage(0);
+                }}
+                rowsPerPageOptions={[5, 10, 25]}
+              />
+            </>
+          ) : (
+            <Box sx={{ textAlign: "center", py: 4 }}>
+              <Typography variant="body1" color="text.secondary">
+                No sessions available
+              </Typography>
+            </Box>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Student Enrollment Modal */}
       <Dialog
