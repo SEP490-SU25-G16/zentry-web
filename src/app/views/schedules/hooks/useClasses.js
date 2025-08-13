@@ -280,7 +280,7 @@ const useClasses = () => {
         enqueueSnackbar(result.error, { variant: "error" });
         return { success: false, error: result.error };
       } else {
-        enqueueSnackbar("Schedule created successfully", { variant: "success" });
+        enqueueSnackbar("Attendance updated successfully", { variant: "success" });
         return { success: true, data: result.data };
       }
     } catch (error) {

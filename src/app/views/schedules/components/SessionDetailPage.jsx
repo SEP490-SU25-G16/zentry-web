@@ -174,6 +174,7 @@ const SessionDetailPage = () => {
 
   const [sessionDetail, setSessionDetail] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState(null);
   const [updating, setUpdating] = useState({});
   const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
@@ -182,10 +183,11 @@ const SessionDetailPage = () => {
   // Helper function to normalize attendance status
   const normalizeStatus = (status) => status || "future";
 
-  const fetchSessionDetail = useCallback(async () => {
+  const fetchSessionDetail = useCallback(async (refresh = true) => {
     if (!sessionId) return;
 
-    setLoading(true);
+    refresh && setLoading(true);
+    !refresh && setIsRefreshing(true);
     setError(null);
 
     try {
@@ -196,6 +198,7 @@ const SessionDetailPage = () => {
       setError("An unexpected error occurred");
     } finally {
       setLoading(false);
+      setIsRefreshing(false);
     }
   }, [sessionId]);
 
@@ -214,15 +217,7 @@ const SessionDetailPage = () => {
       );
 
       if (result.success) {
-        // Update local state
-        setSessionDetail((prev) => ({
-          ...prev,
-          Students: (prev?.Students || []).map((student) =>
-            student.StudentId === studentId
-              ? { ...student, AttendanceStatus: normalizeStatus(newStatus) }
-              : student
-          )
-        }));
+        fetchSessionDetail(false);
 
         setSnackbar({
           open: true,
@@ -493,7 +488,7 @@ const SessionDetailPage = () => {
             </Typography>
           </Box>
 
-          <List>
+          {isRefreshing ? <CircularProgress /> : <List>
             {students.map((student, index) => {
               return (
                 <React.Fragment key={student.StudentId}>
@@ -540,7 +535,7 @@ const SessionDetailPage = () => {
                               disabled={updating[student.StudentId]}
                             />
                           }
-                          label={(student.AttendanceStatus || "future") === "attended" ? "Present" : "Absent"}
+                          label={(student.AttendanceStatus || "future") === "present" ? "Present" : "Absent"}
                         />
                       )}
                       {updating[student.StudentId] && <CircularProgress size={20} />}
@@ -550,7 +545,7 @@ const SessionDetailPage = () => {
                 </React.Fragment>
               );
             })}
-          </List>
+          </List>}
         </CardContent>
       </Card>
 
