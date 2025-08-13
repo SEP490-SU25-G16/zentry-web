@@ -2,8 +2,6 @@ import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import BookIcon from "@mui/icons-material/Book";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
-import CancelIcon from "@mui/icons-material/Cancel";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import HelpIcon from "@mui/icons-material/Help";
 import PersonIcon from "@mui/icons-material/Person";
 import RoomIcon from "@mui/icons-material/Room";
@@ -16,16 +14,19 @@ import {
   CardContent,
   Chip,
   CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   Divider,
-  FormControl,
+  FormControlLabel,
   Grid,
   List,
   ListItem,
   ListItemAvatar,
   ListItemText,
-  MenuItem,
-  Select,
   Snackbar,
+  Switch,
   Typography
 } from "@mui/material";
 import { instance } from "lib/axios";
@@ -176,6 +177,7 @@ const SessionDetailPage = () => {
   const [error, setError] = useState(null);
   const [updating, setUpdating] = useState({});
   const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
+  const [confirmChange, setConfirmChange] = useState({ open: false, studentId: null, newStatus: "" });
 
   // Helper function to normalize attendance status
   const normalizeStatus = (status) => status || "future";
@@ -246,18 +248,25 @@ const SessionDetailPage = () => {
     }
   };
 
-  const getStatusIcon = (status) => {
-    switch (status) {
-      case "attended":
-        return <CheckCircleIcon sx={{ color: "success.main" }} />;
-      case "absented":
-        return <CancelIcon sx={{ color: "error.main" }} />;
-      case "future":
-        return <HelpIcon sx={{ color: "grey.500" }} />;
-      default:
-        return <HelpIcon sx={{ color: "grey.500" }} />;
+  const requestAttendanceChange = (studentId, currentStatus, checked) => {
+    const nextStatus = checked ? "Present" : "Absent";
+    if (nextStatus === currentStatus) return;
+    setConfirmChange({ open: true, studentId, newStatus: nextStatus });
+  };
+
+  const handleConfirmChange = async () => {
+    const { studentId, newStatus } = confirmChange;
+    setConfirmChange({ open: false, studentId: null, newStatus: "" });
+    if (studentId && newStatus) {
+      await handleAttendanceChange(studentId, newStatus);
     }
   };
+
+  const handleCancelChange = () => {
+    setConfirmChange({ open: false, studentId: null, newStatus: "" });
+  };
+
+  // status icon helper removed (unused)
 
   // Removed getStatusColor (unused)
 
@@ -326,7 +335,7 @@ const SessionDetailPage = () => {
   const attendanceStats = {
     total: students.length,
     attended: students.filter((s) => normalizeStatus(s.AttendanceStatus) === "attended").length,
-    absented: students.filter((s) => normalizeStatus(s.AttendanceStatus) === "absented").length,
+    absented: students.filter((s) => normalizeStatus(s.AttendanceStatus) === "absent").length,
     future: students.filter((s) => normalizeStatus(s.AttendanceStatus) === "future").length,
   };
 
@@ -514,22 +523,26 @@ const SessionDetailPage = () => {
                     />
                     <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
                       {/* {getStatusIcon(normalizedStatus)} */}
-                      {student.AttendanceStatus === "future" ? <>
-                      <Chip label="Future" color="warning" />
-                      </> : (
-                      <FormControl size="small" sx={{ minWidth: 120 }}>
-                        <Select
-                          value={student.AttendanceStatus || "future"}
-                          onChange={(e) =>
-                            handleAttendanceChange(student.StudentId, e.target.value)
+                      {student.AttendanceStatus === "future" ? (
+                        <Chip label="Future" color="warning" />
+                      ) : (
+                        <FormControlLabel
+                          control={
+                            <Switch
+                              checked={(student.AttendanceStatus || "future") === "present"}
+                              onChange={(e) =>
+                                requestAttendanceChange(
+                                  student.StudentId,
+                                  student.AttendanceStatus,
+                                  e.target.checked
+                                )
+                              }
+                              disabled={updating[student.StudentId]}
+                            />
                           }
-                          disabled={updating[student.StudentId] || student.AttendanceStatus === "future"}
-                        >
-                          <MenuItem value="future">future</MenuItem>
-                          <MenuItem value="attended">attended</MenuItem>
-                          <MenuItem value="absented">absented</MenuItem>
-                        </Select>
-                      </FormControl>)}
+                          label={(student.AttendanceStatus || "future") === "attended" ? "Present" : "Absent"}
+                        />
+                      )}
                       {updating[student.StudentId] && <CircularProgress size={20} />}
                     </Box>
                   </ListItem>
@@ -540,6 +553,19 @@ const SessionDetailPage = () => {
           </List>
         </CardContent>
       </Card>
+
+      <Dialog open={confirmChange.open} onClose={handleCancelChange}>
+        <DialogTitle>Xác nhận cập nhật</DialogTitle>
+        <DialogContent>
+          <Typography variant="body2">
+            Bạn có chắc muốn đổi trạng thái điểm danh thành "{confirmChange.newStatus}"?
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCancelChange}>Hủy</Button>
+          <Button onClick={handleConfirmChange} variant="contained">Xác nhận</Button>
+        </DialogActions>
+      </Dialog>
 
       {/* Snackbar for notifications */}
       <Snackbar
