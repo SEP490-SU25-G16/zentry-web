@@ -162,7 +162,7 @@ const SessionAttendanceService = {
         error: error.response ? error.response.data?.Error?.Message : "Network Error"
       };
     }
-  },
+  }
 
   // updateAttendance removed (unused)
 };
@@ -178,29 +178,36 @@ const SessionDetailPage = () => {
   const [error, setError] = useState(null);
   const [updating, setUpdating] = useState({});
   const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
-  const [confirmChange, setConfirmChange] = useState({ open: false, studentId: null, newStatus: "" });
+  const [confirmChange, setConfirmChange] = useState({
+    open: false,
+    studentId: null,
+    newStatus: ""
+  });
 
   // Helper function to normalize attendance status
   const normalizeStatus = (status) => status || "future";
 
-  const fetchSessionDetail = useCallback(async (refresh = true) => {
-    if (!sessionId) return;
+  const fetchSessionDetail = useCallback(
+    async (refresh = true) => {
+      if (!sessionId) return;
 
-    refresh && setLoading(true);
-    !refresh && setIsRefreshing(true);
-    setError(null);
+      refresh && setLoading(true);
+      !refresh && setIsRefreshing(true);
+      setError(null);
 
-    try {
-      const result = await SessionAttendanceService.getSessionDetailReal(sessionId);
-      setSessionDetail(result.data?.Data);
-    } catch (err) {
-      console.error("Error fetching session details:", err);
-      setError("An unexpected error occurred");
-    } finally {
-      setLoading(false);
-      setIsRefreshing(false);
-    }
-  }, [sessionId]);
+      try {
+        const result = await SessionAttendanceService.getSessionDetailReal(sessionId);
+        setSessionDetail(result.data?.Data);
+      } catch (err) {
+        console.error("Error fetching session details:", err);
+        setError("An unexpected error occurred");
+      } finally {
+        setLoading(false);
+        setIsRefreshing(false);
+      }
+    },
+    [sessionId]
+  );
 
   useEffect(() => {
     fetchSessionDetail();
@@ -210,11 +217,7 @@ const SessionDetailPage = () => {
     setUpdating((prev) => ({ ...prev, [studentId]: true }));
 
     try {
-      const result = await changeAttendance(
-        sessionId,
-        studentId,
-        newStatus
-      );
+      const result = await changeAttendance(sessionId, studentId, newStatus);
 
       if (result.success) {
         fetchSessionDetail(false);
@@ -270,7 +273,7 @@ const SessionDetailPage = () => {
     return new Date(dateString).toLocaleDateString("en-US", {
       year: "numeric",
       month: "long",
-      day: "numeric",
+      day: "numeric"
     });
   };
 
@@ -329,9 +332,9 @@ const SessionDetailPage = () => {
   // Calculate attendance statistics
   const attendanceStats = {
     total: students.length,
-    attended: students.filter((s) => normalizeStatus(s.AttendanceStatus) === "attended").length,
+    attended: students.filter((s) => normalizeStatus(s.AttendanceStatus) === "present").length,
     absented: students.filter((s) => normalizeStatus(s.AttendanceStatus) === "absent").length,
-    future: students.filter((s) => normalizeStatus(s.AttendanceStatus) === "future").length,
+    future: students.filter((s) => normalizeStatus(s.AttendanceStatus) === "future").length
   };
 
   return (
@@ -353,7 +356,11 @@ const SessionDetailPage = () => {
           <Chip label={weekDay} color="primary" variant="outlined" size="medium" sx={{ mr: 1 }} />
         )}
         {info?.Status && (
-          <Chip label={info.Status} color={info.Status === "Completed" ? "success" : "warning"} size="medium" />
+          <Chip
+            label={info.Status}
+            color={info.Status === "Completed" ? "success" : "warning"}
+            size="medium"
+          />
         )}
       </Box>
 
@@ -428,7 +435,10 @@ const SessionDetailPage = () => {
                   Status
                 </Typography>
               </Box>
-              <Chip label={info?.Status || "Unknown"} color={info?.Status === "Completed" ? "success" : "warning"} />
+              <Chip
+                label={info?.Status || "Unknown"}
+                color={info?.Status === "Completed" ? "success" : "warning"}
+              />
             </Grid>
           </Grid>
         </CardContent>
@@ -452,7 +462,7 @@ const SessionDetailPage = () => {
               {attendanceStats.attended}
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              Attended
+              Present
             </Typography>
           </Card>
         </Grid>
@@ -488,77 +498,89 @@ const SessionDetailPage = () => {
             </Typography>
           </Box>
 
-          {isRefreshing ? <CircularProgress /> : <List>
-            {students.map((student, index) => {
-              return (
-                <React.Fragment key={student.StudentId}>
-                  <ListItem
-                    sx={{
-                      py: 2,
-                      px: 2,
-                      borderRadius: "8px",
-                      mb: 1,
-                      backgroundColor: "grey.50"
-                    }}
-                  >
-                    <ListItemAvatar>
-                      <Avatar sx={{ bgcolor: "primary.main" }}>{(student.FullName || "").charAt(0) || "S"}</Avatar>
-                    </ListItemAvatar>
-                    <ListItemText
-                      primary={
-                        <Typography variant="subtitle1" fontWeight={500}>
-                          {student.FullName}
-                        </Typography>
-                      }
-                      secondary={
-                        <Typography variant="body2" color="text.secondary">
-                          {student.Email}
-                        </Typography>
-                      }
-                    />
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                      {/* {getStatusIcon(normalizedStatus)} */}
-                      {student.AttendanceStatus === "future" ? (
-                        <Chip label="Future" color="warning" />
-                      ) : (
-                        <FormControlLabel
-                          control={
-                            <Switch
-                              checked={(student.AttendanceStatus || "future") === "present"}
-                              onChange={(e) =>
-                                requestAttendanceChange(
-                                  student.StudentId,
-                                  student.AttendanceStatus,
-                                  e.target.checked
-                                )
-                              }
-                              disabled={updating[student.StudentId]}
-                            />
-                          }
-                          label={(student.AttendanceStatus || "future") === "present" ? "Present" : "Absent"}
-                        />
-                      )}
-                      {updating[student.StudentId] && <CircularProgress size={20} />}
-                    </Box>
-                  </ListItem>
-                  {index < students.length - 1 && <Divider />}
-                </React.Fragment>
-              );
-            })}
-          </List>}
+          {isRefreshing ? (
+            <CircularProgress />
+          ) : (
+            <List>
+              {students.map((student, index) => {
+                return (
+                  <React.Fragment key={student.StudentId}>
+                    <ListItem
+                      sx={{
+                        py: 2,
+                        px: 2,
+                        borderRadius: "8px",
+                        mb: 1,
+                        backgroundColor: "grey.50"
+                      }}
+                    >
+                      <ListItemAvatar>
+                        <Avatar sx={{ bgcolor: "primary.main" }}>
+                          {(student.FullName || "").charAt(0) || "S"}
+                        </Avatar>
+                      </ListItemAvatar>
+                      <ListItemText
+                        primary={
+                          <Typography variant="subtitle1" fontWeight={500}>
+                            {student.FullName}
+                          </Typography>
+                        }
+                        secondary={
+                          <Typography variant="body2" color="text.secondary">
+                            {student.Email}
+                          </Typography>
+                        }
+                      />
+                      <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                        {/* {getStatusIcon(normalizedStatus)} */}
+                        {student.AttendanceStatus === "future" ? (
+                          <Chip label="Future" color="warning" />
+                        ) : (
+                          <FormControlLabel
+                            control={
+                              <Switch
+                                checked={(student.AttendanceStatus || "future") === "present"}
+                                onChange={(e) =>
+                                  requestAttendanceChange(
+                                    student.StudentId,
+                                    student.AttendanceStatus,
+                                    e.target.checked
+                                  )
+                                }
+                                disabled={updating[student.StudentId]}
+                              />
+                            }
+                            label={
+                              (student.AttendanceStatus || "future") === "present"
+                                ? "Present"
+                                : "Absent"
+                            }
+                          />
+                        )}
+                        {updating[student.StudentId] && <CircularProgress size={20} />}
+                      </Box>
+                    </ListItem>
+                    {index < students.length - 1 && <Divider />}
+                  </React.Fragment>
+                );
+              })}
+            </List>
+          )}
         </CardContent>
       </Card>
 
       <Dialog open={confirmChange.open} onClose={handleCancelChange}>
-        <DialogTitle>Xác nhận cập nhật</DialogTitle>
+        <DialogTitle>Confirm update</DialogTitle>
         <DialogContent>
           <Typography variant="body2">
-            Bạn có chắc muốn đổi trạng thái điểm danh thành "{confirmChange.newStatus}"?
+            Are you sure you want to change the attendance status to "{confirmChange.newStatus}"?
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCancelChange}>Hủy</Button>
-          <Button onClick={handleConfirmChange} variant="contained">Xác nhận</Button>
+          <Button onClick={handleCancelChange}>Cancel</Button>
+          <Button onClick={handleConfirmChange} variant="contained">
+            Confirm
+          </Button>
         </DialogActions>
       </Dialog>
 
