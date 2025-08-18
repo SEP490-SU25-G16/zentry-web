@@ -212,6 +212,7 @@ const ClassDetailPage = () => {
       const res = await instance.post("/enrollments/import", formData, {
         headers: { "Content-Type": "multipart/form-data" }
       });
+      console.log('test', res?.data);
       enqueueSnackbar(res.data?.Message, { variant: "success" });
       if (res?.data) {
         handleCloseImportStudents();
@@ -221,7 +222,8 @@ const ClassDetailPage = () => {
         }
       }
     } catch (error) {
-      enqueueSnackbar(error.response?.data?.Message, { variant: "error" });
+      console.log("🚀 ~ handleImportStudentsSubmit ~ error:", error)
+      enqueueSnackbar(error.response?.data?.Error?.Message, { variant: "error" });
     } finally {
       setImportingStudents(false);
     }
@@ -336,6 +338,7 @@ const ClassDetailPage = () => {
         if (classResult.success) {
           setClassDetail(classResult.data);
         }
+        fetchSessions();
       }
     } catch (error) {
       console.error("Error adding schedule:", error);
@@ -984,11 +987,11 @@ const ClassDetailPage = () => {
                         const start = new Date(String(session.StartTime).replace(" ", "T"));
                         const end = new Date(String(session.EndTime).replace(" ", "T"));
                         const statusColor =
-                          session.Status === "Completed"
+                          session.Status === "Complete"
                             ? "success"
-                            : session.Status === "Cancelled"
-                            ? "error"
-                            : "warning";
+                            : session.Status === "Active"
+                            ? "warning"
+                            : "primary";
                         return (
                           <TableRow key={session.Id}>
                             <TableCell sx={{ padding: "1em" }}>
@@ -1073,9 +1076,24 @@ const ClassDetailPage = () => {
             pb: 1
           }}
         >
-          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 2, justifyContent: "space-between", width: "100%" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 2 }}>
             <PersonAddIcon sx={{ color: "primary.main" }} />
             <Typography variant="h6">Enroll Students in {classDetail?.sectionCode}</Typography>
+            </div>
+            <Button
+          variant="contained"
+          onClick={handleOpenImportStudents}
+          startIcon={<PersonAddIcon />}
+          sx={{
+            borderRadius: "8px",
+            textTransform: "none",
+            px: 3,
+            py: 1
+          }}
+        >
+          Import Students
+        </Button>
           </Box>
           <Button onClick={handleCloseEnrollModal} sx={{ minWidth: "auto", p: 1 }}>
             <CloseIcon />

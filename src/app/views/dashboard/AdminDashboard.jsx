@@ -3,7 +3,6 @@ import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import ClassIcon from "@mui/icons-material/Class";
 import MeetingRoomIcon from "@mui/icons-material/MeetingRoom";
 import SchoolIcon from "@mui/icons-material/School";
-import SearchIcon from "@mui/icons-material/Search";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import {
   Box,
@@ -12,14 +11,13 @@ import {
   Chip,
   Grid,
   IconButton,
-  InputAdornment,
   List,
   ListItem,
   ListItemText,
   Stack,
-  TextField,
   Typography
 } from "@mui/material";
+import { alpha, useTheme } from "@mui/material/styles";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -56,12 +54,25 @@ const MetricCard = ({ icon, label, value }) => (
   <Card sx={{ borderRadius: 3 }}>
     <CardContent>
       <Stack direction="row" spacing={2} alignItems="center">
-        <Box sx={{ p: 1.2, bgcolor: "grey.100", borderRadius: 2 }}>{icon}</Box>
+        <Box
+          sx={{
+            width: 40,
+            height: 40,
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+            bgcolor: (t) => alpha(t.palette.primary.main, 0.12),
+            color: "primary.main",
+            borderRadius: 2
+          }}
+        >
+          {icon}
+        </Box>
         <Box>
           <Typography variant="subtitle2" color="text.secondary">
             {label}
           </Typography>
-          <Typography variant="h6">{value}</Typography>
+          <Typography variant="h6" color="text.primary">{value}</Typography>
         </Box>
       </Stack>
     </CardContent>
@@ -71,7 +82,7 @@ const MetricCard = ({ icon, label, value }) => (
 const SideCard = ({ title, children, sx }) => (
   <Card sx={{ borderRadius: 3, ...sx }}>
     <CardContent>
-      <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+      <Typography variant="subtitle2" color="primary" sx={{ fontWeight: 600 }} gutterBottom>
         {title}
       </Typography>
       {children}
@@ -84,13 +95,14 @@ const SideCard = ({ title, children, sx }) => (
 const AdminDashboard = () => {
   const [year, setYear] = useState(new Date().getFullYear());
   const [tab, setTab] = useState("students");
-  const [totals, setTotals] = useState({ rooms: 0, courses: 0, classes: 0, devices: 0, faceId: 0 });
+  const [totals, setTotals] = useState({ rooms: 0, courses: 0, classes: 0, devices: 0, totalDevices: 0, faceId: 0, currentWeek: 0 });
   const [topFiveCourse, setTopFiveCourse] = useState([]);
   const [chartCategories, setChartCategories] = useState([]);
   const [chartValues, setChartValues] = useState([]);
   const [chartLoading, setChartLoading] = useState(false);
 
   const { user } = useAuth();
+  const theme = useTheme();
 
   // Fetch chart data by tab + year
   useEffect(() => {
@@ -163,18 +175,25 @@ const AdminDashboard = () => {
   };
 
   const fetchData = async () => {
-    const [rooms, courses, classes, devices] = await Promise.all([
+    const [rooms, courses, classes, devices, currentWeek, faceId] = await Promise.all([
       instance.get("/rooms/total-rooms"),
       instance.get("/courses/total-courses"),
       instance.get("/class-sections/total-class-sections"),
-      instance.get("/devices/total-devices")
+      instance.get("/devices/total-devices"),
+      instance.get(`/schedules/current-week-number?date=${new Date().toISOString().split('T')[0]}`),
+      instance.get("/faceid/users")
     ]);
+
+    console.log('faceId', faceId);
+
     return {
       rooms: rooms.data?.Data,
       courses: courses.data?.Data,
       classes: classes.data?.Data,
-      devices: devices.data?.Data?.TotalDevices,
-      faceId: 0
+      devices: devices.data?.Data?.ActiveDevices,
+      totalDevices: devices.data?.Data?.TotalDevices,
+      faceId: faceId.data?.Data?.TotalCount,
+      currentWeek: currentWeek.data?.Data?.WeekNumber
     };
   };
 
@@ -223,8 +242,8 @@ const AdminDashboard = () => {
                 x2: 0,
                 y2: 1,
                 colorStops: [
-                  { offset: 0, color: "#80d8ff" },
-                  { offset: 1, color: "#6ab7ff" }
+                  { offset: 0, color: theme.palette.primary.light },
+                  { offset: 1, color: theme.palette.primary.main }
                 ]
               }
             },
@@ -248,7 +267,7 @@ const AdminDashboard = () => {
           stack: "total",
           data: present,
           barWidth: 44,
-          itemStyle: { color: "#81c784" }
+          itemStyle: { color: theme.palette.primary.main }
         },
         {
           name: "Absent",
@@ -256,61 +275,45 @@ const AdminDashboard = () => {
           stack: "total",
           data: absent,
           barWidth: 44,
-          itemStyle: { color: "#ef9a9a" },
+          itemStyle: { color: theme.palette.primary.light },
           label: { show: true, position: "top", formatter: ({ value }) => `${100 - value}%` }
         }
       ]
     };
-  }, [tab, chartCategories, chartValues]);
+  }, [tab, chartCategories, chartValues, theme]);
 
   return (
     <Box sx={{ p: 3, pt: 10 }}>
       <Grid container spacing={3}>
         <Grid item xs={12} md={8}>
           {/* Greeting + quick search */}
-          <Card sx={{ borderRadius: 3, mb: 2 }}>
+          <Card sx={{ borderRadius: 3, mb: 2, background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.light} 100%)`, color: "primary.contrastText" }}>
             <CardContent>
               <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={2}>
                 <Box>
-                  <Typography variant="h5">Hello {user.name}</Typography>
+                  <Typography variant="h5" sx={{ color: "common.white" }}>Hello {user.name}</Typography>
                 </Box>
                 <Box>
                   <Chip
-                    label="Week 11"
-                    variant="outlined"
-                    sx={{ borderRadius: 2, px: 1.5, py: 3, fontWeight: 500 }}
+                    label={`Week ${totals?.currentWeek}`}
+                    variant="filled"
+                    sx={{ borderRadius: 2, px: 1.5, py: 3, fontWeight: 500, bgcolor: "rgba(255,255,255,0.2)", color: "common.white" }}
                   />
                 </Box>
               </Stack>
             </CardContent>
           </Card>
-          <Box sx={{ mb: 3 }}>
-            <TextField
-              fullWidth
-              placeholder="Search here..."
-              sx={{ "& .MuiOutlinedInput-root": { borderRadius: 9999 } }}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton edge="end">
-                      <SearchIcon />
-                    </IconButton>
-                  </InputAdornment>
-                )
-              }}
-            />
-          </Box>
 
           {/* Metrics */}
           <Grid container spacing={3}>
             <Grid item xs={12} md={4}>
-              <MetricCard icon={<MeetingRoomIcon />} label="Rooms" value={totals.rooms} />
+              <MetricCard icon={<MeetingRoomIcon color="inherit" />} label="Rooms" value={totals.rooms} />
             </Grid>
             <Grid item xs={12} md={4}>
-              <MetricCard icon={<SchoolIcon />} label="Courses" value={totals.courses} />
+              <MetricCard icon={<SchoolIcon color="inherit" />} label="Courses" value={totals.courses} />
             </Grid>
             <Grid item xs={12} md={4}>
-              <MetricCard icon={<ClassIcon />} label="Classes" value={totals.classes} />
+              <MetricCard icon={<ClassIcon color="inherit" />} label="Classes" value={totals.classes} />
             </Grid>
           </Grid>
 
@@ -325,14 +328,14 @@ const AdminDashboard = () => {
                   mb: 2
                 }}
               >
-                <Typography variant="h6">Biểu đồ</Typography>
+                <Typography variant="h6" color="primary">Biểu đồ</Typography>
                 <TogglePills value={tab} onChange={setTab} />
                 <Stack direction="row" spacing={1} alignItems="center">
-                  <IconButton onClick={() => setYear((y) => y - 1)} size="small">
+                  <IconButton color="primary" onClick={() => setYear((y) => y - 1)} size="small">
                     <ArrowBackIosNewIcon fontSize="inherit" />
                   </IconButton>
-                  <Chip label={year} variant="outlined" />
-                  <IconButton onClick={() => setYear((y) => y + 1)} size="small">
+                  <Chip label={year} color="primary" variant="outlined" />
+                  <IconButton color="primary" onClick={() => setYear((y) => y + 1)} size="small">
                     <ArrowForwardIosIcon fontSize="inherit" />
                   </IconButton>
                 </Stack>
@@ -367,21 +370,21 @@ const AdminDashboard = () => {
           </SideCard>
 
           <SideCard title="Registered Statistics" sx={{ mt: 3 }}>
-            <Stack spacing={2}>
-              <Card variant="outlined" sx={{ borderRadius: 2 }}>
+            <Stack spacing={2} direction="row">
+              <Card variant="outlined" sx={{ borderRadius: 2, width: "50%" }}>
                 <CardContent>
                   <Typography variant="caption" color="text.secondary">
                     Devices
                   </Typography>
-                  <Typography variant="h6">{totals?.devices}</Typography>
+                  <Typography variant="h6">{totals?.devices} / {totals?.totalDevices}</Typography>
                 </CardContent>
               </Card>
-              <Card variant="outlined" sx={{ borderRadius: 2 }}>
+              <Card variant="outlined" sx={{ borderRadius: 2, width: "50%" }}>
                 <CardContent>
                   <Typography variant="caption" color="text.secondary">
                     Face ID
                   </Typography>
-                  <Typography variant="h6">23</Typography>
+                  <Typography variant="h6">{totals?.faceId}</Typography>
                 </CardContent>
               </Card>
             </Stack>

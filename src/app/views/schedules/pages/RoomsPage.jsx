@@ -46,10 +46,9 @@ const RoomsPage = () => {
   const [submitting, setSubmitting] = useState(false);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(PAGE_SIZE);
-  const [order, setOrder] = useState("asc");
-  const [orderBy, setOrderBy] = useState("RoomName");
+  const [order, setOrder] = useState("desc");
+  const [orderBy, setOrderBy] = useState("CreatedAt");
   const [searchTerm, setSearchTerm] = useState("");
-  const [totalCount, setTotalCount] = useState(0);
   const [openModal, setOpenModal] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [editingRoomId, setEditingRoomId] = useState(null);
@@ -75,8 +74,9 @@ const RoomsPage = () => {
       if (error) {
         console.error("Failed to fetch rooms:", error);
       } else {
-        setRooms(data?.Data?.Items || []);
-        setTotalCount(data?.Data?.TotalCount || 0);
+        const items = data?.Data?.Items || [];
+        const sorted = [...items].sort((a, b) => new Date(b.CreatedAt) - new Date(a.CreatedAt));
+        setRooms(sorted);
       }
     } catch (error) {
       console.error("Error fetching rooms:", error);
@@ -138,9 +138,17 @@ const RoomsPage = () => {
 
       if (error) {
         console.error("Error deleting room:", error);
+        enqueueSnackbar(error, {
+          variant: "error"
+        });
+
+
         // TODO: Show error message to user
       } else {
         console.log("Room deleted successfully:", data);
+        enqueueSnackbar("Room deleted successfully", {
+          variant: "success"
+        });
         // Refresh the rooms list after successful deletion
         await fetchRooms();
         // TODO: Show success message
@@ -286,11 +294,13 @@ const RoomsPage = () => {
     if (!formData.capacity.toString().trim()) {
       errors.capacity = "Capacity is required";
     } else {
-      const capacityNum = parseInt(formData.capacity);
-      if (isNaN(capacityNum) || capacityNum < 1) {
-        errors.capacity = "Capacity must be a positive number";
-      } else if (capacityNum > 1000) {
-        errors.capacity = "Capacity must be less than 1000";
+      const capacityNum = Number(formData.capacity);
+      if (Number.isNaN(capacityNum)) {
+        errors.capacity = "Capacity must be a number";
+      } else if (capacityNum < 1) {
+        errors.capacity = "Capacity must be at least 1";
+      } else if (capacityNum > 50) {
+        errors.capacity = "Capacity must be at most 50";
       }
     }
 
@@ -626,7 +636,7 @@ const RoomsPage = () => {
                 error={!!formErrors.capacity}
                 placeholder="e.g., 50"
                 fullWidth
-                inputProps={{ min: 1, max: 1000 }}
+                inputProps={{ min: 1, max: 50 }}
                 sx={{
                   "& .MuiOutlinedInput-root": {
                     borderRadius: "8px"

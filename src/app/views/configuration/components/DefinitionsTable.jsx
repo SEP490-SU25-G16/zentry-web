@@ -24,6 +24,61 @@ import {
 } from "@mui/material";
 import { useState } from "react";
 
+const mockDefinitions = [
+  {
+    key: "firstName",
+    displayName: "First Name",
+    dataType: "String",
+    allowedScopeTypes: ["User", "Profile"],
+    defaultValue: "",
+    description: "The given name of the user.",
+    isDeletable: true,
+  },
+  {
+    key: "age",
+    displayName: "Age",
+    dataType: "Int",
+    allowedScopeTypes: ["User"],
+    defaultValue: 18,
+    unit: "years",
+    description: "Age of the user in years.",
+    isDeletable: true,
+  },
+  {
+    key: "isActive",
+    displayName: "Active Status",
+    dataType: "Boolean",
+    allowedScopeTypes: ["User", "Admin"],
+    defaultValue: true,
+    description: "Whether the user is active.",
+    isDeletable: false,
+  },
+  {
+    key: "salary",
+    displayName: "Monthly Salary",
+    dataType: "Decimal",
+    allowedScopeTypes: ["Employee"],
+    defaultValue: 1000.5,
+    unit: "USD",
+    description: "The monthly salary of the employee.",
+    isDeletable: true,
+  },
+  {
+    key: "gender",
+    displayName: "Gender",
+    dataType: "Selection",
+    allowedScopeTypes: ["User", "Profile"],
+    defaultValue: "M",
+    description: "Gender of the user.",
+    isDeletable: true,
+    options: [
+      { value: "M", displayLabel: "Male" },
+      { value: "F", displayLabel: "Female" },
+      { value: "O", displayLabel: "Other" },
+    ],
+  },
+];
+
 const DefinitionsTable = ({ definitions, loading, searchTerm, onEdit, onDelete }) => {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [pendingDelete, setPendingDelete] = useState(null);
@@ -64,17 +119,17 @@ const DefinitionsTable = ({ definitions, loading, searchTerm, onEdit, onDelete }
     );
   }
 
-  if (definitions.length === 0) {
-    return (
-      <Box sx={{ textAlign: "center", py: 4 }}>
-        <Typography variant="body1" color="text.secondary">
-          {searchTerm
-            ? `No attribute definitions found matching "${searchTerm}"`
-            : "No attribute definitions found."}
-        </Typography>
-      </Box>
-    );
-  }
+  // if (definitions.length === 0) {
+  //   return (
+  //     <Box sx={{ textAlign: "center", py: 4 }}>
+  //       <Typography variant="body1" color="text.secondary">
+  //         {searchTerm
+  //           ? `No attribute definitions found matching "${searchTerm}"`
+  //           : "No attribute definitions found."}
+  //       </Typography>
+  //     </Box>
+  //   );
+  // }
 
   return (
     <Box>
@@ -92,7 +147,7 @@ const DefinitionsTable = ({ definitions, loading, searchTerm, onEdit, onDelete }
             </TableRow>
           </TableHead>
           <TableBody>
-            {definitions.map((definition, index) => (
+            {mockDefinitions.map((definition, index) => (
               <TableRow key={definition.key || index} hover>
                 <TableCell sx={{ padding: "16px" }}>
                   <Typography variant="body2" sx={{ fontFamily: "monospace", fontWeight: 500 }}>
@@ -159,7 +214,7 @@ const DefinitionsTable = ({ definitions, loading, searchTerm, onEdit, onDelete }
       </TableContainer>
 
       {/* Show detailed cards for Selection type definitions */}
-      {definitions
+      {mockDefinitions
         .filter((def) => def.dataType === "Selection" && def.options?.length > 0)
         .map((definition) => (
           <Card key={`selection-${definition.key}`} sx={{ mt: 3, border: "1px solid #e0e0e0" }}>

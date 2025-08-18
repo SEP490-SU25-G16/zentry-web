@@ -3,6 +3,7 @@ import {
   Avatar,
   Box,
   Chip,
+  CircularProgress,
   Container,
   Divider,
   Grid,
@@ -20,16 +21,27 @@ const UserViewPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
   useEffect(() => {
     const fetchUser = async () => {
+      setLoading(true);
       const res = await UserServices.getUserById(id);
       setUser(res.data?.Data || null);
+      setLoading(false);
     };
     fetchUser();
    
   }, [id]);
 
-  if (!user) return <Typography>User not found</Typography>;
+  if (loading) return <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
+    <CircularProgress />
+  </Box>;
+
+  if (!user) return <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
+    <Typography variant="h5" fontWeight={700} gutterBottom>
+      User not found
+    </Typography>
+  </Box>;
 
   const renderStatusChip = (status) => (
     <Chip

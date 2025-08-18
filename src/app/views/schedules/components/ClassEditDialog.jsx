@@ -113,7 +113,6 @@ const ClassEditDialog = ({ open, initialData, onClose, onSave, courses = [], lec
             label="Semester"
             onChange={handleChange}
           >
-            <MenuItem value="FA24">FA25</MenuItem>
             <MenuItem value="SU25">SU25</MenuItem>
           </Select>
         </FormControl>

@@ -29,7 +29,7 @@ const RoomServices = {
       console.error("Error adding room:", error);
       return {
         data: null,
-        error: error.response ? error.response.data?.errors : "Network Error"
+        error: error.response ? error.response.data?.Error?.Message : "Network Error"
       };
     }
   },
@@ -59,7 +59,7 @@ const RoomServices = {
       console.error("Error deleting room:", error);
       return {
         data: null,
-        error: error.response ? error.response.data?.errors : "Network Error"
+        error: error.response ? error.response.data?.Error?.Message : "Network Error"
       };
     }
   }

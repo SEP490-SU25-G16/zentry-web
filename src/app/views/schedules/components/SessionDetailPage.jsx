@@ -428,7 +428,7 @@ const SessionDetailPage = () => {
                   Status
                 </Typography>
               </Box>
-              <Chip label={info?.Status || "Unknown"} color={info?.Status === "Completed" ? "success" : "warning"} />
+              <Chip label={info?.Status || "Unknown"} color={info?.Status === "Complete" ? "success" : info?.Status === "Active" ? "warning" : "primary"} />
             </Grid>
           </Grid>
         </CardContent>

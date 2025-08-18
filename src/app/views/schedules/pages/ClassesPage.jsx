@@ -93,7 +93,8 @@ const ClassesPage = () => {
     // Filter by search term (course name)
     if (searchTerm.trim()) {
       filtered = filtered.filter((cls) =>
-        cls.courseName.toLowerCase().includes(searchTerm.toLowerCase().trim())
+        cls.courseName.toLowerCase().includes(searchTerm.toLowerCase().trim()) ||
+        cls.sectionCode.toLowerCase().includes(searchTerm.toLowerCase().trim())
       );
     }
 
@@ -180,14 +181,8 @@ const ClassesPage = () => {
 
   const handleConfirmDelete = async () => {
     if (deleteTarget?.id) {
-      const result = await deleteClass(deleteTarget.id);
-
-      if (result.success) {
-        // Success handling is done in the hook with snackbar
-        setDeleteTarget(null);
-      }
-      // If there's an error, the hook will show the error message
-      // but we keep the dialog open so user can try again
+      await deleteClass(deleteTarget.id);
+      setDeleteTarget(null);
     }
   };
 

@@ -69,7 +69,7 @@ const AttributeDefinitionModal = ({
     >
       <DialogTitle sx={{ pb: 2 }}>
         <Typography variant="h6" component="div">
-          {isEditing ? "Update Attribute Definition" : "Create Attribute Definition"}
+          {true ? "Update Attribute Definition" : "Create Attribute Definition"}
         </Typography>
       </DialogTitle>
       <DialogContent sx={{ pb: 2 }}>
@@ -316,7 +316,7 @@ const AttributeDefinitionModal = ({
         >
           {submitting ? (
             <CircularProgress size={20} color="inherit" />
-          ) : isEditing ? (
+          ) : true ? (
             "Update Definition"
           ) : (
             "Create Definition"

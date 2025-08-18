@@ -16,6 +16,61 @@ import {
   Typography
 } from "@mui/material";
 
+const mockDefinitions = [
+  {
+    key: "firstName",
+    displayName: "First Name",
+    dataType: "String",
+    allowedScopeTypes: ["User", "Profile"],
+    defaultValue: "",
+    description: "The given name of the user.",
+    isDeletable: true,
+  },
+  {
+    key: "age",
+    displayName: "Age",
+    dataType: "Int",
+    allowedScopeTypes: ["User"],
+    defaultValue: 18,
+    unit: "years",
+    description: "Age of the user in years.",
+    isDeletable: true,
+  },
+  {
+    key: "isActive",
+    displayName: "Active Status",
+    dataType: "Boolean",
+    allowedScopeTypes: ["User", "Admin"],
+    defaultValue: true,
+    description: "Whether the user is active.",
+    isDeletable: false,
+  },
+  {
+    key: "salary",
+    displayName: "Monthly Salary",
+    dataType: "Decimal",
+    allowedScopeTypes: ["Employee"],
+    defaultValue: 1000.5,
+    unit: "USD",
+    description: "The monthly salary of the employee.",
+    isDeletable: true,
+  },
+  {
+    key: "gender",
+    displayName: "Gender",
+    dataType: "Selection",
+    allowedScopeTypes: ["User", "Profile"],
+    defaultValue: "M",
+    description: "Gender of the user.",
+    isDeletable: true,
+    options: [
+      { value: "M", displayLabel: "Male" },
+      { value: "F", displayLabel: "Female" },
+      { value: "O", displayLabel: "Other" },
+    ],
+  },
+];
+
 const SettingModal = ({
   open,
   onClose,
@@ -30,7 +85,7 @@ const SettingModal = ({
 }) => {
   const scopeTypes = ["Global", "Course", "Session"];
 
-  const selectedDefinition = attributeDefinitions.find((def) => def.key === formData.attributeKey);
+  const selectedDefinition = mockDefinitions.find((def) => def.key === formData.attributeKey);
 
   const renderValueInput = () => {
     if (!selectedDefinition) {
@@ -233,7 +288,7 @@ const SettingModal = ({
                       Loading definitions...
                     </MenuItem>
                   ) : (
-                    attributeDefinitions.map((definition) => (
+                    mockDefinitions.map((definition) => (
                       <MenuItem key={definition.key} value={definition.key}>
                         {definition.displayName} ({definition.key})
                       </MenuItem>
@@ -267,6 +322,15 @@ const SettingModal = ({
                         {type}
                       </MenuItem>
                     ))}
+                  <MenuItem key="Global" value="Global">
+                    Global
+                  </MenuItem>
+                  <MenuItem key="Course" value="Course">
+                    Course
+                  </MenuItem>
+                  <MenuItem key="Session" value="Session">
+                    Session
+                  </MenuItem>
                 </Select>
                 {formErrors.scopeType && <FormHelperText>{formErrors.scopeType}</FormHelperText>}
               </FormControl>
