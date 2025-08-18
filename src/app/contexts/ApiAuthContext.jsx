@@ -49,10 +49,10 @@ export const AuthProvider = ({ children }) => {
   const signInWithEmail = async (email, password) => {
     try {
       const { data } = await instance.post("/auth/sign-in", { email, password });
-      
+
       if (data.Success && data.Data) {
         const { Token, UserInfo } = data.Data;
-        
+
         const user = {
           id: UserInfo.Id,
           email: UserInfo.Email,
@@ -60,7 +60,7 @@ export const AuthProvider = ({ children }) => {
           role: UserInfo.Role,
           name: UserInfo.FullName
         };
-        
+
         setSession(Token, user);
         dispatch({
           type: "FB_AUTH_STATE_CHANGED",
@@ -71,7 +71,7 @@ export const AuthProvider = ({ children }) => {
         });
         return data;
       } else {
-        throw new Error(data.Message || "Đăng nhập thất bại");
+        throw new Error("Tài khoản hoặc mật khẩu không chính xác");
       }
     } catch (error) {
       throw error;
@@ -81,10 +81,10 @@ export const AuthProvider = ({ children }) => {
   const signInWithGoogle = async () => {
     try {
       const { data } = await instance.post("/auth/google-signin");
-      
+
       if (data.Success && data.Data) {
         const { Token, UserInfo } = data.Data;
-        
+
         const user = {
           id: UserInfo.Id,
           email: UserInfo.Email,
@@ -92,7 +92,7 @@ export const AuthProvider = ({ children }) => {
           role: UserInfo.Role,
           name: UserInfo.FullName
         };
-        
+
         setSession(Token, user);
         dispatch({
           type: "FB_AUTH_STATE_CHANGED",
@@ -113,10 +113,10 @@ export const AuthProvider = ({ children }) => {
   const createUserWithEmail = async (email, password, name) => {
     try {
       const { data } = await instance.post("/auth/sign-up", { email, password, name });
-      
+
       if (data.Success && data.Data) {
         const { Token, UserInfo } = data.Data;
-        
+
         const user = {
           id: UserInfo.Id,
           email: UserInfo.Email,
@@ -124,7 +124,7 @@ export const AuthProvider = ({ children }) => {
           role: UserInfo.Role,
           name: UserInfo.FullName
         };
-        
+
         setSession(Token, user);
         dispatch({
           type: "FB_AUTH_STATE_CHANGED",
@@ -192,10 +192,11 @@ export const AuthProvider = ({ children }) => {
         method: "API",
         signInWithEmail,
         createUserWithEmail
-      }}>
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
 };
 
-export default AuthContext; 
+export default AuthContext;

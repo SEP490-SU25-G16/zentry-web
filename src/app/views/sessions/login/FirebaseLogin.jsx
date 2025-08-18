@@ -147,7 +147,7 @@ export default function FirebaseLogin() {
       navigate(state ? state.from : "/");
       enqueueSnackbar("Logged In Successfully", { variant: "success" });
     } catch (error) {
-      enqueueSnackbar(error.message, { variant: "error" });
+      enqueueSnackbar("Incorrect username or password", { variant: "error" });
     }
   };
 
@@ -181,10 +181,6 @@ export default function FirebaseLogin() {
           </Typography>
 
           <Box sx={{ textAlign: "left", mb: 4 }}>
-            <FeatureItem>
-              <div className="feature-icon" />
-              <Typography variant="body1">JWT, Firebase & Auth0 Authentication</Typography>
-            </FeatureItem>
             <FeatureItem>
               <div className="feature-icon" />
               <Typography variant="body1">Clean & Organized Code</Typography>

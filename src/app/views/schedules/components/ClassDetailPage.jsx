@@ -58,7 +58,8 @@ import { useClasses } from "../hooks";
 const ClassDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { getClass, enrollStudent, bulkEnrollStudents, createSchedule, enrollLecturer } = useClasses();
+  const { getClass, enrollStudent, bulkEnrollStudents, createSchedule, enrollLecturer } =
+    useClasses();
   const { users, loading: usersLoading } = useUsers();
 
   const [classDetail, setClassDetail] = useState(null);
@@ -112,8 +113,7 @@ const ClassDetailPage = () => {
     setSessionsLoading(true);
     try {
       const result = await instance.get(`class-sections/${id}/sessions`);
-      const sessionsData =
-        result.data?.Data?.Sessions || result.data?.Data || result.data || [];
+      const sessionsData = result.data?.Data?.Sessions || result.data?.Data || result.data || [];
       setSessions(Array.isArray(sessionsData) ? sessionsData : []);
     } catch (err) {
       console.error("Error fetching sessions:", err);
@@ -202,7 +202,9 @@ const ClassDetailPage = () => {
 
   const handleImportStudentsSubmit = async () => {
     if (!importStudentsFile) return;
-    const isCsv = importStudentsFile.type === "text/csv" || importStudentsFile.name.toLowerCase().endsWith(".csv");
+    const isCsv =
+      importStudentsFile.type === "text/csv" ||
+      importStudentsFile.name.toLowerCase().endsWith(".csv");
     if (!isCsv) return;
     setImportingStudents(true);
     try {
@@ -250,9 +252,7 @@ const ClassDetailPage = () => {
   };
 
   const handleOpenAssignLecturer = () => {
-    setSelectedLecturerId(
-      classDetail?.lecturerId || classDetail?.original?.LecturerId || ""
-    );
+    setSelectedLecturerId(classDetail?.lecturerId || classDetail?.original?.LecturerId || "");
     setAssignLecturerOpen(true);
   };
 
@@ -501,7 +501,7 @@ const ClassDetailPage = () => {
         <Typography variant="h4" component="h1" sx={{ flexGrow: 1 }}>
           Class Details
         </Typography>
-        <Button
+        {/* <Button
           variant="contained"
           onClick={handleOpenImportStudents}
           startIcon={<PersonAddIcon />}
@@ -513,7 +513,7 @@ const ClassDetailPage = () => {
           }}
         >
           Import Students
-        </Button>
+        </Button> */}
         <Button
           variant="outlined"
           onClick={handleOpenAssignLecturer}
@@ -999,8 +999,13 @@ const ClassDetailPage = () => {
                             </TableCell>
                             <TableCell sx={{ padding: "1em" }}>
                               <Box sx={{ display: "flex", alignItems: "center" }}>
-                                <AccessTimeIcon sx={{ fontSize: 16, mr: 1, color: "text.secondary" }} />
-                                {start.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                                <AccessTimeIcon
+                                  sx={{ fontSize: 16, mr: 1, color: "text.secondary" }}
+                                />
+                                {start.toLocaleTimeString([], {
+                                  hour: "2-digit",
+                                  minute: "2-digit"
+                                })}
                                 {" - "}
                                 {end.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                               </Box>
@@ -1009,25 +1014,27 @@ const ClassDetailPage = () => {
                               {start.toLocaleDateString("en-US", {
                                 year: "numeric",
                                 month: "short",
-                                day: "numeric",
+                                day: "numeric"
                               })}
                             </TableCell>
                             <TableCell sx={{ padding: "1em" }}>
                               <Chip label={session.Status} color={statusColor} size="small" />
                             </TableCell>
                             <TableCell sx={{ padding: "1em" }}>
-                        <Button
-                          variant="outlined"
-                          size="small"
-                          onClick={() => navigate(`/schedules/class/${id}/session/${session.Id}`)}
-                          sx={{
-                            borderRadius: "6px",
-                            textTransform: "none"
-                          }}
-                        >
-                          View Details
-                        </Button>
-                      </TableCell>
+                              <Button
+                                variant="outlined"
+                                size="small"
+                                onClick={() =>
+                                  navigate(`/schedules/class/${id}/session/${session.Id}`)
+                                }
+                                sx={{
+                                  borderRadius: "6px",
+                                  textTransform: "none"
+                                }}
+                              >
+                                View Details
+                              </Button>
+                            </TableCell>
                           </TableRow>
                         );
                       })}
@@ -1330,7 +1337,11 @@ const ClassDetailPage = () => {
         </DialogContent>
 
         <DialogActions sx={{ p: 3, pt: 1 }}>
-          <Button onClick={handleCloseAssignLecturer} variant="outlined" disabled={assigningLecturer}>
+          <Button
+            onClick={handleCloseAssignLecturer}
+            variant="outlined"
+            disabled={assigningLecturer}
+          >
             Cancel
           </Button>
           <Button
@@ -1589,13 +1600,25 @@ const ClassDetailPage = () => {
         PaperProps={{ sx: { borderRadius: "12px", p: 1 } }}
       >
         <DialogTitle sx={{ pb: 2 }}>
-          <Typography variant="h6" component="div">Import Students</Typography>
+          <Typography variant="h6" component="div">
+            Import Students
+          </Typography>
         </DialogTitle>
         <DialogContent sx={{ pb: 2 }}>
           <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-            <Button variant="outlined" component="label" sx={{ alignSelf: "flex-start" }} startIcon={<UploadFileIcon />}>
+            <Button
+              variant="outlined"
+              component="label"
+              sx={{ alignSelf: "flex-start" }}
+              startIcon={<UploadFileIcon />}
+            >
               Choose CSV File
-              <input hidden type="file" accept=".csv" onChange={(e) => setImportStudentsFile(e.target.files?.[0] || null)} />
+              <input
+                hidden
+                type="file"
+                accept=".csv"
+                onChange={(e) => setImportStudentsFile(e.target.files?.[0] || null)}
+              />
             </Button>
             <Typography variant="body2" color="text.secondary">
               {importStudentsFile ? `Selected: ${importStudentsFile.name}` : "No file selected"}
@@ -1603,7 +1626,11 @@ const ClassDetailPage = () => {
           </Box>
         </DialogContent>
         <DialogActions sx={{ p: 3, pt: 1 }}>
-          <Button onClick={handleCloseImportStudents} color="inherit" sx={{ borderRadius: "8px", textTransform: "none", px: 3 }}>
+          <Button
+            onClick={handleCloseImportStudents}
+            color="inherit"
+            sx={{ borderRadius: "8px", textTransform: "none", px: 3 }}
+          >
             Cancel
           </Button>
           <Button
