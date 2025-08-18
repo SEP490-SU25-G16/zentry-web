@@ -159,6 +159,38 @@ const ClassServices = {
       };
     }
   },
+  updateSchedule: async (scheduleId, scheduleData) => {
+    try {
+      const { data } = await instance.put(`/schedules/${scheduleId}`, {
+        ...scheduleData
+      });
+      return {
+        data,
+        error: null
+      };
+    } catch (error) {
+      console.error("Error updating schedule:", error);
+      return {
+        data: null,
+        error: error.response ? error.response.data?.Error?.Message : "Network Error"
+      };
+    }
+  },
+  deleteSchedule: async (scheduleId) => {
+    try {
+      const { data } = await instance.delete(`/schedules/${scheduleId}`);
+      return {
+        data,
+        error: null
+      };
+    } catch (error) {
+      console.error("Error deleting schedule:", error);
+      return {
+        data: null,
+        error: error.response ? error.response.data?.Error?.Message : "Network Error"
+      };
+    }
+  },
   changeAttendance: async (sectionId, studentId, status) => {
     try {
       const { data } = await instance.put(`/attendance/sessions/${sectionId}/students/${studentId}/status`, {
@@ -171,6 +203,39 @@ const ClassServices = {
       };
     } catch (error) {
       console.error("Error changing attendance:", error);
+      return {
+        data: null,
+        error: error.response ? error.response.data?.Error?.Message : "Network Error"
+      };
+    }
+  }
+  ,
+  updateSession: async (sessionId, sessionData) => {
+    try {
+      const { data } = await instance.put(`/attendance/sessions/${sessionId}`, {
+        ...sessionData
+      });
+      return {
+        data,
+        error: null
+      };
+    } catch (error) {
+      console.error("Error updating session:", error);
+      return {
+        data: null,
+        error: error.response ? error.response.data?.Error?.Message : "Network Error"
+      };
+    }
+  },
+  deleteSession: async (sessionId) => {
+    try {
+      const { data } = await instance.delete(`/attendance/sessions/${sessionId}`);
+      return {
+        data,
+        error: null
+      };
+    } catch (error) {
+      console.error("Error deleting session:", error);
       return {
         data: null,
         error: error.response ? error.response.data?.Error?.Message : "Network Error"

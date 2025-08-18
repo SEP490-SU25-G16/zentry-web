@@ -1,3 +1,4 @@
+import { Visibility as VisibilityIcon } from "@mui/icons-material";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import AddIcon from "@mui/icons-material/Add";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -5,6 +6,8 @@ import BookIcon from "@mui/icons-material/Book";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import ClassIcon from "@mui/icons-material/Class";
 import CloseIcon from "@mui/icons-material/Close";
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
 import PersonIcon from "@mui/icons-material/Person";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import RoomIcon from "@mui/icons-material/Room";
@@ -28,6 +31,7 @@ import {
   FormControl,
   FormControlLabel,
   Grid,
+  IconButton,
   InputAdornment,
   InputLabel,
   List,
@@ -45,6 +49,7 @@ import {
   TablePagination,
   TableRow,
   TextField,
+  Tooltip,
   Typography
 } from "@mui/material";
 import { instance } from "lib/axios";
@@ -58,7 +63,7 @@ import { useClasses } from "../hooks";
 const ClassDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { getClass, enrollStudent, bulkEnrollStudents, createSchedule, enrollLecturer } =
+  const { getClass, enrollStudent, bulkEnrollStudents, createSchedule, enrollLecturer, updateSchedule, deleteSchedule, updateSession, deleteSession } =
     useClasses();
   const { users, loading: usersLoading } = useUsers();
 
@@ -83,9 +88,19 @@ const ClassDetailPage = () => {
   const [sessionsLoading, setSessionsLoading] = useState(false);
   const [sessionsPage, setSessionsPage] = useState(0);
   const [sessionsRowsPerPage, setSessionsRowsPerPage] = useState(5);
+  const [editSessionOpen, setEditSessionOpen] = useState(false);
+  const [sessionForm, setSessionForm] = useState({
+    lecturerId: "",
+    startTime: "",
+    endTime: "",
+    sessionConfigs: { absentReportGracePeriodHours: "", totalAttendanceRounds: "" }
+  });
+  const [editingSessionId, setEditingSessionId] = useState(null);
+  const [deletingSession, setDeletingSession] = useState(null);
 
   // Add Schedule Modal state
   const [addScheduleModalOpen, setAddScheduleModalOpen] = useState(false);
+  const [editingScheduleId, setEditingScheduleId] = useState(null);
   const [scheduleForm, setScheduleForm] = useState({
     roomId: "",
     startDate: "",
@@ -95,6 +110,10 @@ const ClassDetailPage = () => {
     weekDay: ""
   });
   const [addingSchedule, setAddingSchedule] = useState(false);
+
+  // Delete confirm state
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [scheduleToDelete, setScheduleToDelete] = useState(null);
 
   // Assign lecturer state
   const [assignLecturerOpen, setAssignLecturerOpen] = useState(false);
@@ -239,6 +258,7 @@ const ClassDetailPage = () => {
 
   const handleAddSchedule = () => {
     setAddScheduleModalOpen(true);
+    setEditingScheduleId(null);
     setScheduleForm({
       roomId: "",
       startDate: "",
@@ -249,6 +269,100 @@ const ClassDetailPage = () => {
     });
     // Always fetch rooms when opening the modal to ensure fresh data
     fetchRooms();
+  };
+
+  const handleEditSchedule = (schedule) => {
+    setEditingScheduleId(schedule.Id || schedule.id);
+    setAddScheduleModalOpen(true);
+    // Prefill form
+    const startDate = String(schedule.StartDate || schedule.startDate).slice(0, 10);
+    const endDate = String(schedule.EndDate || schedule.endDate).slice(0, 10);
+    const startTime = String(schedule.StartTime || schedule.startTime).slice(0, 5);
+    const endTime = String(schedule.EndTime || schedule.endTime).slice(0, 5);
+    setScheduleForm({
+      roomId: schedule.RoomId || schedule.roomId || "",
+      startDate: startDate || "",
+      endDate: endDate || "",
+      startTime: startTime || "",
+      endTime: endTime || "",
+      weekDay: schedule.WeekDay || schedule.weekDay || ""
+    });
+    fetchRooms();
+  };
+
+  const handleDeleteScheduleClick = (schedule) => {
+    setScheduleToDelete(schedule);
+    setDeleteConfirmOpen(true);
+  };
+
+  const handleConfirmDeleteSchedule = async () => {
+    if (!scheduleToDelete) return;
+    try {
+      const result = await deleteSchedule(scheduleToDelete.Id || scheduleToDelete.id);
+      if (result.success) {
+        setDeleteConfirmOpen(false);
+        setScheduleToDelete(null);
+        await fetchSessions();
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  // ----------- Session Edit/Delete -----------
+  const openEditSession = (session) => {
+    setEditingSessionId(session.Id);
+    setSessionForm({
+      lecturerId: classDetail?.lecturerId || classDetail?.original?.LecturerId || "",
+      startTime: String(session.StartTime).replace(" ", "T"),
+      endTime: String(session.EndTime).replace(" ", "T"),
+      sessionConfigs: {
+        absentReportGracePeriodHours: String(session.AbsentReportGracePeriodHours || ""),
+        totalAttendanceRounds: String(session.TotalAttendanceRounds || "")
+      }
+    });
+    setEditSessionOpen(true);
+  };
+
+  const handleSessionFormChange = (path, value) => {
+    setSessionForm((prev) => {
+      if (path.startsWith("sessionConfigs.")) {
+        const key = path.split(".")[1];
+        return { ...prev, sessionConfigs: { ...prev.sessionConfigs, [key]: value } };
+      }
+      return { ...prev, [path]: value };
+    });
+  };
+
+  const handleSaveSession = async () => {
+    if (!editingSessionId) return;
+    const payload = {
+      lecturerId: sessionForm.lecturerId,
+      startTime: sessionForm.startTime,
+      endTime: sessionForm.endTime,
+      sessionConfigs: {
+        absentReportGracePeriodHours: sessionForm.sessionConfigs.absentReportGracePeriodHours,
+        totalAttendanceRounds: sessionForm.sessionConfigs.totalAttendanceRounds
+      }
+    };
+    const res = await updateSession(editingSessionId, payload);
+    if (res.success) {
+      setEditSessionOpen(false);
+      await fetchSessions();
+    }
+  };
+
+  const confirmDeleteSession = (session) => {
+    setDeletingSession(session);
+  };
+
+  const handleDeleteSession = async () => {
+    if (!deletingSession) return;
+    const res = await deleteSession(deletingSession.Id);
+    if (res.success) {
+      setDeletingSession(null);
+      await fetchSessions();
+    }
   };
 
   const handleOpenAssignLecturer = () => {
@@ -282,6 +396,7 @@ const ClassDetailPage = () => {
 
   const handleCloseAddScheduleModal = () => {
     setAddScheduleModalOpen(false);
+    setEditingScheduleId(null);
     setScheduleForm({
       roomId: "",
       startDate: "",
@@ -313,7 +428,7 @@ const ClassDetailPage = () => {
 
     setAddingSchedule(true);
     try {
-      // Create schedule data payload
+      // Schedule payload
       const scheduleData = {
         lecturerId: classDetail.lecturerId || classDetail.original?.LecturerId,
         classSectionId: id,
@@ -325,10 +440,19 @@ const ClassDetailPage = () => {
         weekDay: scheduleForm.weekDay
       };
 
-      console.log("Adding schedule with data:", scheduleData);
-
-      // Use the createSchedule service
-      const result = await createSchedule(scheduleData);
+      let result;
+      if (editingScheduleId) {
+        result = await updateSchedule(editingScheduleId, {
+          roomId: scheduleData.roomId,
+          startDate: scheduleData.startDate,
+          endDate: scheduleData.endDate,
+          startTime: scheduleData.startTime,
+          endTime: scheduleData.endTime,
+          weekDay: scheduleData.weekDay
+        });
+      } else {
+        result = await createSchedule(scheduleData);
+      }
 
       if (result.success) {
         handleCloseAddScheduleModal();
@@ -341,7 +465,7 @@ const ClassDetailPage = () => {
         fetchSessions();
       }
     } catch (error) {
-      console.error("Error adding schedule:", error);
+      console.error("Error saving schedule:", error);
     } finally {
       setAddingSchedule(false);
     }
@@ -862,7 +986,7 @@ const ClassDetailPage = () => {
                     <TableCell sx={{ padding: "1em", fontWeight: 600 }}>Time</TableCell>
                     <TableCell sx={{ padding: "1em", fontWeight: 600 }}>Room</TableCell>
                     <TableCell sx={{ padding: "1em", fontWeight: 600 }}>Date Range</TableCell>
-                    {/* <TableCell sx={{ padding: "1em", fontWeight: 600 }}>Actions</TableCell> */}
+                    <TableCell sx={{ padding: "1em", fontWeight: 600 }}>Actions</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -908,19 +1032,27 @@ const ClassDetailPage = () => {
                           </>
                         )}
                       </TableCell>
-                      {/* <TableCell sx={{ padding: "1em" }}>
+                      <TableCell sx={{ padding: "1em" }}>
                         <Button
                           variant="outlined"
                           size="small"
-                          onClick={() => navigate(`/schedules/class/${id}/session/${schedule.Id}`)}
-                          sx={{
-                            borderRadius: "6px",
-                            textTransform: "none"
-                          }}
+                          startIcon={<EditIcon />}
+                          onClick={() => handleEditSchedule(schedule)}
+                          sx={{ mr: 1, textTransform: "none", borderRadius: "6px" }}
                         >
-                          View Details
+                          Edit
                         </Button>
-                      </TableCell> */}
+                        <Button
+                          variant="outlined"
+                          color="error"
+                          size="small"
+                          startIcon={<DeleteIcon />}
+                          onClick={() => handleDeleteScheduleClick(schedule)}
+                          sx={{ textTransform: "none", borderRadius: "6px" }}
+                        >
+                          Delete
+                        </Button>
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -987,10 +1119,10 @@ const ClassDetailPage = () => {
                         const start = new Date(String(session.StartTime).replace(" ", "T"));
                         const end = new Date(String(session.EndTime).replace(" ", "T"));
                         const statusColor =
-                          session.Status === "Complete"
-                            ? "success"
-                            : session.Status === "Active"
+                          session.Status === "Completed"
                             ? "warning"
+                            : session.Status === "Active"
+                            ? "success"
                             : "primary";
                         return (
                           <TableRow key={session.Id}>
@@ -1021,19 +1153,35 @@ const ClassDetailPage = () => {
                               <Chip label={session.Status} color={statusColor} size="small" />
                             </TableCell>
                             <TableCell sx={{ padding: "1em" }}>
-                              <Button
-                                variant="outlined"
-                                size="small"
-                                onClick={() =>
-                                  navigate(`/schedules/class/${id}/session/${session.Id}`)
-                                }
-                                sx={{
-                                  borderRadius: "6px",
-                                  textTransform: "none"
-                                }}
-                              >
-                                View Details
-                              </Button>
+                              <Tooltip title="View Details">
+                      <IconButton
+                        size="small"
+                        onClick={() =>
+                          navigate(`/schedules/class/${id}/session/${session.Id}`)
+                        }
+                        sx={{ color: "primary.main" }}
+                      >
+                        <VisibilityIcon fontSize="small" />
+                      </IconButton>
+                      </Tooltip>
+                      <Tooltip title="Edit">
+                              <IconButton
+                        size="small"
+                        onClick={() => openEditSession(session)}
+                        sx={{ color: "primary.main" }}
+                      >
+                        <EditIcon fontSize="small" />
+                      </IconButton>
+                      </Tooltip>
+                      <Tooltip title="Delete">
+                        <IconButton
+                          size="small"
+                          onClick={() => confirmDeleteSession(session)}
+                          sx={{ color: "error.main" }}
+                        >
+                          <DeleteIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
                             </TableCell>
                           </TableRow>
                         );
@@ -1374,8 +1522,12 @@ const ClassDetailPage = () => {
           }}
         >
           <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-            <AddIcon sx={{ color: "secondary.main" }} />
-            <Typography variant="h6">Add Schedule for {classDetail?.sectionCode}</Typography>
+            {editingScheduleId ? (
+              <EditIcon sx={{ color: "secondary.main" }} />
+            ) : (
+              <AddIcon sx={{ color: "secondary.main" }} />
+            )}
+            <Typography variant="h6">{editingScheduleId ? "Edit" : "Add"} Schedule for {classDetail?.sectionCode}</Typography>
           </Box>
           <Button onClick={handleCloseAddScheduleModal} sx={{ minWidth: "auto", p: 1 }}>
             <CloseIcon />
@@ -1584,10 +1736,119 @@ const ClassDetailPage = () => {
               !scheduleForm.weekDay ||
               addingSchedule
             }
-            startIcon={addingSchedule ? <CircularProgress size={16} /> : <AddIcon />}
+            startIcon={
+              addingSchedule ? (
+                <CircularProgress size={16} />
+              ) : editingScheduleId ? (
+                <EditIcon />
+              ) : (
+                <AddIcon />
+              )
+            }
           >
-            {addingSchedule ? "Adding..." : "Add Schedule"}
+            {addingSchedule ? (editingScheduleId ? "Saving..." : "Adding...") : editingScheduleId ? "Save Changes" : "Add Schedule"}
           </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Confirm Delete Schedule */}
+      <Dialog
+        open={deleteConfirmOpen}
+        onClose={() => setDeleteConfirmOpen(false)}
+        maxWidth="xs"
+        fullWidth
+        PaperProps={{ sx: { borderRadius: "12px" } }}
+      >
+        <DialogTitle>Confirm Delete</DialogTitle>
+        <DialogContent>
+          <Typography>Are you sure you want to delete this schedule?</Typography>
+        </DialogContent>
+        <DialogActions sx={{ p: 2 }}>
+          <Button variant="outlined" onClick={() => setDeleteConfirmOpen(false)}>Cancel</Button>
+          <Button variant="contained" color="error" onClick={handleConfirmDeleteSchedule} startIcon={<DeleteIcon />}>Delete</Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Edit Session Modal */}
+      <Dialog open={editSessionOpen} onClose={() => setEditSessionOpen(false)} maxWidth="sm" fullWidth PaperProps={{ sx: { borderRadius: "12px" } }}>
+        <DialogTitle>Edit Session</DialogTitle>
+        <DialogContent>
+          <Grid container spacing={2} sx={{ mt: 1 }}>
+            <Grid item xs={12}>
+              <FormControl fullWidth>
+                <InputLabel>Lecturer</InputLabel>
+                <Select
+                  label="Lecturer"
+                  value={sessionForm.lecturerId}
+                  onChange={(e) => handleSessionFormChange("lecturerId", e.target.value)}
+                >
+                  {usersLoading ? (
+                    <MenuItem disabled>Loading...</MenuItem>
+                  ) : lecturers.length > 0 ? (
+                    lecturers.map((lec) => (
+                      <MenuItem key={lec.UserId} value={lec.UserId}>
+                        {lec.FullName} {lec.Email ? `- ${lec.Email}` : ""}
+                      </MenuItem>
+                    ))
+                  ) : (
+                    <MenuItem disabled>No lecturers available</MenuItem>
+                  )}
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="Start Time"
+                type="datetime-local"
+                value={sessionForm.startTime}
+                onChange={(e) => handleSessionFormChange("startTime", e.target.value)}
+                InputLabelProps={{ shrink: true }}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="End Time"
+                type="datetime-local"
+                value={sessionForm.endTime}
+                onChange={(e) => handleSessionFormChange("endTime", e.target.value)}
+                InputLabelProps={{ shrink: true }}
+              />
+            </Grid>
+            {/* <Grid item xs={12} md={6}>
+              <TextField
+                fullWidth
+                label="Absent Grace Hours"
+                value={sessionForm.sessionConfigs.absentReportGracePeriodHours}
+                onChange={(e) => handleSessionFormChange("sessionConfigs.absentReportGracePeriodHours", e.target.value)}
+              />
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <TextField
+                fullWidth
+                label="Total Attendance Rounds"
+                value={sessionForm.sessionConfigs.totalAttendanceRounds}
+                onChange={(e) => handleSessionFormChange("sessionConfigs.totalAttendanceRounds", e.target.value)}
+              />
+            </Grid> */}
+          </Grid>
+        </DialogContent>
+        <DialogActions sx={{ p: 2 }}>
+          <Button variant="outlined" onClick={() => setEditSessionOpen(false)}>Cancel</Button>
+          <Button variant="contained" onClick={handleSaveSession} startIcon={<EditIcon />}>Save</Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Confirm Delete Session */}
+      <Dialog open={Boolean(deletingSession)} onClose={() => setDeletingSession(null)} maxWidth="xs" fullWidth PaperProps={{ sx: { borderRadius: "12px" } }}>
+        <DialogTitle>Confirm Delete</DialogTitle>
+        <DialogContent>
+          <Typography>Are you sure you want to delete this session?</Typography>
+        </DialogContent>
+        <DialogActions sx={{ p: 2 }}>
+          <Button variant="outlined" onClick={() => setDeletingSession(null)}>Cancel</Button>
+          <Button variant="contained" color="error" onClick={handleDeleteSession} startIcon={<DeleteIcon />}>Delete</Button>
         </DialogActions>
       </Dialog>
 

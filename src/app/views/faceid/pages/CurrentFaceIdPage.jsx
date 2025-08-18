@@ -1,24 +1,24 @@
-import React, { useState, useEffect } from "react";
+import { Person as PersonIcon, Search as SearchIcon } from "@mui/icons-material";
 import {
   Box,
-  Typography,
+  Chip,
+  CircularProgress,
+  InputAdornment,
   Paper,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
-  TableRow,
   TablePagination,
+  TableRow,
   TableSortLabel,
-  Chip,
-  CircularProgress,
   TextField,
-  InputAdornment
+  Typography
 } from "@mui/material";
-import { Person as PersonIcon, Search as SearchIcon } from "@mui/icons-material";
+import { instance } from "lib/axios";
 import { useSnackbar } from "notistack";
-import { mockFaceIdCurrent } from "../mock/mockFaceIdCurrent";
+import { useEffect, useState } from "react";
 
 const PAGE_SIZE = 5;
 
@@ -45,9 +45,10 @@ const CurrentFaceIdPage = () => {
     await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate network delay
     try {
       // Simulate API call - replace with actual API call
-      const response = mockFaceIdCurrent;
-      setFaceIds(response);
-      setTotalCount(response.length);
+      const response = await instance.get("/faceid/users");
+      console.log("🚀 ~ fetchFaceIds ~ response:", response)
+      setFaceIds(response.data?.Data?.Users);
+      setTotalCount(response.data?.Data?.TotalCount);
     } catch (error) {
       console.error("Error fetching face IDs:", error);
       enqueueSnackbar("Failed to fetch face IDs", { variant: "error" });
@@ -117,7 +118,7 @@ const CurrentFaceIdPage = () => {
     // Apply search filter
     if (searchTerm.trim()) {
       filteredFaceIds = faceIds.filter((faceId) =>
-        faceId.userId.toLowerCase().includes(searchTerm.toLowerCase())
+        faceId.UserId.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
@@ -138,9 +139,9 @@ const CurrentFaceIdPage = () => {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case "Registered":
+      case true:
         return "success";
-      case "Not yet":
+      case false:
         return "warning";
       default:
         return "default";
@@ -276,7 +277,7 @@ const CurrentFaceIdPage = () => {
               ) : (
                 getPaginatedFaceIds().map((faceId, index) => (
                   <TableRow
-                    key={faceId.userId}
+                    key={faceId.UserId}
                     sx={{
                       "&:last-child td, &:last-child th": { border: 0 },
                       "&:hover": { backgroundColor: "#f8f9fa" },
@@ -285,15 +286,15 @@ const CurrentFaceIdPage = () => {
                   >
                     <TableCell component="th" scope="row" sx={{ py: 2, px: 3 }}>
                       <Typography variant="subtitle1" fontWeight="medium">
-                        {faceId.userId}
+                        {faceId.UserId}
                       </Typography>
                     </TableCell>
                     <TableCell sx={{ py: 2, px: 3 }}>
                       <Chip
-                        label={faceId.status}
+                        label={faceId.HasFaceId ? "Registered" : "Not yet"}
                         variant="filled"
                         size="small"
-                        color={getStatusColor(faceId.status)}
+                        color={getStatusColor(faceId.HasFaceId)}
                         sx={{
                           fontWeight: 500,
                           minWidth: 80,
@@ -302,10 +303,10 @@ const CurrentFaceIdPage = () => {
                       />
                     </TableCell>
                     <TableCell sx={{ py: 2, px: 3 }}>
-                      <Typography variant="body2">{formatDate(faceId.registeredAt)}</Typography>
+                      <Typography variant="body2">{formatDate(faceId.CreatedAt)}</Typography>
                     </TableCell>
                     <TableCell sx={{ py: 2, px: 3 }}>
-                      <Typography variant="body2">{formatDate(faceId.updatedAt)}</Typography>
+                      <Typography variant="body2">{formatDate(faceId.UpdatedAt)}</Typography>
                     </TableCell>
                   </TableRow>
                 ))

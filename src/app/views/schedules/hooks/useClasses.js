@@ -271,6 +271,48 @@ const useClasses = () => {
     }
   };
 
+  const updateSchedule = async (scheduleId, scheduleData) => {
+    setSubmitting(true);
+    try {
+      const result = await ClassServices.updateSchedule(scheduleId, scheduleData);
+      if (result.error) {
+        enqueueSnackbar(result.error, { variant: "error" });
+        return { success: false, error: result.error };
+      } else {
+        enqueueSnackbar("Schedule updated successfully", { variant: "success" });
+        return { success: true, data: result.data };
+      }
+    } catch (error) {
+      console.error("Error updating schedule:", error);
+      const errorMessage = "Failed to update schedule";
+      enqueueSnackbar(errorMessage, { variant: "error" });
+      return { success: false, error: errorMessage };
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const deleteSchedule = async (scheduleId) => {
+    setSubmitting(true);
+    try {
+      const result = await ClassServices.deleteSchedule(scheduleId);
+      if (result.error) {
+        enqueueSnackbar(result.error, { variant: "error" });
+        return { success: false, error: result.error };
+      } else {
+        enqueueSnackbar("Schedule deleted successfully", { variant: "success" });
+        return { success: true, data: result.data };
+      }
+    } catch (error) {
+      console.error("Error deleting schedule:", error);
+      const errorMessage = "Failed to delete schedule";
+      enqueueSnackbar(errorMessage, { variant: "error" });
+      return { success: false, error: errorMessage };
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   const changeAttendance = async (sectionId, studentId, status) => {
     setSubmitting(true);
     try {
@@ -286,6 +328,48 @@ const useClasses = () => {
     } catch (error) {
       console.error("Error creating schedule:", error);
       const errorMessage = "Failed to create schedule";
+      enqueueSnackbar(errorMessage, { variant: "error" });
+      return { success: false, error: errorMessage };
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const updateSession = async (sessionId, sessionData) => {
+    setSubmitting(true);
+    try {
+      const result = await ClassServices.updateSession(sessionId, sessionData);
+      if (result.error) {
+        enqueueSnackbar(result.error, { variant: "error" });
+        return { success: false, error: result.error };
+      } else {
+        enqueueSnackbar("Session updated successfully", { variant: "success" });
+        return { success: true, data: result.data };
+      }
+    } catch (error) {
+      console.error("Error updating session:", error);
+      const errorMessage = "Failed to update session";
+      enqueueSnackbar(errorMessage, { variant: "error" });
+      return { success: false, error: errorMessage };
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const deleteSession = async (sessionId) => {
+    setSubmitting(true);
+    try {
+      const result = await ClassServices.deleteSession(sessionId);
+      if (result.error) {
+        enqueueSnackbar(result.error, { variant: "error" });
+        return { success: false, error: result.error };
+      } else {
+        enqueueSnackbar("Session deleted successfully", { variant: "success" });
+        return { success: true, data: result.data };
+      }
+    } catch (error) {
+      console.error("Error deleting session:", error);
+      const errorMessage = "Failed to delete session";
       enqueueSnackbar(errorMessage, { variant: "error" });
       return { success: false, error: errorMessage };
     } finally {
@@ -310,9 +394,13 @@ const useClasses = () => {
     enrollLecturer,
     bulkEnrollStudents,
     createSchedule,
+    updateSchedule,
+    deleteSchedule,
     refreshClasses,
     fetchClasses,
-    changeAttendance
+    changeAttendance,
+    updateSession,
+    deleteSession
   };
 };
 
