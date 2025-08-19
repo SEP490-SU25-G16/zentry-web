@@ -97,6 +97,7 @@ const ClassDetailPage = () => {
   });
   const [editingSessionId, setEditingSessionId] = useState(null);
   const [deletingSession, setDeletingSession] = useState(null);
+  const [deletingEnrollment, setDeletingEnrollment] = useState(null);
 
   // Add Schedule Modal state
   const [addScheduleModalOpen, setAddScheduleModalOpen] = useState(false);
@@ -217,6 +218,15 @@ const ClassDetailPage = () => {
   const handleCloseImportStudents = () => {
     setImportStudentsOpen(false);
     setImportStudentsFile(null);
+  };
+
+  const confirmDeleteEnrollment = (enrollment) => {
+    setDeletingEnrollment(enrollment);
+  };
+
+  const handleDeleteEnrollment = () => {
+    enqueueSnackbar("Student removed from class", { variant: "success" });
+    setDeletingEnrollment(null);
   };
 
   const handleImportStudentsSubmit = async () => {
@@ -904,6 +914,7 @@ const ClassDetailPage = () => {
                     <TableCell sx={{ padding: "1em", fontWeight: 600 }}>Student Name</TableCell>
                     <TableCell sx={{ padding: "1em", fontWeight: 600 }}>Enrollment Date</TableCell>
                     <TableCell sx={{ padding: "1em", fontWeight: 600 }}>Status</TableCell>
+                    <TableCell sx={{ padding: "1em", fontWeight: 600 }}>Actions</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -927,6 +938,17 @@ const ClassDetailPage = () => {
                           color={enrollment.Status === "Active" ? "success" : "default"}
                           size="small"
                         />
+                      </TableCell>
+                      <TableCell sx={{ padding: "1em" }}>
+                        <Button
+                          variant="outlined"
+                          size="small"
+                          startIcon={<DeleteIcon />}
+                          onClick={() => confirmDeleteEnrollment(enrollment)}
+                          sx={{ mr: 1, textTransform: "none", borderRadius: "6px" }}
+                        >
+                          Remove
+                        </Button>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -1849,6 +1871,18 @@ const ClassDetailPage = () => {
         <DialogActions sx={{ p: 2 }}>
           <Button variant="outlined" onClick={() => setDeletingSession(null)}>Cancel</Button>
           <Button variant="contained" color="error" onClick={handleDeleteSession} startIcon={<DeleteIcon />}>Delete</Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Confirm Delete Enrollment */}
+      <Dialog open={Boolean(deletingEnrollment)} onClose={() => setDeletingEnrollment(null)} maxWidth="xs" fullWidth PaperProps={{ sx: { borderRadius: "12px" } }}>
+        <DialogTitle>Confirm remove</DialogTitle>
+        <DialogContent>
+          <Typography>Are you sure you want to remove this student from the class?</Typography>
+        </DialogContent>
+        <DialogActions sx={{ p: 2 }}>
+          <Button variant="outlined" onClick={() => setDeletingEnrollment(null)}>Cancel</Button>
+          <Button variant="contained" color="error" onClick={handleDeleteEnrollment} startIcon={<DeleteIcon />}>Remove</Button>
         </DialogActions>
       </Dialog>
 

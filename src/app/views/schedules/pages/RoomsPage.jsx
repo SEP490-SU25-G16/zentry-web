@@ -3,7 +3,6 @@ import {
   Business as BusinessIcon,
   Delete as DeleteIcon,
   Edit as EditIcon,
-  People as PeopleIcon,
   Search as SearchIcon
 } from "@mui/icons-material";
 import {
@@ -115,7 +114,6 @@ const RoomsPage = () => {
     setFormData({
       roomName: room.RoomName,
       building: room.Building,
-      capacity: room.Capacity.toString()
     });
     setFormErrors({});
     setOpenModal(true);
@@ -463,7 +461,7 @@ const RoomsPage = () => {
                     Building
                   </TableSortLabel>
                 </TableCell>
-                <TableCell align="center" sx={{ py: 2, px: 3 }}>
+                {/* <TableCell align="center" sx={{ py: 2, px: 3 }}>
                   <TableSortLabel
                     active={orderBy === "Capacity"}
                     direction={orderBy === "Capacity" ? order : "asc"}
@@ -474,7 +472,7 @@ const RoomsPage = () => {
                       Capacity
                     </Box>
                   </TableSortLabel>
-                </TableCell>
+                </TableCell> */}
                 <TableCell sx={{ py: 2, px: 3 }}>
                   <TableSortLabel
                     active={orderBy === "CreatedAt"}
@@ -527,14 +525,14 @@ const RoomsPage = () => {
                         icon={<BusinessIcon />}
                       />
                     </TableCell>
-                    <TableCell align="center" sx={{ py: 2, px: 3 }}>
+                    {/* <TableCell align="center" sx={{ py: 2, px: 3 }}>
                       <Chip
                         label={`${room.Capacity} people`}
                         variant="filled"
                         size="small"
                         color="secondary"
                       />
-                    </TableCell>
+                    </TableCell> */}
                     <TableCell sx={{ py: 2, px: 3 }}>
                       <Typography variant="body2">{formatDate(room.CreatedAt)}</Typography>
                     </TableCell>
@@ -627,7 +625,7 @@ const RoomsPage = () => {
               {formErrors.building && <FormHelperText>{formErrors.building}</FormHelperText>}
             </FormControl>
 
-            <FormControl fullWidth error={!!formErrors.capacity}>
+            {/* <FormControl fullWidth error={!!formErrors.capacity}>
               <TextField
                 label="Capacity"
                 type="number"
@@ -644,7 +642,7 @@ const RoomsPage = () => {
                 }}
               />
               {formErrors.capacity && <FormHelperText>{formErrors.capacity}</FormHelperText>}
-            </FormControl>
+            </FormControl> */}
           </Box>
         </DialogContent>
         <DialogActions sx={{ p: 3, pt: 1 }}>
