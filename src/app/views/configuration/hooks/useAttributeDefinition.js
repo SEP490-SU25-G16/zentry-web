@@ -276,16 +276,16 @@ export const useAttributeDefinition = () => {
 
       const result = editingId
         ? await DefinitionServices.updateDefinition(editingId, {
-          Key: attributeDefinition.key,
-          DisplayName: attributeDefinition.displayName,
-          Description: attributeDefinition.description,
-          DataType: attributeDefinition.dataType,
-          AllowedScopeTypes: attributeDefinition.allowedScopeTypes || [],
-          Unit: attributeDefinition.unit || "",
-          DefaultValue: String(attributeDefinition.defaultValue ?? ""),
-          IsDeletable: Boolean(attributeDefinition.isDeletable),
-          Options: attributeDefinition.options || []
-        })
+            Key: attributeDefinition.key,
+            DisplayName: attributeDefinition.displayName,
+            Description: attributeDefinition.description,
+            DataType: attributeDefinition.dataType,
+            AllowedScopeTypes: attributeDefinition.allowedScopeTypes || [],
+            Unit: attributeDefinition.unit || "",
+            DefaultValue: String(attributeDefinition.defaultValue ?? ""),
+            IsDeletable: Boolean(attributeDefinition.isDeletable),
+            Options: attributeDefinition.options || []
+          })
         : await DefinitionServices.createDefinition(attributeDefinition);
 
       if (result.error) {
@@ -300,7 +300,9 @@ export const useAttributeDefinition = () => {
       } else {
         // Success
         showSnackbar(
-          editingId ? "Attribute definition updated successfully!" : "Attribute definition created successfully!",
+          editingId
+            ? "Attribute definition updated successfully!"
+            : "Attribute definition created successfully!",
           "success"
         );
         handleCloseModal();

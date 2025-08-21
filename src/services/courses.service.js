@@ -32,7 +32,7 @@ const CourseServices = {
       console.error("Error adding course:", error);
       return {
         data: null,
-        error: error.response ? error.response.data?.errors : "Network Error"
+        error: error.response ? error.response.data?.Error?.Message : "Network Error"
       };
     }
   },
@@ -47,7 +47,7 @@ const CourseServices = {
       console.error("Error editing course:", error);
       return {
         data: null,
-        error: error.response ? error.response.data?.errors : "Network Error"
+        error: error.response ? error.response.data?.Error?.Message : "Network Error"
       };
     }
   },

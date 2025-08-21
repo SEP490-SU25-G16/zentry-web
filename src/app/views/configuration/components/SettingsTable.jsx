@@ -31,7 +31,7 @@ const mockSettings = [
     scopeType: "Global",
     scopeId: "00000000-0000-0000-0000-000000000000",
     value: "My LMS Platform",
-    updatedAt: "2025-08-15T10:30:00Z",
+    updatedAt: "2025-08-15T10:30:00Z"
   },
   {
     id: "2",
@@ -41,7 +41,7 @@ const mockSettings = [
     scopeType: "Course",
     scopeId: "123e4567-e89b-12d3-a456-426614174000",
     value: "200",
-    updatedAt: "2025-08-16T09:45:00Z",
+    updatedAt: "2025-08-16T09:45:00Z"
   },
   {
     id: "3",
@@ -51,7 +51,7 @@ const mockSettings = [
     scopeType: "Global",
     scopeId: "00000000-0000-0000-0000-000000000000",
     value: "true",
-    updatedAt: "2025-08-12T14:20:00Z",
+    updatedAt: "2025-08-12T14:20:00Z"
   },
   {
     id: "4",
@@ -61,7 +61,7 @@ const mockSettings = [
     scopeType: "Course",
     scopeId: "987e6543-e21b-45d3-b123-926614174111",
     value: "99.99",
-    updatedAt: "2025-08-14T11:10:00Z",
+    updatedAt: "2025-08-14T11:10:00Z"
   },
   {
     id: "5",
@@ -71,7 +71,7 @@ const mockSettings = [
     scopeType: "Session",
     scopeId: "456e7890-e12b-34d3-c789-126614174222",
     value: "2025-09-01T08:00:00Z",
-    updatedAt: "2025-08-17T08:05:00Z",
+    updatedAt: "2025-08-17T08:05:00Z"
   },
   {
     id: "6",
@@ -81,8 +81,8 @@ const mockSettings = [
     scopeType: "Global",
     scopeId: "00000000-0000-0000-0000-000000000000",
     value: '{"darkMode":true,"primaryColor":"#1976d2"}',
-    updatedAt: "2025-08-18T01:15:00Z",
-  },
+    updatedAt: "2025-08-18T01:15:00Z"
+  }
 ];
 
 const SettingsTable = ({ settings, loading, searchTerm, onEdit, onDelete }) => {
@@ -172,7 +172,7 @@ const SettingsTable = ({ settings, loading, searchTerm, onEdit, onDelete }) => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {mockSettings.map((setting, index) => (
+            {settings.map((setting, index) => (
               <TableRow key={setting.id || index} hover>
                 <TableCell sx={{ padding: "16px" }}>
                   <Typography variant="body2" sx={{ fontFamily: "monospace", fontWeight: 500 }}>
@@ -241,12 +241,17 @@ const SettingsTable = ({ settings, loading, searchTerm, onEdit, onDelete }) => {
         <DialogTitle>Confirm Delete</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Bạn có chắc muốn xóa setting cho "{pendingDelete?.attributeKey}" ở scope "{pendingDelete?.scopeType}"?
+            Are you sure you want to delete setting for "{pendingDelete?.attributeKey}" in scope "
+            {pendingDelete?.scopeType}"?
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={closeConfirm} color="inherit">Hủy</Button>
-          <Button onClick={confirmDelete} color="error" variant="contained">Xóa</Button>
+          <Button onClick={closeConfirm} color="inherit">
+            Cancel
+          </Button>
+          <Button onClick={confirmDelete} color="error" variant="contained">
+            Delete
+          </Button>
         </DialogActions>
       </Dialog>
     </Box>

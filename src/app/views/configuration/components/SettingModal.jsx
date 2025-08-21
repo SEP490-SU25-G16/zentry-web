@@ -24,7 +24,7 @@ const mockDefinitions = [
     allowedScopeTypes: ["User", "Profile"],
     defaultValue: "",
     description: "The given name of the user.",
-    isDeletable: true,
+    isDeletable: true
   },
   {
     key: "age",
@@ -34,7 +34,7 @@ const mockDefinitions = [
     defaultValue: 18,
     unit: "years",
     description: "Age of the user in years.",
-    isDeletable: true,
+    isDeletable: true
   },
   {
     key: "isActive",
@@ -43,7 +43,7 @@ const mockDefinitions = [
     allowedScopeTypes: ["User", "Admin"],
     defaultValue: true,
     description: "Whether the user is active.",
-    isDeletable: false,
+    isDeletable: false
   },
   {
     key: "salary",
@@ -53,7 +53,7 @@ const mockDefinitions = [
     defaultValue: 1000.5,
     unit: "USD",
     description: "The monthly salary of the employee.",
-    isDeletable: true,
+    isDeletable: true
   },
   {
     key: "gender",
@@ -66,9 +66,9 @@ const mockDefinitions = [
     options: [
       { value: "M", displayLabel: "Male" },
       { value: "F", displayLabel: "Female" },
-      { value: "O", displayLabel: "Other" },
-    ],
-  },
+      { value: "O", displayLabel: "Other" }
+    ]
+  }
 ];
 
 const SettingModal = ({
@@ -288,7 +288,7 @@ const SettingModal = ({
                       Loading definitions...
                     </MenuItem>
                   ) : (
-                    mockDefinitions.map((definition) => (
+                    attributeDefinitions.map((definition) => (
                       <MenuItem key={definition.key} value={definition.key}>
                         {definition.displayName} ({definition.key})
                       </MenuItem>

@@ -113,7 +113,7 @@ const RoomsPage = () => {
     setEditingRoomId(room.Id);
     setFormData({
       roomName: room.RoomName,
-      building: room.Building,
+      building: room.Building
     });
     setFormErrors({});
     setOpenModal(true);
@@ -139,7 +139,6 @@ const RoomsPage = () => {
         enqueueSnackbar(error, {
           variant: "error"
         });
-
 
         // TODO: Show error message to user
       } else {
@@ -200,7 +199,7 @@ const RoomsPage = () => {
 
   const getSortedAndFilteredRooms = () => {
     // Filter rooms by search term first
-    console.log("🚀 ~ getSortedAndFilteredRooms ~ rooms:", searchTerm)
+    console.log("🚀 ~ getSortedAndFilteredRooms ~ rooms:", searchTerm);
     let filteredRooms = rooms.filter(
       (room) =>
         room.RoomName?.toLowerCase().includes(searchTerm.toLowerCase().trim()) ||
@@ -307,9 +306,9 @@ const RoomsPage = () => {
   };
 
   const handleSubmit = async () => {
-    if (!validateForm()) {
-      return;
-    }
+    // if (!validateForm()) {
+    //   return;
+    // }
     setSubmitting(true);
 
     try {

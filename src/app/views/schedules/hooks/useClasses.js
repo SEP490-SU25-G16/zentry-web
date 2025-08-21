@@ -158,7 +158,7 @@ const useClasses = () => {
       const result = await ClassServices.deleteClass(classId);
 
       if (result.error) {
-        enqueueSnackbar('Class has started, cannot be deleted', { variant: "error" });
+        enqueueSnackbar("Class has started, cannot be deleted", { variant: "error" });
         return { success: false, error: result.error };
       } else {
         enqueueSnackbar("Class deleted successfully", { variant: "success" });
@@ -252,7 +252,7 @@ const useClasses = () => {
     setSubmitting(true);
     try {
       const result = await ClassServices.createSchedule(scheduleData);
-      console.log("🚀 ~ createSchedule ~ result:", result)
+      console.log("🚀 ~ createSchedule ~ result:", result);
 
       if (result.error) {
         enqueueSnackbar(result.error, { variant: "error" });
@@ -349,7 +349,7 @@ const useClasses = () => {
     } catch (error) {
       console.error("Error updating session:", error);
       const errorMessage = "Failed to update session";
-      enqueueSnackbar(errorMessage, { variant: "error" });
+      enqueueSnackbar("Failed to update session", { variant: "error" });
       return { success: false, error: errorMessage };
     } finally {
       setSubmitting(false);

@@ -176,7 +176,7 @@ export const useUsers = () => {
         enqueueSnackbar(result.error, { variant: "error" });
         return { success: false, error: result.error };
       } else {
-        enqueueSnackbar("User updated successfully", { variant: "success" });
+        enqueueSnackbar("Invalid email format", { variant: "error" });
         await fetchUsers();
         return { success: true };
       }
@@ -219,7 +219,7 @@ export const useUsers = () => {
         enqueueSnackbar(result.error, { variant: "error" });
         return { success: false, error: result.error };
       } else {
-        enqueueSnackbar("User status updated", { variant: "success" });
+        enqueueSnackbar("Failed to update status", { variant: "error" });
         await fetchUsers();
         return { success: true };
       }

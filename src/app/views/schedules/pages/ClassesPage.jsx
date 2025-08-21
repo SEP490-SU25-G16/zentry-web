@@ -51,7 +51,6 @@ const ClassesPage = () => {
     return users.filter((user) => user.Role === "Lecturer");
   }, [users]);
 
-
   // Helper function to get course name by courseId
   const getCourseNameById = (courseId) => {
     const course = courses.find((c) => c.Id === courseId);
@@ -92,9 +91,10 @@ const ClassesPage = () => {
 
     // Filter by search term (course name)
     if (searchTerm.trim()) {
-      filtered = filtered.filter((cls) =>
-        cls.courseName.toLowerCase().includes(searchTerm.toLowerCase().trim()) ||
-        cls.sectionCode.toLowerCase().includes(searchTerm.toLowerCase().trim())
+      filtered = filtered.filter(
+        (cls) =>
+          cls.courseName.toLowerCase().includes(searchTerm.toLowerCase().trim()) ||
+          cls.sectionCode.toLowerCase().includes(searchTerm.toLowerCase().trim())
       );
     }
 
@@ -103,7 +103,11 @@ const ClassesPage = () => {
       filtered = filtered.filter((cls) => cls.semester === selectedSemester);
     }
 
-    return filtered;
+    return filtered.sort((a, b) => {
+      const aTime = new Date(a.original?.CreatedAt || a.CreatedAt || 0).getTime() || 0;
+      const bTime = new Date(b.original?.CreatedAt || b.CreatedAt || 0).getTime() || 0;
+      return bTime - aTime;
+    });
   }, [transformedClasses, searchTerm, selectedSemester]);
 
   // Handle semester selection
