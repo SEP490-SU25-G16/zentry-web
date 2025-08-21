@@ -41,9 +41,7 @@ const DefinitionServices = {
   },
   getDefinitions: async () => {
     try {
-      const { data } = await instance.get("/configurations/definitions", {
-        pageSize: 2000
-      });
+      const { data } = await instance.get("/configurations/definitions?PageSize=100");
       return {
         data: data?.Data?.AttributeDefinitions,
         error: null
@@ -60,12 +58,15 @@ const DefinitionServices = {
   },
   updateDefinition: async (definitionId, definition) => {
     try {
-      const { data } = await instance.put(`/configurations/definitions/${definitionId}`, definition);
+      const { data } = await instance.put(
+        `/configurations/definitions/${definitionId}`,
+        definition
+      );
       return { data, error: null };
     } catch (error) {
       return {
         data: null,
-        error: error.response ? error.response.data?.error?.message : "Failed to update definition"
+        error: error.response ? error.response.data?.Error?.Message : "Failed to update definition"
       };
     }
   },

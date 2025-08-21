@@ -32,7 +32,7 @@ const mockDefinitions = [
     allowedScopeTypes: ["User", "Profile"],
     defaultValue: "",
     description: "The given name of the user.",
-    isDeletable: true,
+    isDeletable: true
   },
   {
     key: "age",
@@ -42,7 +42,7 @@ const mockDefinitions = [
     defaultValue: 18,
     unit: "years",
     description: "Age of the user in years.",
-    isDeletable: true,
+    isDeletable: true
   },
   {
     key: "isActive",
@@ -51,7 +51,7 @@ const mockDefinitions = [
     allowedScopeTypes: ["User", "Admin"],
     defaultValue: true,
     description: "Whether the user is active.",
-    isDeletable: false,
+    isDeletable: false
   },
   {
     key: "salary",
@@ -61,7 +61,7 @@ const mockDefinitions = [
     defaultValue: 1000.5,
     unit: "USD",
     description: "The monthly salary of the employee.",
-    isDeletable: true,
+    isDeletable: true
   },
   {
     key: "gender",
@@ -74,9 +74,9 @@ const mockDefinitions = [
     options: [
       { value: "M", displayLabel: "Male" },
       { value: "F", displayLabel: "Female" },
-      { value: "O", displayLabel: "Other" },
-    ],
-  },
+      { value: "O", displayLabel: "Other" }
+    ]
+  }
 ];
 
 const DefinitionsTable = ({ definitions, loading, searchTerm, onEdit, onDelete }) => {
@@ -136,18 +136,18 @@ const DefinitionsTable = ({ definitions, loading, searchTerm, onEdit, onDelete }
       <TableContainer component={Paper} sx={{ boxShadow: "none", border: "1px solid #e0e0e0" }}>
         <Table>
           <TableHead>
-              <TableRow sx={{ backgroundColor: "#f5f5f5" }}>
+            <TableRow sx={{ backgroundColor: "#f5f5f5" }}>
               <TableCell sx={{ fontWeight: 600, padding: "16px" }}>Key</TableCell>
               <TableCell sx={{ fontWeight: 600, padding: "16px" }}>Display Name</TableCell>
               <TableCell sx={{ fontWeight: 600, padding: "16px" }}>Data Type</TableCell>
               <TableCell sx={{ fontWeight: 600, padding: "16px" }}>Allowed Scopes</TableCell>
               <TableCell sx={{ fontWeight: 600, padding: "16px" }}>Default Value</TableCell>
-                <TableCell sx={{ fontWeight: 600, padding: "16px" }}>Description</TableCell>
-                <TableCell sx={{ fontWeight: 600, padding: "16px", width: 120 }}>Actions</TableCell>
+              <TableCell sx={{ fontWeight: 600, padding: "16px" }}>Description</TableCell>
+              <TableCell sx={{ fontWeight: 600, padding: "16px", width: 120 }}>Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {mockDefinitions.map((definition, index) => (
+            {definitions.map((definition, index) => (
               <TableRow key={definition.key || index} hover>
                 <TableCell sx={{ padding: "16px" }}>
                   <Typography variant="body2" sx={{ fontFamily: "monospace", fontWeight: 500 }}>
@@ -201,7 +201,11 @@ const DefinitionsTable = ({ definitions, loading, searchTerm, onEdit, onDelete }
                       color="error"
                       onClick={() => openConfirm(definition)}
                       disabled={definition.isDeletable === false}
-                      title={definition.isDeletable === false ? "This definition cannot be deleted" : "Delete"}
+                      title={
+                        definition.isDeletable === false
+                          ? "This definition cannot be deleted"
+                          : "Delete"
+                      }
                     >
                       <DeleteIcon fontSize="small" />
                     </IconButton>
@@ -241,12 +245,17 @@ const DefinitionsTable = ({ definitions, loading, searchTerm, onEdit, onDelete }
         <DialogTitle>Confirm Delete</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Bạn có chắc muốn xóa definition "{pendingDelete?.displayName}"? Hành động này không thể hoàn tác.
+            Are you sure you want to delete definition "{pendingDelete?.displayName}"? This action
+            cannot be undone.
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={closeConfirm} color="inherit">Hủy</Button>
-          <Button onClick={confirmDelete} color="error" variant="contained">Xóa</Button>
+          <Button onClick={closeConfirm} color="inherit">
+            Cancel
+          </Button>
+          <Button onClick={confirmDelete} color="error" variant="contained">
+            Delete
+          </Button>
         </DialogActions>
       </Dialog>
     </Box>

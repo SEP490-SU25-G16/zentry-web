@@ -68,7 +68,7 @@ const ClassServices = {
       console.error("Error updating class:", error);
       return {
         data: null,
-        error: error.response ? error.response.data?.errors : "Network Error"
+        error: error.response ? error.response.data?.Error?.Message : "Network Error"
       };
     }
   },
@@ -193,10 +193,13 @@ const ClassServices = {
   },
   changeAttendance: async (sectionId, studentId, status) => {
     try {
-      const { data } = await instance.put(`/attendance/sessions/${sectionId}/students/${studentId}/status`, {
-        status
-      });
-      console.log('run day hehe');
+      const { data } = await instance.put(
+        `/attendance/sessions/${sectionId}/students/${studentId}/status`,
+        {
+          status
+        }
+      );
+      console.log("run day hehe");
       return {
         data,
         error: null
@@ -208,8 +211,7 @@ const ClassServices = {
         error: error.response ? error.response.data?.Error?.Message : "Network Error"
       };
     }
-  }
-  ,
+  },
   updateSession: async (sessionId, sessionData) => {
     try {
       const { data } = await instance.put(`/attendance/sessions/${sessionId}`, {

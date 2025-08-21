@@ -72,7 +72,9 @@ const MetricCard = ({ icon, label, value }) => (
           <Typography variant="subtitle2" color="text.secondary">
             {label}
           </Typography>
-          <Typography variant="h6" color="text.primary">{value}</Typography>
+          <Typography variant="h6" color="text.primary">
+            {value}
+          </Typography>
         </Box>
       </Stack>
     </CardContent>
@@ -95,7 +97,15 @@ const SideCard = ({ title, children, sx }) => (
 const AdminDashboard = () => {
   const [year, setYear] = useState(new Date().getFullYear());
   const [tab, setTab] = useState("students");
-  const [totals, setTotals] = useState({ rooms: 0, courses: 0, classes: 0, devices: 0, totalDevices: 0, faceId: 0, currentWeek: 0 });
+  const [totals, setTotals] = useState({
+    rooms: 0,
+    courses: 0,
+    classes: 0,
+    devices: 0,
+    totalDevices: 0,
+    faceId: 0,
+    currentWeek: 0
+  });
   const [topFiveCourse, setTopFiveCourse] = useState([]);
   const [chartCategories, setChartCategories] = useState([]);
   const [chartValues, setChartValues] = useState([]);
@@ -119,7 +129,7 @@ const AdminDashboard = () => {
         const values = categories.map((k) => Number(semesters[k]) || 0);
         setChartCategories(categories);
         setChartValues(values);
-    } catch {
+      } catch {
         setChartCategories([]);
         setChartValues([]);
       } finally {
@@ -141,7 +151,7 @@ const AdminDashboard = () => {
   useEffect(() => {
     (async () => {
       const schema = await fetchSchema();
-      console.log("🚀 ~ fetchSchema ~ schema:", schema)
+      console.log("🚀 ~ fetchSchema ~ schema:", schema);
     })();
   }, [year]);
 
@@ -166,7 +176,11 @@ const AdminDashboard = () => {
   };
 
   const fetchSchema = async () => {
-    const [classes, student, attendance] = await Promise.all([getClass(year), getStudent(year), getAttendance(year)]);
+    const [classes, student, attendance] = await Promise.all([
+      getClass(year),
+      getStudent(year),
+      getAttendance(year)
+    ]);
     return {
       class: classes.data?.Data,
       student: student.data?.Data,
@@ -180,11 +194,9 @@ const AdminDashboard = () => {
       instance.get("/courses/total-courses"),
       instance.get("/class-sections/total-class-sections"),
       instance.get("/devices/total-devices"),
-      instance.get(`/schedules/current-week-number?date=${new Date().toISOString().split('T')[0]}`),
+      instance.get(`/schedules/current-week-number?date=${new Date().toISOString().split("T")[0]}`),
       instance.get("/faceid/users")
     ]);
-
-    console.log('faceId', faceId);
 
     return {
       rooms: rooms.data?.Data,
@@ -192,7 +204,9 @@ const AdminDashboard = () => {
       classes: classes.data?.Data,
       devices: devices.data?.Data?.ActiveDevices,
       totalDevices: devices.data?.Data?.TotalDevices,
-      faceId: faceId.data?.Data?.TotalCount,
+      faceId: `${faceId.data?.Data?.Users?.map((t) => t.HasFaceId).length} / ${
+        faceId.data?.Data?.TotalCount
+      }`,
       currentWeek: currentWeek.data?.Data?.WeekNumber
     };
   };
@@ -287,17 +301,33 @@ const AdminDashboard = () => {
       <Grid container spacing={3}>
         <Grid item xs={12} md={8}>
           {/* Greeting + quick search */}
-          <Card sx={{ borderRadius: 3, mb: 2, background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.light} 100%)`, color: "primary.contrastText" }}>
+          <Card
+            sx={{
+              borderRadius: 3,
+              mb: 2,
+              background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.light} 100%)`,
+              color: "primary.contrastText"
+            }}
+          >
             <CardContent>
               <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={2}>
                 <Box>
-                  <Typography variant="h5" sx={{ color: "common.white" }}>Hello {user.name}</Typography>
+                  <Typography variant="h5" sx={{ color: "common.white" }}>
+                    Hello {user.name}
+                  </Typography>
                 </Box>
                 <Box>
                   <Chip
                     label={`Week ${totals?.currentWeek}`}
                     variant="filled"
-                    sx={{ borderRadius: 2, px: 1.5, py: 3, fontWeight: 500, bgcolor: "rgba(255,255,255,0.2)", color: "common.white" }}
+                    sx={{
+                      borderRadius: 2,
+                      px: 1.5,
+                      py: 3,
+                      fontWeight: 500,
+                      bgcolor: "rgba(255,255,255,0.2)",
+                      color: "common.white"
+                    }}
                   />
                 </Box>
               </Stack>
@@ -307,13 +337,25 @@ const AdminDashboard = () => {
           {/* Metrics */}
           <Grid container spacing={3}>
             <Grid item xs={12} md={4}>
-              <MetricCard icon={<MeetingRoomIcon color="inherit" />} label="Rooms" value={totals.rooms} />
+              <MetricCard
+                icon={<MeetingRoomIcon color="inherit" />}
+                label="Rooms"
+                value={totals.rooms}
+              />
             </Grid>
             <Grid item xs={12} md={4}>
-              <MetricCard icon={<SchoolIcon color="inherit" />} label="Courses" value={totals.courses} />
+              <MetricCard
+                icon={<SchoolIcon color="inherit" />}
+                label="Courses"
+                value={totals.courses}
+              />
             </Grid>
             <Grid item xs={12} md={4}>
-              <MetricCard icon={<ClassIcon color="inherit" />} label="Classes" value={totals.classes} />
+              <MetricCard
+                icon={<ClassIcon color="inherit" />}
+                label="Classes"
+                value={totals.classes}
+              />
             </Grid>
           </Grid>
 
@@ -328,7 +370,9 @@ const AdminDashboard = () => {
                   mb: 2
                 }}
               >
-                <Typography variant="h6" color="primary">Biểu đồ</Typography>
+                <Typography variant="h6" color="primary">
+                  Chart
+                </Typography>
                 <TogglePills value={tab} onChange={setTab} />
                 <Stack direction="row" spacing={1} alignItems="center">
                   <IconButton color="primary" onClick={() => setYear((y) => y - 1)} size="small">
@@ -376,7 +420,9 @@ const AdminDashboard = () => {
                   <Typography variant="caption" color="text.secondary">
                     Devices
                   </Typography>
-                  <Typography variant="h6">{totals?.devices} / {totals?.totalDevices}</Typography>
+                  <Typography variant="h6">
+                    {totals?.devices} / {totals?.totalDevices}
+                  </Typography>
                 </CardContent>
               </Card>
               <Card variant="outlined" sx={{ borderRadius: 2, width: "50%" }}>
@@ -393,7 +439,16 @@ const AdminDashboard = () => {
           <SideCard title="Top 5 courses" sx={{ mt: 3 }}>
             <List dense>
               {topFiveCourse.map((course) => (
-                <ListItem key={course.courseId} sx={{ px: 0, borderRadius: 2, border: "1px solid #e0e0e0", marginBottom: 4, padding: 2 }}>
+                <ListItem
+                  key={course.courseId}
+                  sx={{
+                    px: 0,
+                    borderRadius: 2,
+                    border: "1px solid #e0e0e0",
+                    marginBottom: 4,
+                    padding: 2
+                  }}
+                >
                   <TrendingUpIcon fontSize="small" color="primary" style={{ marginRight: 8 }} />
                   <ListItemText
                     primaryTypographyProps={{ variant: "body2" }}

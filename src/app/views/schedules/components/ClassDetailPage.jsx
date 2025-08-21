@@ -34,6 +34,7 @@ import {
   IconButton,
   InputAdornment,
   InputLabel,
+  OutlinedInput,
   List,
   ListItem,
   ListItemAvatar,
@@ -63,8 +64,17 @@ import { useClasses } from "../hooks";
 const ClassDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { getClass, enrollStudent, bulkEnrollStudents, createSchedule, enrollLecturer, updateSchedule, deleteSchedule, updateSession, deleteSession } =
-    useClasses();
+  const {
+    getClass,
+    enrollStudent,
+    bulkEnrollStudents,
+    createSchedule,
+    enrollLecturer,
+    updateSchedule,
+    deleteSchedule,
+    updateSession,
+    deleteSession
+  } = useClasses();
   const { users, loading: usersLoading } = useUsers();
 
   const [classDetail, setClassDetail] = useState(null);
@@ -225,7 +235,7 @@ const ClassDetailPage = () => {
   };
 
   const handleDeleteEnrollment = () => {
-    enqueueSnackbar("Student removed from class", { variant: "success" });
+    enqueueSnackbar("Student removed successfully", { variant: "success" });
     setDeletingEnrollment(null);
   };
 
@@ -243,7 +253,6 @@ const ClassDetailPage = () => {
       const res = await instance.post("/enrollments/import", formData, {
         headers: { "Content-Type": "multipart/form-data" }
       });
-      console.log('test', res?.data);
       enqueueSnackbar(res.data?.Message, { variant: "success" });
       if (res?.data) {
         handleCloseImportStudents();
@@ -253,7 +262,6 @@ const ClassDetailPage = () => {
         }
       }
     } catch (error) {
-      console.log("🚀 ~ handleImportStudentsSubmit ~ error:", error)
       enqueueSnackbar(error.response?.data?.Error?.Message, { variant: "error" });
     } finally {
       setImportingStudents(false);
@@ -1176,34 +1184,34 @@ const ClassDetailPage = () => {
                             </TableCell>
                             <TableCell sx={{ padding: "1em" }}>
                               <Tooltip title="View Details">
-                      <IconButton
-                        size="small"
-                        onClick={() =>
-                          navigate(`/schedules/class/${id}/session/${session.Id}`)
-                        }
-                        sx={{ color: "primary.main" }}
-                      >
-                        <VisibilityIcon fontSize="small" />
-                      </IconButton>
-                      </Tooltip>
-                      <Tooltip title="Edit">
-                              <IconButton
-                        size="small"
-                        onClick={() => openEditSession(session)}
-                        sx={{ color: "primary.main" }}
-                      >
-                        <EditIcon fontSize="small" />
-                      </IconButton>
-                      </Tooltip>
-                      <Tooltip title="Delete">
-                        <IconButton
-                          size="small"
-                          onClick={() => confirmDeleteSession(session)}
-                          sx={{ color: "error.main" }}
-                        >
-                          <DeleteIcon fontSize="small" />
-                        </IconButton>
-                      </Tooltip>
+                                <IconButton
+                                  size="small"
+                                  onClick={() =>
+                                    navigate(`/schedules/class/${id}/session/${session.Id}`)
+                                  }
+                                  sx={{ color: "primary.main" }}
+                                >
+                                  <VisibilityIcon fontSize="small" />
+                                </IconButton>
+                              </Tooltip>
+                              <Tooltip title="Edit">
+                                <IconButton
+                                  size="small"
+                                  onClick={() => openEditSession(session)}
+                                  sx={{ color: "primary.main" }}
+                                >
+                                  <EditIcon fontSize="small" />
+                                </IconButton>
+                              </Tooltip>
+                              <Tooltip title="Delete">
+                                <IconButton
+                                  size="small"
+                                  onClick={() => confirmDeleteSession(session)}
+                                  sx={{ color: "error.main" }}
+                                >
+                                  <DeleteIcon fontSize="small" />
+                                </IconButton>
+                              </Tooltip>
                             </TableCell>
                           </TableRow>
                         );
@@ -1253,24 +1261,32 @@ const ClassDetailPage = () => {
             pb: 1
           }}
         >
-          <Box sx={{ display: "flex", alignItems: "center", gap: 2, justifyContent: "space-between", width: "100%" }}>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: 2,
+              justifyContent: "space-between",
+              width: "100%"
+            }}
+          >
             <div style={{ display: "flex", alignItems: "center", gap: 2 }}>
-            <PersonAddIcon sx={{ color: "primary.main" }} />
-            <Typography variant="h6">Enroll Students in {classDetail?.sectionCode}</Typography>
+              <PersonAddIcon sx={{ color: "primary.main" }} />
+              <Typography variant="h6">Enroll Students in {classDetail?.sectionCode}</Typography>
             </div>
             <Button
-          variant="contained"
-          onClick={handleOpenImportStudents}
-          startIcon={<PersonAddIcon />}
-          sx={{
-            borderRadius: "8px",
-            textTransform: "none",
-            px: 3,
-            py: 1
-          }}
-        >
-          Import Students
-        </Button>
+              variant="contained"
+              onClick={handleOpenImportStudents}
+              startIcon={<PersonAddIcon />}
+              sx={{
+                borderRadius: "8px",
+                textTransform: "none",
+                px: 3,
+                py: 1
+              }}
+            >
+              Import Students
+            </Button>
           </Box>
           <Button onClick={handleCloseEnrollModal} sx={{ minWidth: "auto", p: 1 }}>
             <CloseIcon />
@@ -1549,27 +1565,35 @@ const ClassDetailPage = () => {
             ) : (
               <AddIcon sx={{ color: "secondary.main" }} />
             )}
-            <Typography variant="h6">{editingScheduleId ? "Edit" : "Add"} Schedule for {classDetail?.sectionCode}</Typography>
+            <Typography variant="h6">
+              {editingScheduleId ? "Edit" : "Add"} Schedule for {classDetail?.sectionCode}
+            </Typography>
           </Box>
           <Button onClick={handleCloseAddScheduleModal} sx={{ minWidth: "auto", p: 1 }}>
             <CloseIcon />
           </Button>
         </DialogTitle>
 
-        <DialogContent sx={{ pt: 2 }}>
+        <DialogContent sx={{ pt: 2, mt: 5 }}>
           <Grid container spacing={3}>
             {/* Room Selection */}
-            <Grid item xs={12} md={6}>
+            <Grid item xs={12} md={6} style={{ pt: 10 }}>
               <FormControl fullWidth>
-                <InputLabel>Room</InputLabel>
+                <InputLabel id="room-select-label">Roomcc</InputLabel>
                 <Select
+                  labelId="room-select-label"
+                  id="room-select"
                   value={scheduleForm.roomId}
-                  label="Room"
                   onChange={(e) => handleScheduleFormChange("roomId", e.target.value)}
-                  startAdornment={
-                    <InputAdornment position="start">
-                      <RoomIcon />
-                    </InputAdornment>
+                  input={
+                    <OutlinedInput
+                      label="Room"
+                      startAdornment={
+                        <InputAdornment position="start">
+                          <RoomIcon />
+                        </InputAdornment>
+                      }
+                    />
                   }
                 >
                   {roomsLoading ? (
@@ -1610,15 +1634,21 @@ const ClassDetailPage = () => {
             {/* Week Day Selection */}
             <Grid item xs={12} md={6}>
               <FormControl fullWidth>
-                <InputLabel>Week Day</InputLabel>
+                <InputLabel id="weekday-select-label">Week Day</InputLabel>
                 <Select
+                  labelId="weekday-select-label"
+                  id="weekday-select"
                   value={scheduleForm.weekDay}
-                  label="Week Day"
                   onChange={(e) => handleScheduleFormChange("weekDay", e.target.value)}
-                  startAdornment={
-                    <InputAdornment position="start">
-                      <CalendarTodayIcon />
-                    </InputAdornment>
+                  input={
+                    <OutlinedInput
+                      label="Week Day"
+                      startAdornment={
+                        <InputAdornment position="start">
+                          <CalendarTodayIcon />
+                        </InputAdornment>
+                      }
+                    />
                   }
                 >
                   {weekDays.map((day) => (
@@ -1768,7 +1798,13 @@ const ClassDetailPage = () => {
               )
             }
           >
-            {addingSchedule ? (editingScheduleId ? "Saving..." : "Adding...") : editingScheduleId ? "Save Changes" : "Add Schedule"}
+            {addingSchedule
+              ? editingScheduleId
+                ? "Saving..."
+                : "Adding..."
+              : editingScheduleId
+              ? "Save Changes"
+              : "Add Schedule"}
           </Button>
         </DialogActions>
       </Dialog>
@@ -1786,13 +1822,28 @@ const ClassDetailPage = () => {
           <Typography>Are you sure you want to delete this schedule?</Typography>
         </DialogContent>
         <DialogActions sx={{ p: 2 }}>
-          <Button variant="outlined" onClick={() => setDeleteConfirmOpen(false)}>Cancel</Button>
-          <Button variant="contained" color="error" onClick={handleConfirmDeleteSchedule} startIcon={<DeleteIcon />}>Delete</Button>
+          <Button variant="outlined" onClick={() => setDeleteConfirmOpen(false)}>
+            Cancel
+          </Button>
+          <Button
+            variant="contained"
+            color="error"
+            onClick={handleConfirmDeleteSchedule}
+            startIcon={<DeleteIcon />}
+          >
+            Delete
+          </Button>
         </DialogActions>
       </Dialog>
 
       {/* Edit Session Modal */}
-      <Dialog open={editSessionOpen} onClose={() => setEditSessionOpen(false)} maxWidth="sm" fullWidth PaperProps={{ sx: { borderRadius: "12px" } }}>
+      <Dialog
+        open={editSessionOpen}
+        onClose={() => setEditSessionOpen(false)}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{ sx: { borderRadius: "12px" } }}
+      >
         <DialogTitle>Edit Session</DialogTitle>
         <DialogContent>
           <Grid container spacing={2} sx={{ mt: 1 }}>
@@ -1857,32 +1908,66 @@ const ClassDetailPage = () => {
           </Grid>
         </DialogContent>
         <DialogActions sx={{ p: 2 }}>
-          <Button variant="outlined" onClick={() => setEditSessionOpen(false)}>Cancel</Button>
-          <Button variant="contained" onClick={handleSaveSession} startIcon={<EditIcon />}>Save</Button>
+          <Button variant="outlined" onClick={() => setEditSessionOpen(false)}>
+            Cancel
+          </Button>
+          <Button variant="contained" onClick={handleSaveSession} startIcon={<EditIcon />}>
+            Save
+          </Button>
         </DialogActions>
       </Dialog>
 
       {/* Confirm Delete Session */}
-      <Dialog open={Boolean(deletingSession)} onClose={() => setDeletingSession(null)} maxWidth="xs" fullWidth PaperProps={{ sx: { borderRadius: "12px" } }}>
+      <Dialog
+        open={Boolean(deletingSession)}
+        onClose={() => setDeletingSession(null)}
+        maxWidth="xs"
+        fullWidth
+        PaperProps={{ sx: { borderRadius: "12px" } }}
+      >
         <DialogTitle>Confirm Delete</DialogTitle>
         <DialogContent>
           <Typography>Are you sure you want to delete this session?</Typography>
         </DialogContent>
         <DialogActions sx={{ p: 2 }}>
-          <Button variant="outlined" onClick={() => setDeletingSession(null)}>Cancel</Button>
-          <Button variant="contained" color="error" onClick={handleDeleteSession} startIcon={<DeleteIcon />}>Delete</Button>
+          <Button variant="outlined" onClick={() => setDeletingSession(null)}>
+            Cancel
+          </Button>
+          <Button
+            variant="contained"
+            color="error"
+            onClick={handleDeleteSession}
+            startIcon={<DeleteIcon />}
+          >
+            Delete
+          </Button>
         </DialogActions>
       </Dialog>
 
       {/* Confirm Delete Enrollment */}
-      <Dialog open={Boolean(deletingEnrollment)} onClose={() => setDeletingEnrollment(null)} maxWidth="xs" fullWidth PaperProps={{ sx: { borderRadius: "12px" } }}>
+      <Dialog
+        open={Boolean(deletingEnrollment)}
+        onClose={() => setDeletingEnrollment(null)}
+        maxWidth="xs"
+        fullWidth
+        PaperProps={{ sx: { borderRadius: "12px" } }}
+      >
         <DialogTitle>Confirm remove</DialogTitle>
         <DialogContent>
           <Typography>Are you sure you want to remove this student from the class?</Typography>
         </DialogContent>
         <DialogActions sx={{ p: 2 }}>
-          <Button variant="outlined" onClick={() => setDeletingEnrollment(null)}>Cancel</Button>
-          <Button variant="contained" color="error" onClick={handleDeleteEnrollment} startIcon={<DeleteIcon />}>Remove</Button>
+          <Button variant="outlined" onClick={() => setDeletingEnrollment(null)}>
+            Cancel
+          </Button>
+          <Button
+            variant="contained"
+            color="error"
+            onClick={handleDeleteEnrollment}
+            startIcon={<DeleteIcon />}
+          >
+            Remove
+          </Button>
         </DialogActions>
       </Dialog>
 

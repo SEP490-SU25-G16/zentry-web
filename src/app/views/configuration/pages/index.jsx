@@ -73,7 +73,7 @@ const ConfigurationPage = () => {
   const {
     // Configuration Data State
     loading: dataLoading,
-    
+
     settingsPagination,
     activeTab,
     page,

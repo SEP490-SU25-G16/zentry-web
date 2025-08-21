@@ -106,8 +106,8 @@ const SettingServices = {
           error.response?.data?.message ||
           "Failed to delete setting."
       };
-    }finally {
-      window.location.reload();
+    } finally {
+      // window.location.reload();
     }
   },
   getSettings: async () => {

@@ -225,15 +225,12 @@ export const useSetting = () => {
         value: formData.value.trim()
       };
 
-      console.log("Creating setting:", settingData);
-
       const result = editingId
         ? await SettingServices.updateSetting(editingId, settingData)
         : await SettingServices.createSetting(settingData);
 
       if (result.error) {
-        console.error("API Error:", result.error);
-        enqueueSnackbar(result.error, { variant: "error" });
+        enqueueSnackbar("Setting created successfully", { variant: "error" });
 
         // Set specific field errors based on the error message
         if (result.error.includes("ScopeId")) {
@@ -256,18 +253,20 @@ export const useSetting = () => {
         // TODO: Show error message in snackbar
         // showSnackbar(result.error, "error");
       } else {
-        console.log(editingId ? "Setting updated successfully:" : "Setting created successfully:", result.data);
+        enqueueSnackbar(
+          editingId ? "Setting updated successfully" : "Setting created successfully",
+          { variant: "success" }
+        );
         handleCloseModal();
         // TODO: Show success message and refresh data
         // showSnackbar("Setting created successfully!", "success");
         // refreshData();
       }
     } catch (error) {
-      console.error("Unexpected error submitting setting:", error);
-      // TODO: Show error message
-      // showSnackbar("An unexpected error occurred. Please try again.", "error");
+      enqueueSnackbar("An unexpected error occurred. Please try again.", { variant: "error" });
     } finally {
       setSubmitting(false);
+      window.location.reload();
     }
   };
 
