@@ -13,7 +13,7 @@ import useAuth from "app/hooks/useAuth";
 import useSettings from "app/hooks/useSettings";
 
 import { Home } from "@mui/icons-material";
-import { MatxMenu, MatxSearchBox } from "app/components";
+import { MatxMenu } from "app/components";
 import { Span } from "app/components/Typography";
 import { topBarHeight } from "app/utils/constant";
 import { Link } from "react-router-dom";
@@ -102,7 +102,7 @@ const Layout1Topbar = () => {
         </Box>
 
         <Box display="flex" alignItems="center">
-          <MatxSearchBox />
+          {/* <MatxSearchBox /> */}
 
           {/* <NotificationProvider>
             <NotificationBar />

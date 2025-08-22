@@ -1,9 +1,9 @@
+import Box from "@mui/material/Box";
+import ButtonBase from "@mui/material/ButtonBase";
+import Icon from "@mui/material/Icon";
+import styled from "@mui/material/styles/styled";
 import { Fragment } from "react";
 import { NavLink } from "react-router-dom";
-import Box from "@mui/material/Box";
-import Icon from "@mui/material/Icon";
-import ButtonBase from "@mui/material/ButtonBase";
-import styled from "@mui/material/styles/styled";
 
 import useSettings from "app/hooks/useSettings";
 import { Paragraph, Span } from "../Typography";
