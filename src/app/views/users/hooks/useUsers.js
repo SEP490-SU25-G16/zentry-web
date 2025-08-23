@@ -120,7 +120,8 @@ export const useUsers = () => {
         user.FullName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         user.Email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         user.Role?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.Status?.toLowerCase().includes(searchTerm.toLowerCase());
+        user.Status?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.UserId?.toLowerCase().includes(searchTerm.toLowerCase());
 
       const matchesStatus = !statusFilter || user.Status === statusFilter;
       const matchesRole = !roleFilter || user.Role === roleFilter;
@@ -219,7 +220,7 @@ export const useUsers = () => {
         enqueueSnackbar(result.error, { variant: "error" });
         return { success: false, error: result.error };
       } else {
-        enqueueSnackbar("Failed to update status", { variant: "error" });
+        enqueueSnackbar("Status updated successfully", { variant: "success" });
         await fetchUsers();
         return { success: true };
       }

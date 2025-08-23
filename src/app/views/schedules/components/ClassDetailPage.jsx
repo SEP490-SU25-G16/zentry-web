@@ -34,13 +34,13 @@ import {
   IconButton,
   InputAdornment,
   InputLabel,
-  OutlinedInput,
   List,
   ListItem,
   ListItemAvatar,
   ListItemButton,
   ListItemText,
   MenuItem,
+  OutlinedInput,
   Select,
   Table,
   TableBody,
@@ -1574,12 +1574,14 @@ const ClassDetailPage = () => {
           </Button>
         </DialogTitle>
 
-        <DialogContent sx={{ pt: 2, mt: 5 }}>
+        <DialogContent sx={{ pt: 0, mt: 0 }}>
           <Grid container spacing={3}>
+            <div style={{ display: "flex", width: '100%', height: '10px' }}>
+            </div>
             {/* Room Selection */}
             <Grid item xs={12} md={6} style={{ pt: 10 }}>
               <FormControl fullWidth>
-                <InputLabel id="room-select-label">Roomcc</InputLabel>
+                <InputLabel id="room-select-label">Room</InputLabel>
                 <Select
                   labelId="room-select-label"
                   id="room-select"

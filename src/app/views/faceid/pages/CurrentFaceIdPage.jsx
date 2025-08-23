@@ -35,10 +35,30 @@ const CurrentFaceIdPage = () => {
   const [orderBy, setOrderBy] = useState("userId");
   const [totalCount, setTotalCount] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
+  const [users, setUsers] = useState([]);
 
   useEffect(() => {
     fetchFaceIds();
+    fetchUsers();
   }, []);
+
+  const fetchUsers = async () => {
+    try {
+      const response = await instance.get("/user", {
+        params: {
+          PageSize: 2000
+        }
+      });
+      setUsers(response.data?.Data?.Users);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+    }
+  };
+
+  const getUserName = (userId) => {
+    const user = users.find((user) => user.UserId === userId);
+    return user?.FullName || userId;
+  };
 
   const fetchFaceIds = async () => {
     setLoading(true);
@@ -286,7 +306,7 @@ const CurrentFaceIdPage = () => {
                   >
                     <TableCell component="th" scope="row" sx={{ py: 2, px: 3 }}>
                       <Typography variant="subtitle1" fontWeight="medium">
-                        {faceId.UserId}
+                        {getUserName(faceId.UserId)}
                       </Typography>
                     </TableCell>
                     <TableCell sx={{ py: 2, px: 3 }}>
