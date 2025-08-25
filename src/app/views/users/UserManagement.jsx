@@ -77,8 +77,9 @@ const UserManagement = () => {
 
     // Computed values
     getPaginatedUsers,
-    getFilteredCount
-  , changeUserStatus } = useUsers();
+    getFilteredCount,
+    changeUserStatus
+  } = useUsers();
 
   // Modal states
   const [openModal, setOpenModal] = useState(false);
@@ -195,7 +196,9 @@ const UserManagement = () => {
     try {
       const res = await UserServices.importUsers(importFile);
       if (res.error) {
-        enqueueSnackbar(typeof res.error === "string" ? res.error : "Import failed", { variant: "error" });
+        enqueueSnackbar(typeof res.error === "string" ? res.error : "Import failed", {
+          variant: "error"
+        });
       } else {
         enqueueSnackbar(res.data?.Message || "Users imported successfully", { variant: "success" });
         handleCloseImportModal();
@@ -337,34 +340,34 @@ const UserManagement = () => {
           </Typography>
         </Box>
         <Box sx={{ display: "flex", gap: 2 }}>
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={handleOpenModal}
-          sx={{
-            borderRadius: "8px",
-            textTransform: "none",
-            px: 3,
-            py: 1,
-            mt: 1
-          }}
-        >
-          Add User
-        </Button>
-        <Button
-          variant="contained"
-          startIcon={<ImportExport />}
-          onClick={handleOpenImportModal}
-          sx={{
-            borderRadius: "8px",
-            textTransform: "none",
-            px: 3,
-            py: 1,
-            mt: 1
-          }}
-        >
-          Import User
-        </Button>
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={handleOpenModal}
+            sx={{
+              borderRadius: "8px",
+              textTransform: "none",
+              px: 3,
+              py: 1,
+              mt: 1
+            }}
+          >
+            Add User
+          </Button>
+          <Button
+            variant="contained"
+            startIcon={<ImportExport />}
+            onClick={handleOpenImportModal}
+            sx={{
+              borderRadius: "8px",
+              textTransform: "none",
+              px: 3,
+              py: 1,
+              mt: 1
+            }}
+          >
+            Import User
+          </Button>
         </Box>
       </Box>
 
@@ -647,17 +650,17 @@ const UserManagement = () => {
                         </IconButton>
                       </Tooltip> */}
                       <Tooltip title="Toggle status">
-                          <Switch
-                            size="small"
-                            checked={(user.Status || "").toLowerCase() === "active"}
-                            onChange={async (e) => {
-                              const next = e.target.checked ? "Active" : "Inactive";
-                              setUserToToggle(user);
-                              setNextStatus(next);
-                              setConfirmStatusOpen(true);
-                            }}
-                          />
-                        </Tooltip>
+                        <Switch
+                          size="small"
+                          checked={(user.Status || "").toLowerCase() === "active"}
+                          onChange={async (e) => {
+                            const next = e.target.checked ? "Active" : "Inactive";
+                            setUserToToggle(user);
+                            setNextStatus(next);
+                            setConfirmStatusOpen(true);
+                          }}
+                        />
+                      </Tooltip>
                     </TableCell>
                   </TableRow>
                 ))
@@ -748,7 +751,7 @@ const UserManagement = () => {
                 }}
               >
                 <MenuItem value="Admin">Admin</MenuItem>
-                <MenuItem value="Lecture">Lecture</MenuItem>
+                <MenuItem value="Lecturer">Lecturer</MenuItem>
                 <MenuItem value="Student">Student</MenuItem>
               </TextField>
               {formErrors.role && <FormHelperText>{formErrors.role}</FormHelperText>}
@@ -949,7 +952,11 @@ const UserManagement = () => {
           </Box>
         </DialogContent>
         <DialogActions sx={{ p: 3, pt: 1 }}>
-          <Button onClick={handleCloseImportModal} color="inherit" sx={{ borderRadius: "8px", textTransform: "none", px: 3 }}>
+          <Button
+            onClick={handleCloseImportModal}
+            color="inherit"
+            sx={{ borderRadius: "8px", textTransform: "none", px: 3 }}
+          >
             Cancel
           </Button>
           <Button

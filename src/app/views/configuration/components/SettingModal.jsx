@@ -322,7 +322,7 @@ const SettingModal = ({
                         {type}
                       </MenuItem>
                     ))}
-                  <MenuItem key="Global" value="Global">
+                  {/* <MenuItem key="Global" value="Global">
                     Global
                   </MenuItem>
                   <MenuItem key="Course" value="Course">
@@ -330,7 +330,7 @@ const SettingModal = ({
                   </MenuItem>
                   <MenuItem key="Session" value="Session">
                     Session
-                  </MenuItem>
+                  </MenuItem> */}
                 </Select>
                 {formErrors.scopeType && <FormHelperText>{formErrors.scopeType}</FormHelperText>}
               </FormControl>
