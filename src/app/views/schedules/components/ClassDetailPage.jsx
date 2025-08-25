@@ -108,6 +108,7 @@ const ClassDetailPage = () => {
   const [editingSessionId, setEditingSessionId] = useState(null);
   const [deletingSession, setDeletingSession] = useState(null);
   const [deletingEnrollment, setDeletingEnrollment] = useState(null);
+  const [removingEnrollment, setRemovingEnrollment] = useState(false);
 
   // Add Schedule Modal state
   const [addScheduleModalOpen, setAddScheduleModalOpen] = useState(false);
@@ -234,9 +235,29 @@ const ClassDetailPage = () => {
     setDeletingEnrollment(enrollment);
   };
 
-  const handleDeleteEnrollment = () => {
-    enqueueSnackbar("Student removed successfully", { variant: "success" });
-    setDeletingEnrollment(null);
+  const handleDeleteEnrollment = async () => {
+    if (!deletingEnrollment) return;
+    setRemovingEnrollment(true);
+    try {
+      const payload = {
+        classSectionId: id,
+        studentId: deletingEnrollment.StudentId || deletingEnrollment.studentId,
+        enrollmentId: deletingEnrollment.EnrollmentId || deletingEnrollment.enrollmentId
+      };
+      const res = await instance.post("/enrollments/remove-student", payload);
+      enqueueSnackbar(res.data?.Message || "Student removed successfully", { variant: "success" });
+      const classResult = await getClass(id);
+      if (classResult.success) {
+        setClassDetail(classResult.data);
+      }
+      setDeletingEnrollment(null);
+    } catch (error) {
+      enqueueSnackbar(error.response?.data?.Error?.Message || "Failed to remove student", {
+        variant: "error"
+      });
+    } finally {
+      setRemovingEnrollment(false);
+    }
   };
 
   const handleImportStudentsSubmit = async () => {
@@ -1966,7 +1987,8 @@ const ClassDetailPage = () => {
             variant="contained"
             color="error"
             onClick={handleDeleteEnrollment}
-            startIcon={<DeleteIcon />}
+            startIcon={removingEnrollment ? <CircularProgress size={16} /> : <DeleteIcon />}
+            disabled={removingEnrollment}
           >
             Remove
           </Button>
