@@ -952,6 +952,21 @@ const ClassDetailPage = () => {
                   Enrolled Students ({classDetail.original.Enrollments.length})
                 </Typography>
               </Box>
+              <div>
+              <Button
+                variant="outlined"
+                onClick={handleOpenImportStudents}
+                startIcon={<UploadFileIcon />}
+                sx={{
+                  borderRadius: "8px",
+                  textTransform: "none",
+                  px: 3,
+                  py: 1,
+                  mr: 1
+                }}
+              >
+                Import Students
+              </Button>
               <Button
                 variant="contained"
                 onClick={handleEnrollStudent}
@@ -965,19 +980,7 @@ const ClassDetailPage = () => {
               >
                 Enroll More Students
               </Button>
-              <Button
-                variant="outlined"
-                onClick={handleOpenImportStudents}
-                startIcon={<UploadFileIcon />}
-                sx={{
-                  borderRadius: "8px",
-                  textTransform: "none",
-                  px: 3,
-                  py: 1
-                }}
-              >
-                Import Students
-              </Button>
+              </div>
             </Box>
 
             <TableContainer>
