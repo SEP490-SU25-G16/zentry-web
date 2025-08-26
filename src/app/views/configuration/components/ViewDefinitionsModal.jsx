@@ -1,26 +1,25 @@
-import React from "react";
+import { Close as CloseIcon, Visibility as VisibilityIcon } from "@mui/icons-material";
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  Typography,
   Box,
-  Grid,
+  Button,
   Card,
   CardContent,
   Chip,
   CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Grid,
+  Paper,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
-  Paper
+  Typography
 } from "@mui/material";
-import { Visibility as VisibilityIcon, Close as CloseIcon } from "@mui/icons-material";
 
 const ViewDefinitionsModal = ({ open, onClose, loading, attributeDefinitions }) => {
   const getDataTypeColor = (dataType) => {

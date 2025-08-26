@@ -2,8 +2,6 @@ import { Delete as DeleteIcon, Edit as EditIcon } from "@mui/icons-material";
 import {
   Box,
   Button,
-  Card,
-  CardContent,
   Chip,
   CircularProgress,
   Dialog,
@@ -11,7 +9,6 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
-  Grid,
   IconButton,
   Paper,
   Table,
@@ -218,7 +215,7 @@ const DefinitionsTable = ({ definitions, loading, searchTerm, onEdit, onDelete }
       </TableContainer>
 
       {/* Show detailed cards for Selection type definitions */}
-      {mockDefinitions
+      {/* {mockDefinitions
         .filter((def) => def.dataType === "Selection" && def.options?.length > 0)
         .map((definition) => (
           <Card key={`selection-${definition.key}`} sx={{ mt: 3, border: "1px solid #e0e0e0" }}>
@@ -239,7 +236,7 @@ const DefinitionsTable = ({ definitions, loading, searchTerm, onEdit, onDelete }
               </Grid>
             </CardContent>
           </Card>
-        ))}
+        ))} */}
 
       <Dialog open={confirmOpen} onClose={closeConfirm}>
         <DialogTitle>Confirm Delete</DialogTitle>

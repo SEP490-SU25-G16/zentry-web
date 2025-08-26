@@ -137,6 +137,11 @@ const ClassDetailPage = () => {
   const [importStudentsFile, setImportStudentsFile] = useState(null);
   const [importingStudents, setImportingStudents] = useState(false);
 
+  // Import schedules state
+  const [importSchedulesOpen, setImportSchedulesOpen] = useState(false);
+  const [importSchedulesFile, setImportSchedulesFile] = useState(null);
+  const [importingSchedules, setImportingSchedules] = useState(false);
+
   const lecturers = users.filter((user) => user.Role === "Lecturer");
 
   const fetchSessions = useCallback(async () => {
@@ -327,6 +332,46 @@ const ClassDetailPage = () => {
       weekDay: schedule.WeekDay || schedule.weekDay || ""
     });
     fetchRooms();
+  };
+
+  const handleOpenImportSchedules = () => {
+    setImportSchedulesOpen(true);
+    setImportSchedulesFile(null);
+  };
+
+  const handleCloseImportSchedules = () => {
+    setImportSchedulesOpen(false);
+    setImportSchedulesFile(null);
+  };
+
+  const handleImportSchedulesSubmit = async () => {
+    if (!importSchedulesFile) return;
+    const isCsv =
+      importSchedulesFile.type === "text/csv" ||
+      importSchedulesFile.name.toLowerCase().endsWith(".csv");
+    if (!isCsv) return;
+    setImportingSchedules(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", importSchedulesFile);
+      formData.append("classSectionId", id);
+      const res = await instance.post("/schedules/import", formData, {
+        headers: { "Content-Type": "multipart/form-data" }
+      });
+      enqueueSnackbar(res.data?.Message || "Imported schedules successfully", { variant: "success" });
+      handleCloseImportSchedules();
+      const classResult = await getClass(id);
+      if (classResult.success) {
+        setClassDetail(classResult.data);
+      }
+      await fetchSessions();
+    } catch (error) {
+      enqueueSnackbar(error.response?.data?.Error?.Message || "Failed to import schedules", {
+        variant: "error"
+      });
+    } finally {
+      setImportingSchedules(false);
+    }
   };
 
   const handleDeleteScheduleClick = (schedule) => {
@@ -1014,19 +1059,35 @@ const ClassDetailPage = () => {
                   Class Schedules ({classDetail.original.Schedules.length})
                 </Typography>
               </Box>
-              <Button
-                variant="contained"
-                onClick={handleAddSchedule}
-                startIcon={<AddIcon />}
-                sx={{
-                  borderRadius: "8px",
-                  textTransform: "none",
-                  px: 3,
-                  py: 1
-                }}
-              >
-                Add Schedule
-              </Button>
+              <Box>
+                <Button
+                  variant="outlined"
+                  onClick={handleOpenImportSchedules}
+                  startIcon={<UploadFileIcon />}
+                  sx={{
+                    borderRadius: "8px",
+                    textTransform: "none",
+                    px: 3,
+                    py: 1,
+                    mr: 1
+                  }}
+                >
+                  Import Schedules
+                </Button>
+                <Button
+                  variant="contained"
+                  onClick={handleAddSchedule}
+                  startIcon={<AddIcon />}
+                  sx={{
+                    borderRadius: "8px",
+                    textTransform: "none",
+                    px: 3,
+                    py: 1
+                  }}
+                >
+                  Add Schedule
+                </Button>
+              </Box>
             </Box>
 
             <TableContainer>
@@ -2044,6 +2105,59 @@ const ClassDetailPage = () => {
             sx={{ borderRadius: "8px", textTransform: "none", px: 3 }}
           >
             {importingStudents ? <CircularProgress size={20} color="inherit" /> : "Import"}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Import Schedules Modal */}
+      <Dialog
+        open={importSchedulesOpen}
+        onClose={handleCloseImportSchedules}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{ sx: { borderRadius: "12px", p: 1 } }}
+      >
+        <DialogTitle sx={{ pb: 2 }}>
+          <Typography variant="h6" component="div">
+            Import Schedules
+          </Typography>
+        </DialogTitle>
+        <DialogContent sx={{ pb: 2 }}>
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+            <Button
+              variant="outlined"
+              component="label"
+              sx={{ alignSelf: "flex-start" }}
+              startIcon={<UploadFileIcon />}
+            >
+              Choose CSV File
+              <input
+                hidden
+                type="file"
+                accept=".csv"
+                onChange={(e) => setImportSchedulesFile(e.target.files?.[0] || null)}
+              />
+            </Button>
+            <Typography variant="body2" color="text.secondary">
+              {importSchedulesFile ? `Selected: ${importSchedulesFile.name}` : "No file selected"}
+            </Typography>
+          </Box>
+        </DialogContent>
+        <DialogActions sx={{ p: 3, pt: 1 }}>
+          <Button
+            onClick={handleCloseImportSchedules}
+            color="inherit"
+            sx={{ borderRadius: "8px", textTransform: "none", px: 3 }}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleImportSchedulesSubmit}
+            variant="contained"
+            disabled={!importSchedulesFile || importingSchedules}
+            sx={{ borderRadius: "8px", textTransform: "none", px: 3 }}
+          >
+            {importingSchedules ? <CircularProgress size={20} color="inherit" /> : "Import"}
           </Button>
         </DialogActions>
       </Dialog>
