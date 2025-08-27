@@ -358,7 +358,9 @@ const ClassDetailPage = () => {
       const res = await instance.post("/schedules/import", formData, {
         headers: { "Content-Type": "multipart/form-data" }
       });
-      enqueueSnackbar(res.data?.Message || "Imported schedules successfully", { variant: "success" });
+      enqueueSnackbar(res.data?.Message || "Imported schedules successfully", {
+        variant: "success"
+      });
       handleCloseImportSchedules();
       const classResult = await getClass(id);
       if (classResult.success) {
@@ -953,33 +955,33 @@ const ClassDetailPage = () => {
                 </Typography>
               </Box>
               <div>
-              <Button
-                variant="outlined"
-                onClick={handleOpenImportStudents}
-                startIcon={<UploadFileIcon />}
-                sx={{
-                  borderRadius: "8px",
-                  textTransform: "none",
-                  px: 3,
-                  py: 1,
-                  mr: 1
-                }}
-              >
-                Import Students
-              </Button>
-              <Button
-                variant="contained"
-                onClick={handleEnrollStudent}
-                startIcon={<PersonAddIcon />}
-                sx={{
-                  borderRadius: "8px",
-                  textTransform: "none",
-                  px: 3,
-                  py: 1
-                }}
-              >
-                Enroll More Students
-              </Button>
+                <Button
+                  variant="outlined"
+                  onClick={handleOpenImportStudents}
+                  startIcon={<UploadFileIcon />}
+                  sx={{
+                    borderRadius: "8px",
+                    textTransform: "none",
+                    px: 3,
+                    py: 1,
+                    mr: 1
+                  }}
+                >
+                  Import Students
+                </Button>
+                <Button
+                  variant="contained"
+                  onClick={handleEnrollStudent}
+                  startIcon={<PersonAddIcon />}
+                  sx={{
+                    borderRadius: "8px",
+                    textTransform: "none",
+                    px: 3,
+                    py: 1
+                  }}
+                >
+                  Enroll More Students
+                </Button>
               </div>
             </Box>
 
@@ -1050,49 +1052,49 @@ const ClassDetailPage = () => {
       )}
 
       {/* Schedules Table */}
-      {classDetail.original?.Schedules && classDetail.original.Schedules.length > 0 && (
-        <Card sx={{ mt: 4, boxShadow: 3 }}>
-          <CardContent sx={{ p: 4 }}>
-            <Box
-              sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 3 }}
-            >
-              <Box sx={{ display: "flex", alignItems: "center" }}>
-                <CalendarTodayIcon sx={{ fontSize: 32, color: "secondary.main", mr: 2 }} />
-                <Typography variant="h5" component="h2" fontWeight={600}>
-                  Class Schedules ({classDetail.original.Schedules.length})
-                </Typography>
-              </Box>
-              <Box>
-                <Button
-                  variant="outlined"
-                  onClick={handleOpenImportSchedules}
-                  startIcon={<UploadFileIcon />}
-                  sx={{
-                    borderRadius: "8px",
-                    textTransform: "none",
-                    px: 3,
-                    py: 1,
-                    mr: 1
-                  }}
-                >
-                  Import Schedules
-                </Button>
-                <Button
-                  variant="contained"
-                  onClick={handleAddSchedule}
-                  startIcon={<AddIcon />}
-                  sx={{
-                    borderRadius: "8px",
-                    textTransform: "none",
-                    px: 3,
-                    py: 1
-                  }}
-                >
-                  Add Schedule
-                </Button>
-              </Box>
+      <Card sx={{ mt: 4, boxShadow: 3 }}>
+        <CardContent sx={{ p: 4 }}>
+          <Box
+            sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 3 }}
+          >
+            <Box sx={{ display: "flex", alignItems: "center" }}>
+              <CalendarTodayIcon sx={{ fontSize: 32, color: "secondary.main", mr: 2 }} />
+              <Typography variant="h5" component="h2" fontWeight={600}>
+                Class Schedules ({classDetail.original?.Schedules?.length || 0})
+              </Typography>
             </Box>
+            <Box>
+              <Button
+                variant="outlined"
+                onClick={handleOpenImportSchedules}
+                startIcon={<UploadFileIcon />}
+                sx={{
+                  borderRadius: "8px",
+                  textTransform: "none",
+                  px: 3,
+                  py: 1,
+                  mr: 1
+                }}
+              >
+                Import Schedules
+              </Button>
+              <Button
+                variant="contained"
+                onClick={handleAddSchedule}
+                startIcon={<AddIcon />}
+                sx={{
+                  borderRadius: "8px",
+                  textTransform: "none",
+                  px: 3,
+                  py: 1
+                }}
+              >
+                Add Schedule
+              </Button>
+            </Box>
+          </Box>
 
+          {classDetail.original?.Schedules && classDetail.original.Schedules.length > 0 && (
             <TableContainer>
               <Table>
                 <TableHead>
@@ -1173,22 +1175,22 @@ const ClassDetailPage = () => {
                 </TableBody>
               </Table>
             </TableContainer>
+          )}
 
-            <TablePagination
-              component="div"
-              count={classDetail.original.Schedules.length}
-              page={schedulePage}
-              onPageChange={(event, newPage) => setSchedulePage(newPage)}
-              rowsPerPage={scheduleRowsPerPage}
-              onRowsPerPageChange={(event) => {
-                setScheduleRowsPerPage(parseInt(event.target.value, 10));
-                setSchedulePage(0);
-              }}
-              rowsPerPageOptions={[5, 10, 25]}
-            />
-          </CardContent>
-        </Card>
-      )}
+          <TablePagination
+            component="div"
+            count={classDetail.original.Schedules.length}
+            page={schedulePage}
+            onPageChange={(event, newPage) => setSchedulePage(newPage)}
+            rowsPerPage={scheduleRowsPerPage}
+            onRowsPerPageChange={(event) => {
+              setScheduleRowsPerPage(parseInt(event.target.value, 10));
+              setSchedulePage(0);
+            }}
+            rowsPerPageOptions={[5, 10, 25]}
+          />
+        </CardContent>
+      </Card>
 
       {/* Sessions Table - right below Class Schedules */}
       <Card sx={{ mt: 4, boxShadow: 3 }}>
@@ -1661,8 +1663,7 @@ const ClassDetailPage = () => {
 
         <DialogContent sx={{ pt: 0, mt: 0 }}>
           <Grid container spacing={3}>
-            <div style={{ display: "flex", width: '100%', height: '10px' }}>
-            </div>
+            <div style={{ display: "flex", width: "100%", height: "10px" }}></div>
             {/* Room Selection */}
             <Grid item xs={12} md={6} style={{ pt: 10 }}>
               <FormControl fullWidth>
