@@ -1179,7 +1179,7 @@ const ClassDetailPage = () => {
 
           <TablePagination
             component="div"
-            count={classDetail.original.Schedules.length}
+            count={classDetail.original?.Schedules?.length || 0}
             page={schedulePage}
             onPageChange={(event, newPage) => setSchedulePage(newPage)}
             rowsPerPage={scheduleRowsPerPage}
